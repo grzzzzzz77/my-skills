@@ -1,0 +1,273 @@
+{
+  "metadata": {
+    "description": "Skills backup synced by Skills Manager",
+    "version": "2026.05.09"
+  },
+  "name": "my-skills",
+  "owner": {
+    "name": "grzzzzzz77"
+  },
+  "plugins": [
+    {
+      "description": "Anthony Fu's {Opinionated} preferences and best practices for web development",
+      "name": "antfu",
+      "skills": [
+        "./"
+      ],
+      "source": "./antfu",
+      "strict": false
+    },
+    {
+      "description": "Create Cursor rules for persistent AI guidance. Use when you want to create a rule, add coding standards, set up project conventions, configure file-specific patterns, create RULE.md files, or asks about .cursor/rules/ or AGENTS.md.",
+      "name": "create-rule",
+      "skills": [
+        "./"
+      ],
+      "source": "./create-rule",
+      "strict": false
+    },
+    {
+      "description": "Guides users through creating effective Agent Skills for Cursor. Use when you want to create, write, or author a new skill, or asks about skill structure, best practices, or SKILL.md format.",
+      "name": "create-skill",
+      "skills": [
+        "./"
+      ],
+      "source": "./create-skill",
+      "strict": false
+    },
+    {
+      "description": "Create custom subagents for specialized AI tasks. Use when you want to create a new type of subagent, set up task-specific agents, configure code reviewers, debuggers, or domain-specific assistants with custom prompts.",
+      "name": "create-subagent",
+      "skills": [
+        "./"
+      ],
+      "source": "./create-subagent",
+      "strict": false
+    },
+    {
+      "description": "Expert in Java development with Spring Boot and enterprise patterns",
+      "name": "java",
+      "skills": [
+        "./"
+      ],
+      "source": "./java",
+      "strict": false
+    },
+    {
+      "description": "Get best practices for JUnit 5 unit testing, including data-driven tests",
+      "name": "java-junit",
+      "skills": [
+        "./"
+      ],
+      "source": "./java-junit",
+      "strict": false
+    },
+    {
+      "description": "Get best practices for developing applications with Spring Boot.",
+      "name": "java-springboot",
+      "skills": [
+        "./"
+      ],
+      "source": "./java-springboot",
+      "strict": false
+    },
+    {
+      "description": "Convert 'Applied intelligently' Cursor rules (.cursor/rules/*.mdc) and slash commands (.cursor/commands/*.md) to Agent Skills format (.cursor/skills/). Use when you want to migrate rules or commands to skills, convert .mdc rules to SKILL.md format, or consolidate commands into the skills directory.",
+      "name": "migrate-to-skills",
+      "skills": [
+        "./"
+      ],
+      "source": "./migrate-to-skills",
+      "strict": false
+    },
+    {
+      "description": "MySQL development best practices for schema design, query optimization, and database administration",
+      "name": "mysql-best-practices",
+      "skills": [
+        "./"
+      ],
+      "source": "./mysql-best-practices",
+      "strict": false
+    },
+    {
+      "description": "Nuxt full-stack Vue framework with SSR, auto-imports, and file-based routing. Use when working with Nuxt apps, server routes, useFetch, middleware, or hybrid rendering.",
+      "name": "nuxt",
+      "skills": [
+        "./"
+      ],
+      "source": "./nuxt",
+      "strict": false
+    },
+    {
+      "description": "Pinia official Vue state management library, type-safe and extensible. Use when defining stores, working with state/getters/actions, or implementing store patterns in Vue apps.",
+      "name": "pinia",
+      "skills": [
+        "./"
+      ],
+      "source": "./pinia",
+      "strict": false
+    },
+    {
+      "description": "Node.js package manager with strict dependency resolution. Use when running pnpm specific commands, configuring workspaces, or managing dependencies with catalogs, patches, or overrides.",
+      "name": "pnpm",
+      "skills": [
+        "./"
+      ],
+      "source": "./pnpm",
+      "strict": false
+    },
+    {
+      "description": "PostgreSQL development best practices for schema design, query optimization, and database administration",
+      "name": "postgresql-best-practices",
+      "skills": [
+        "./"
+      ],
+      "source": "./postgresql-best-practices",
+      "strict": false
+    },
+    {
+      "description": "Redis performance optimization and best practices. Use this skill when working with Redis data structures, Redis Query Engine (RQE), vector search with RedisVL, semantic caching with LangCache, or optimizing Redis performance.",
+      "name": "redis-development",
+      "skills": [
+        "./"
+      ],
+      "source": "./redis-development",
+      "strict": false
+    },
+    {
+      "description": "Runs the rest of a /shell request as a literal shell command. Use only when the user explicitly invokes /shell and wants the following text executed directly in the terminal.",
+      "name": "shell",
+      "skills": [
+        "./"
+      ],
+      "source": "./shell",
+      "strict": false
+    },
+    {
+      "description": "Create and present web-based slides for developers using Markdown, Vue components, code highlighting, animations, and interactive features. Use when building technical presentations, conference talks, or teaching materials.",
+      "name": "slidev",
+      "skills": [
+        "./"
+      ],
+      "source": "./slidev",
+      "strict": false
+    },
+    {
+      "description": "Expert Spring Boot 4 testing specialist that selects the best Spring Boot testing techniques for your situation with Junit 6 and AssertJ.",
+      "name": "spring-boot-testing",
+      "skills": [
+        "./"
+      ],
+      "source": "./spring-boot-testing",
+      "strict": false
+    },
+    {
+      "description": "SQL development best practices for writing efficient, secure, and maintainable database queries",
+      "name": "sql-best-practices",
+      "skills": [
+        "./"
+      ],
+      "source": "./sql-best-practices",
+      "strict": false
+    },
+    {
+      "description": "tsdown fast TypeScript library bundler powered by Rolldown and Oxc. Use when bundling TypeScript libraries, configuring entry points, or generating .d.ts declaration files.",
+      "name": "tsdown",
+      "skills": [
+        "./"
+      ],
+      "source": "./tsdown",
+      "strict": false
+    },
+    {
+      "description": "Turborepo monorepo build system guidance. Triggers on: turbo.json, task pipelines,\ndependsOn, caching, remote cache, the \"turbo\" CLI, --filter, --affected, CI optimization, environment\nvariables, internal packages, monorepo structure/best practices, and boundaries.\n\nUse when user: configures tasks/workflows/pipelines, creates packages, sets up\nmonorepo, shares code between apps, runs changed/affected packages, debugs cache,\nor has apps/packages directories.\n",
+      "name": "turborepo",
+      "skills": [
+        "./"
+      ],
+      "source": "./turborepo",
+      "strict": false
+    },
+    {
+      "description": "UnoCSS instant atomic CSS engine, superset of Tailwind CSS. Use when configuring UnoCSS, writing utility rules, shortcuts, or working with presets like Wind, Icons, Attributify.",
+      "name": "unocss",
+      "skills": [
+        "./"
+      ],
+      "source": "./unocss",
+      "strict": false
+    },
+    {
+      "description": "Modify Cursor/VSCode user settings in settings.json. Use when you want to change editor settings, preferences, configuration, themes, font size, tab size, format on save, auto save, keybindings, or any settings.json values.",
+      "name": "update-cursor-settings",
+      "skills": [
+        "./"
+      ],
+      "source": "./update-cursor-settings",
+      "strict": false
+    },
+    {
+      "description": "Vite next-generation frontend build tool with fast HMR and optimized builds. Use when configuring Vite, adding plugins, working with dev server, or building for production.",
+      "name": "vite",
+      "skills": [
+        "./"
+      ],
+      "source": "./vite",
+      "strict": false
+    },
+    {
+      "description": "VitePress static site generator powered by Vite and Vue. Use when building documentation sites, configuring themes, or writing Markdown with Vue components.",
+      "name": "vitepress",
+      "skills": [
+        "./"
+      ],
+      "source": "./vitepress",
+      "strict": false
+    },
+    {
+      "description": "Vitest fast unit testing framework powered by Vite with Jest-compatible API. Use when writing tests, mocking, configuring coverage, or working with test filtering and fixtures.",
+      "name": "vitest",
+      "skills": [
+        "./"
+      ],
+      "source": "./vitest",
+      "strict": false
+    },
+    {
+      "description": "Vue.js progressive JavaScript framework. Use when building Vue components, working with reactivity (ref, reactive, computed, watch), or implementing Vue Composition API patterns.",
+      "name": "vue",
+      "skills": [
+        "./"
+      ],
+      "source": "./vue",
+      "strict": false
+    },
+    {
+      "description": "Vue 3 and Vue.js best practices for TypeScript, vue-tsc, and Volar. This skill should be used when writing, reviewing, or refactoring Vue components to ensure correct typing patterns. Triggers on tasks involving Vue components, props extraction, wrapper components, template type checking, or Volar configuration.",
+      "name": "vue-best-practices",
+      "skills": [
+        "./"
+      ],
+      "source": "./vue-best-practices",
+      "strict": false
+    },
+    {
+      "description": "Apply VueUse composables where appropriate to build concise, maintainable Vue.js / Nuxt features.",
+      "name": "vueuse-functions",
+      "skills": [
+        "./"
+      ],
+      "source": "./vueuse-functions",
+      "strict": false
+    },
+    {
+      "description": "Review UI code for Web Interface Guidelines compliance. Use when asked to \"review my UI\", \"check accessibility\", \"audit design\", \"review UX\", or \"check my site against best practices\".",
+      "name": "web-design-guidelines",
+      "skills": [
+        "./"
+      ],
+      "source": "./web-design-guidelines",
+      "strict": false
+    }
+  ]
+}
