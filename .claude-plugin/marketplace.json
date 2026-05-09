@@ -45,33 +45,6 @@
       "strict": false
     },
     {
-      "description": "Expert in Java development with Spring Boot and enterprise patterns",
-      "name": "java",
-      "skills": [
-        "./"
-      ],
-      "source": "./java",
-      "strict": false
-    },
-    {
-      "description": "Get best practices for JUnit 5 unit testing, including data-driven tests",
-      "name": "java-junit",
-      "skills": [
-        "./"
-      ],
-      "source": "./java-junit",
-      "strict": false
-    },
-    {
-      "description": "Get best practices for developing applications with Spring Boot.",
-      "name": "java-springboot",
-      "skills": [
-        "./"
-      ],
-      "source": "./java-springboot",
-      "strict": false
-    },
-    {
       "description": "Convert 'Applied intelligently' Cursor rules (.cursor/rules/*.mdc) and slash commands (.cursor/commands/*.md) to Agent Skills format (.cursor/skills/). Use when you want to migrate rules or commands to skills, convert .mdc rules to SKILL.md format, or consolidate commands into the skills directory.",
       "name": "migrate-to-skills",
       "skills": [
