@@ -171,6 +171,15 @@
       "strict": false
     },
     {
+      "description": "UI/UX design intelligence for web and mobile. Includes styles, color palettes, font pairings, UX guidelines, chart types, and stack-specific design guidance.",
+      "name": "ui-ux-pro-max",
+      "skills": [
+        "./"
+      ],
+      "source": "./ui-ux-pro-max",
+      "strict": false
+    },
+    {
       "description": "UnoCSS instant atomic CSS engine, superset of Tailwind CSS. Use when configuring UnoCSS, writing utility rules, shortcuts, or working with presets like Wind, Icons, Attributify.",
       "name": "unocss",
       "skills": [
