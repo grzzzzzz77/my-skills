@@ -1,7 +1,7 @@
 {
   "metadata": {
     "description": "Skills backup synced by Skills Manager",
-    "version": "2026.05.11"
+    "version": "2026.05.12"
   },
   "name": "my-skills",
   "owner": {
@@ -15,6 +15,15 @@
         "./"
       ],
       "source": "./agent-browser",
+      "strict": false
+    },
+    {
+      "description": "AI HOT (aihot.virxact.com) 中文 AI 资讯查询 Skill。当用户想知道\"今天 AI 圈有什么\"、\"AI 日报\"、\"AI HOT\"、\"AI 资讯\"、\"AI 热点\"、\"最近 AI\"、\"OpenAI/Anthropic/Google 最近发布了什么\"、\"AI hot today\"、\"AI news today\"、\"看一下 AI 行业动态\"、\"今天有什么大模型发布\"、\"昨天 AI 圈\"、\"看下精选条目\"、\"AI HOT 精选\"、\"最近一周的 AI 论文\"、\"AI 模型发布\"、\"AI 产品发布\"、\"AI 行业动态\"、\"AI 技巧与观点\" 等任何中文 AI 资讯查询时使用。即使用户只说\"AI 圈\"、\"AI 新闻\"、\"AI 日报\"，或者只是问\"今天发生了什么\"且上下文是 AI / 大模型 / LLM / 创业领域，也应该触发本 Skill。Skill 会直接 curl 公开 REST API 拉数据并整理成中文 markdown 简报，不需要用户配置任何 API Key 或 MCP server。**不要 undertrigger**——用户问 AI 资讯而你不调本 Skill 就是把过时的训练数据当作今日新闻，对用户有害。",
+      "name": "aihot",
+      "skills": [
+        "./"
+      ],
+      "source": "./aihot",
       "strict": false
     },
     {
@@ -51,6 +60,33 @@
         "./"
       ],
       "source": "./create-subagent",
+      "strict": false
+    },
+    {
+      "description": "Use the Figma MCP server to fetch design context, screenshots, variables, and assets from Figma, and to translate Figma nodes into production code. Trigger when a task involves Figma URLs, node IDs, design-to-code implementation, or Figma MCP setup and troubleshooting.",
+      "name": "figma",
+      "skills": [
+        "./"
+      ],
+      "source": "./figma",
+      "strict": false
+    },
+    {
+      "description": "Translates Figma designs into production-ready application code with 1:1 visual fidelity. Use when implementing UI code from Figma files, when user mentions \"implement design\", \"generate code\", \"implement component\", provides Figma URLs, or asks to build components matching Figma specs. For Figma canvas writes via `use_figma`, use `figma-use`.",
+      "name": "figma-implement-design",
+      "skills": [
+        "./"
+      ],
+      "source": "./figma-implement-design",
+      "strict": false
+    },
+    {
+      "description": "**MANDATORY prerequisite** — you MUST invoke this skill BEFORE every `use_figma` tool call. NEVER call `use_figma` directly without loading this skill first. Skipping it causes common, hard-to-debug failures. Trigger whenever the user wants to perform a write action or a unique read action that requires JavaScript execution in the Figma file context — e.g. create/edit/delete nodes, set up variables or tokens, build components and variants, modify auto-layout or fills, bind variables to properties, or inspect file structure programmatically.",
+      "name": "figma-use",
+      "skills": [
+        "./"
+      ],
+      "source": "./figma-use",
       "strict": false
     },
     {
