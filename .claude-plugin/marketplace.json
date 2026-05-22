@@ -126,6 +126,15 @@
       "strict": false
     },
     {
+      "description": "Analyze frontend pages and backend API docs to produce page-to-interface mapping documents, structured JSON, visualSpec, and deliverable annotated page visuals. Use when asked to map UI modules to API fields, explain page data sources, or generate interface annotation diagrams from Vue/uni-app/WXML/React pages and API documentation.",
+      "name": "page-interface-skill",
+      "skills": [
+        "./"
+      ],
+      "source": "./page-interface-skill",
+      "strict": false
+    },
+    {
       "description": "Pinia official Vue state management library, type-safe and extensible. Use when defining stores, working with state/getters/actions, or implementing store patterns in Vue apps.",
       "name": "pinia",
       "skills": [
