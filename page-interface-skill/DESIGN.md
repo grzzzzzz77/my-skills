@@ -1,25 +1,26 @@
-# page-interface-skill v2 设计文档
+# page-interface-skill v3 设计文档
 
 ## 目标
 
-把 `page-interface-skill` 从“接口字段映射文档生成器”升级为“页面原型 + 接口标注交付器”。
+把 `page-interface-skill` 从“接口字段映射文档生成器”升级为“功能流程可交互溯源交付器”。
 
 升级后的效果应该是：
 
 1. 读取 Vue / uni-app / WXML / React 页面源码。
 2. 读取 service 请求代码和后端接口文档。
-3. 分析页面模块、展示字段、接口字段、前端计算逻辑。
-4. 在没有真实截图时，根据页面代码生成接近真实页面的静态 HTML 原型。
-5. 把原型渲染成图片或 SVG。
-6. 在页面区域上画红框、箭头和接口字段说明卡片。
-7. 输出可交付 Markdown，里面嵌入标注图、字段表、JSON 和待确认点。
+3. 读取或推导业务流程：入口、申请、工作台、分享、归因、成交、提现、明细。
+4. 分析页面模块、展示字段、接口字段、前端计算逻辑。
+5. 在没有真实截图时，根据页面代码生成接近真实页面的静态 HTML 原型。
+6. 生成可交互 HTML：左侧流程、中央页面原型和链路、右侧数据来源面板。
+7. 输出 flowSpec、Markdown、静态原型和标注图。
 
 ## 为什么要升级
 
-原来的 skill 可以说明“字段来自哪里”，但可视化只停留在 `visualSpec` 或结构图。
+原来的 skill 可以说明“字段来自哪里”，v2 可以生成页面标注图，但联调仍然需要在“业务流程”层面理解每一步为什么会调用接口，以及页面数据如何跨页面流动。
 
 真正用于联调时，研发、产品、QA 更需要看到：
 
+- 这个功能从入口到提交、审核、分享、提现的完整流程；
 - 页面上这块区域是什么；
 - 它展示了哪些字段；
 - 字段来自哪个接口；
@@ -27,7 +28,7 @@
 - 哪些展示受状态控制；
 - 哪些字段后端文档缺失或口径不一致。
 
-因此 v2 的核心价值是：**把页面视觉和接口字段绑定在同一个可交付图里。**
+因此 v3 的核心价值是：**把业务流程、页面视觉和接口字段绑定在同一个可点击 HTML 里。**
 
 ## 新的交付物
 
@@ -35,21 +36,22 @@
 
 ```txt
 docs/page-interface-mapping/
-  page-name.mapping.md
-  page-name.visualSpec.json
-  page-name.prototype.html
-  page-name.annotated.svg
-  page-name.annotated.png
+  feature-name.flow.html
+  feature-name.flowSpec.json
+  feature-name.mapping.md
+  feature-name.prototype.html
+  feature-name.annotated.svg
 ```
 
 其中：
 
+- `flow.html`：主交付物，可直接浏览器打开；包含流程节点、页面原型、字段溯源面板。
+- `flowSpec.json`：结构化流程/页面/热点/字段/证据，可复用生成 HTML。
 - `mapping.md`：主交付文档。
-- `visualSpec.json`：结构化标注数据，可复用生成图片。
 - `prototype.html`：根据页面源码还原的静态原型。
-- `annotated.svg/png`：带接口字段标注的页面图。
+- `annotated.svg/png`：带接口字段标注的页面图，可嵌入 Markdown。
 
-如果用户只要一个 Markdown 文件，也应该把标注图嵌入 Markdown。
+如果用户只要一个 Markdown 文件，也应该把 `flow.html` 和标注图链接写进去。
 
 ## 处理流程
 
@@ -97,6 +99,32 @@ docs/page-interface-mapping/
 - `computed`：前端计算字段
 - `local`：本地状态
 - `static`：静态文案或本地资源
+
+### 2.5 业务流程建模
+
+为每个流程节点建立结构化信息：
+
+```json
+{
+  "id": "workspace",
+  "title": "进入分销中心工作台",
+  "trigger": "onShow",
+  "screen": "distribution-index-partner",
+  "apis": ["/api/campus-distribution/workspace"],
+  "hotspot": "workspace.card",
+  "next": ["share", "income", "register"],
+  "risks": []
+}
+```
+
+流程节点要能覆盖页面间跳转和关键分支，例如：
+
+- 普通用户 -> 申请页
+- 大使 -> 工作台
+- 大使 -> 合伙人申请 -> 审核中
+- 工作台 -> 分享海报 -> 新用户归因
+- 工作台 -> 收益中心 -> 提现
+- 工作台 -> 注册明细 -> 个人/团队列表
 
 ### 3. 静态原型生成
 
@@ -180,6 +208,44 @@ mock 数据要覆盖关键状态：
 - 置信度
 - 证据来源
 
+### 5.5 交互 HTML 生成
+
+`flow.html` 是 v3 的核心交付，应为纯静态文件，不依赖项目运行或外部 CDN。
+
+推荐三栏布局：
+
+```txt
+┌──────────────┬─────────────────────────────┬────────────────────┐
+│ 左：业务流程  │ 中：手机页面原型 + 链路卡片   │ 右：数据来源面板     │
+└──────────────┴─────────────────────────────┴────────────────────┘
+```
+
+要求：
+
+- 左侧流程节点可点击。
+- 中间页面原型包含可点击热点，热点选中后高亮。
+- 右侧展示接口、字段、计算逻辑、证据行号、待确认点。
+- 支持角色切换和页面状态切换。
+- 中间区域设置 `overflow: auto` 和合理 `min-width`，避免信息被裁掉。
+- 生成后抽取内嵌 `<script>` 用 `node --check` 校验。
+
+示例交互数据结构：
+
+```js
+const detailMap = {
+  'workspace.card': {
+    title: '分销中心：身份收益卡',
+    api: 'POST /api/campus-distribution/workspace',
+    sourceType: 'response + computed',
+    fields: [
+      ['distributionData.balance', 'incomeSummary.totalIncomeAmount -> formatDistributionAmount']
+    ],
+    evidence: ['src/pagesA/distribution/index.vue:27', 'src/services/distribution.js:183'],
+    risks: []
+  }
+}
+```
+
 ### 6. Markdown 输出
 
 Markdown 结构：
@@ -260,6 +326,23 @@ Markdown 结构：
   ]
 }
 ```
+
+## flowSpec 建议结构
+
+```json
+{
+  "featureName": "校园分销",
+  "sourceFiles": [],
+  "apiDocs": [],
+  "roles": ["ambassador", "partner"],
+  "flows": [],
+  "screens": [],
+  "details": [],
+  "pendingQuestions": []
+}
+```
+
+其中 `details` 是可点击热点的数据来源说明，必须包含接口、字段、逻辑和证据。
 
 ## 降级策略
 

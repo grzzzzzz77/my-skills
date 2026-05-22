@@ -126,7 +126,7 @@
       "strict": false
     },
     {
-      "description": "Analyze frontend pages and backend API docs to produce page-to-interface mapping documents, structured JSON, visualSpec, and deliverable annotated page visuals. Use when asked to map UI modules to API fields, explain page data sources, or generate interface annotation diagrams from Vue/uni-app/WXML/React pages and API documentation.",
+      "description": "Analyze frontend pages, service code, business flows, and backend API docs to produce page-to-interface mappings, static prototypes, annotated visuals, and interactive traceable HTML flow maps. Use when asked to map UI modules to API fields, explain data sources, annotate pages, or generate an interactive HTML that links business process steps, page hotspots, frontend bindings, service normalize logic, API request/response fields, evidence lines, and pending backend questions.",
       "name": "page-interface-skill",
       "skills": [
         "./"
