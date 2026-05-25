@@ -1,387 +1,262 @@
-# page-interface-skill v3 设计文档
+# page-interface-skill v4 设计文档
 
 ## 目标
 
-把 `page-interface-skill` 从“接口字段映射文档生成器”升级为“功能流程可交互溯源交付器”。
+把 `page-interface-skill` 从“能生成页面接口映射”升级为“稳定、通用、可审查的联调地图生成器”。
 
-升级后的效果应该是：
+v4 的重点不是更像某一个业务页面，而是让任何页面分析任务都先经过统一建模，再生成可视化交付物：
 
-1. 读取 Vue / uni-app / WXML / React 页面源码。
-2. 读取 service 请求代码和后端接口文档。
-3. 读取或推导业务流程：入口、申请、工作台、分享、归因、成交、提现、明细。
-4. 分析页面模块、展示字段、接口字段、前端计算逻辑。
-5. 在没有真实截图时，根据页面代码生成接近真实页面的静态 HTML 原型。
-6. 生成可交互 HTML：左侧流程、中央页面原型和链路、右侧数据来源面板。
-7. 输出 flowSpec、Markdown、静态原型和标注图。
+1. 页面模块模型
+2. 角色/状态矩阵
+3. API 清单
+4. 业务流程节点
+5. 字段溯源 details
+6. 风险与待确认点
+7. 可点击 HTML 与标注图
 
-## 为什么要升级
+## v3 暴露的问题
 
-原来的 skill 可以说明“字段来自哪里”，v2 可以生成页面标注图，但联调仍然需要在“业务流程”层面理解每一步为什么会调用接口，以及页面数据如何跨页面流动。
+以复杂移动端页面为例，v3 容易产生这些问题：
 
-真正用于联调时，研发、产品、QA 更需要看到：
+- 红框坐标靠手工估算，和实际模块不稳定对齐。
+- 页面原型太像“示意图”，却没有明确说明哪些来自真实布局、哪些是抽象结构。
+- 流程节点缺少角色/状态维度，复杂功能会变成一串模糊步骤。
+- 字段表堆在右侧，缺少“模块结论”和“接口总览”。
+- 风险点隐藏在明细里，不利于产品、QA、后端快速发现联调问题。
+- schema 没有记录热点定位策略，后续无法判断红框可信度。
 
-- 这个功能从入口到提交、审核、分享、提现的完整流程；
-- 页面上这块区域是什么；
-- 它展示了哪些字段；
-- 字段来自哪个接口；
-- 哪些是接口原始字段，哪些是前端 computed；
-- 哪些展示受状态控制；
-- 哪些字段后端文档缺失或口径不一致。
+## 会话无关设计目标
 
-因此 v3 的核心价值是：**把业务流程、页面视觉和接口字段绑定在同一个可点击 HTML 里。**
+v4 报告必须能在一个全新会话里稳定复现同等质量。判断标准不是“当前对话解释后能看懂”，而是只打开 `flowSpec.json` 和 `flow.html`，也能看懂页面、接口、字段和风险。
 
-## 新的交付物
+因此生成逻辑要把布局、字段溯源、流程/模块联动、质量校验写成默认契约：
 
-建议每次输出到类似目录：
+- 左侧默认是紧凑流程轴，不是模块卡片副本。
+- 中间默认是模块结构卡片，不承载完整流程说明。
+- 右侧默认是字段溯源卡片，不使用窄表格。
+- 所有非直接响应字段都必须在 `traceChain` 里追到依赖来源或明确写“无接口来源”。
+- 所有人工判断必须进入 `pendingQuestions` 或 `qualityNotes`，不能只留在聊天上下文。
+
+## v4 设计原则
+
+### 1. 先建模再生成
+
+每次生成前必须先得到：
+
+- `roleStateMatrix`
+- `apiInventory`
+- `modules`
+- `flows`
+- `details`
+- `pendingQuestions`
+
+HTML 只是模型的呈现层，不应在生成 HTML 时临时拼逻辑。
+
+模型必须自包含。不要依赖用户和助手当前对话里的解释来补足报告含义；下一次单独拿 `flowSpec.json` 和 HTML 打开，也应该能看懂字段来源、计算逻辑和风险点。
+
+### 2. 热点不再默认使用手写坐标
+
+热点定位策略分级：
+
+1. `screenshot-measured`：真实截图或 DOM 测量，可信度最高。
+2. `generated-dom`：静态原型中模块容器自动生成，可信。
+3. `module-card`：结构化模块卡片，不伪装真实页面。
+4. `structure-row`：表格/列表结构行。
+5. `manual-low-confidence`：低可信手工坐标，只能作为最后兜底，并必须写入质量说明。
+
+默认禁止凭感觉给手机原型写绝对红框坐标。
+
+### 3. 无真实截图时改用结构图
+
+无截图、无法运行页面、无法测量 DOM 时，优先生成：
+
+- 页面模块结构图
+- 手机宽度的模块卡片图
+- 流程 + 模块 + 字段联动图
+
+而不是假装 1:1 还原真实 UI。
+
+### 4. 首页必须回答三个问题
+
+`flow.html` 首屏必须清楚回答：
+
+1. 这个功能有哪些页面/状态？
+2. 这个功能调用哪些接口？
+3. 当前最重要的待确认点是什么？
+
+字段表是第二层信息，不应该挤占首屏结论。
+
+### 5. 面向三类读者
+
+- 产品：看流程、状态、风险。
+- QA：看触发方式、页面状态、空态/失败分支、验收点。
+- 研发：看接口、字段、normalize、证据行号。
+
+交互 HTML 需要用 Tab 或面板把三类信息分层。
+
+### 6. computed/local/static 不能当成结论
+
+字段表里如果某个 UI 字段不是后端直接返回，不能只显示 `computed/local/static`。这几个词只是来源类型，不是溯源结果。
+
+必须补齐：
+
+- `displayLabel`：中文展示名、页面文案或业务含义，优先来自 template 文案；没有直接文案时写产品能看懂的中文名。
+- `sourceType`：字段来源类型。
+- `apiField`：直连 API 字段，没有则写 `-`。
+- `frontendLogic`：前端如何生成该值，包括 computed、normalize、Map 映射、列表分组、日期计算、静态配置。
+- `traceChain`：字段溯源链路，按 UI -> 页面状态/computed -> service/normalize -> API 字段 -> 证据的顺序展示。
+- `evidence`：源码行号。
+
+合格示例：
 
 ```txt
-docs/page-interface-mapping/
-  feature-name.flow.html
-  feature-name.flowSpec.json
-  feature-name.mapping.md
-  feature-name.prototype.html
-  feature-name.annotated.svg
+身份标题 | roleView.title | computed | - | roleViewMap[activeRole] 选择身份标题 | index.vue:168-229
+累计收益 | distributionData.balance | response+normalize | totalIncomeAmount | normalizeWorkspace 后 formatDistributionAmount | distribution.js:176-181
+团队直属大使分组 | register.teamAmbassadors | computed | records[].promoterUid | teamUsers 按 promoterUid/promoterAgentNo 分组 | register-detail.vue:137-153
 ```
 
-其中：
-
-- `flow.html`：主交付物，可直接浏览器打开；包含流程节点、页面原型、字段溯源面板。
-- `flowSpec.json`：结构化流程/页面/热点/字段/证据，可复用生成 HTML。
-- `mapping.md`：主交付文档。
-- `prototype.html`：根据页面源码还原的静态原型。
-- `annotated.svg/png`：带接口字段标注的页面图，可嵌入 Markdown。
-
-如果用户只要一个 Markdown 文件，也应该把 `flow.html` 和标注图链接写进去。
-
-## 处理流程
-
-### 1. 输入解析
-
-读取：
-
-- 页面文件：`.vue`、`.wxml`、`.tsx`、`.jsx`
-- 样式文件：`.scss`、`.css`、`.wxss`
-- service 文件：接口 URL、method、请求体、normalize 逻辑
-- 后端文档：接口路径、入参、响应字段、枚举、模型
-
-分析页面模板里的：
-
-- `{{ field }}`
-- `v-if`
-- `v-for`
-- `v-model`
-- `:class`
-- `:src`
-- `@tap`
-- 表单字段
-- 弹窗
-- 列表
-- 二维码
-- 分享海报
-
-### 2. 字段追踪
-
-追踪路径：
+不合格示例：
 
 ```txt
-页面展示字段
--> script 变量 / computed
--> service 方法
--> normalize 函数
--> 后端接口字段
--> 接口文档字段
+roleView.title | computed/local/static
+distributionData.balance | incomeSummary.totalIncomeAmount
 ```
 
-字段来源类型：
+computed 字段的最低合格展示应包含链路，例如：
 
-- `response`：接口响应字段
-- `request`：提交给后端的字段
-- `computed`：前端计算字段
-- `local`：本地状态
-- `static`：静态文案或本地资源
+```txt
+身份标题
+UI roleView.title
+-> computed roleView = roleViewMap[distributionData.role]
+-> distributionData 来自 APIgetDistributionWorkspace()
+-> normalizeWorkspace 将 identityStatus.identityType 归一化为 role
+-> API workspace.identityStatus.identityType
+```
 
-### 2.5 业务流程建模
-
-为每个流程节点建立结构化信息：
+## 推荐 flowSpec
 
 ```json
 {
-  "id": "workspace",
-  "title": "进入分销中心工作台",
-  "trigger": "onShow",
-  "screen": "distribution-index-partner",
-  "apis": ["/api/campus-distribution/workspace"],
-  "hotspot": "workspace.card",
-  "next": ["share", "income", "register"],
-  "risks": []
-}
-```
-
-流程节点要能覆盖页面间跳转和关键分支，例如：
-
-- 普通用户 -> 申请页
-- 大使 -> 工作台
-- 大使 -> 合伙人申请 -> 审核中
-- 工作台 -> 分享海报 -> 新用户归因
-- 工作台 -> 收益中心 -> 提现
-- 工作台 -> 注册明细 -> 个人/团队列表
-
-### 3. 静态原型生成
-
-如果没有真实截图，则从页面源码生成原型，而不是只画抽象框图。
-
-uni-app 转 HTML 规则：
-
-| uni-app / Vue | HTML 原型 |
-| --- | --- |
-| `view` | `div` |
-| `text` | `span` |
-| `image` | `img` |
-| `scroll-view` | `div.scroll-view` |
-| `CustomNavbar` | 自定义导航栏 div |
-| `u-popup` | fixed 弹层 |
-| `button` | button |
-| `input` | input |
-| `textarea` | textarea |
-
-样式处理：
-
-- `rpx` 默认按 `1rpx = 0.5px` 转换。
-- 以 375px 手机宽度作为默认视口。
-- 尽量保留颜色、字号、卡片、圆角、阴影和间距。
-- SCSS 嵌套可以只展开关键选择器。
-- 不能解析的复杂样式，以视觉近似为准。
-
-### 4. Mock 数据生成
-
-为了让页面看起来真实，需要生成 mock state。
-
-例如分销页面：
-
-```js
-{
-  roleName: '校园合伙人',
-  statusText: '正常',
-  name: '张同学 | 浙江大学',
-  balance: '1280.00',
-  pendingAmount: '120.00',
-  withdrawableAmount: '860.00',
-  monthRegisterCount: 36,
-  monthOrderCount: 8,
-  monthReward: '320.00'
-}
-```
-
-mock 数据要覆盖关键状态：
-
-- 正常
-- 冻结
-- 审核中
-- 驳回
-- 空列表
-- 有列表
-- 弹窗打开
-
-### 5. 标注图生成
-
-标注图布局建议：
-
-```txt
-┌──────────────────────┬───────────────────────────┐
-│ 页面原型 / 截图       │ 标注卡片                   │
-│ 红框圈出页面区域      │ 接口 URL / 字段 / 逻辑      │
-│ 箭头指向右侧说明      │ response/computed/static    │
-└──────────────────────┴───────────────────────────┘
-```
-
-每个标注卡包含：
-
-- 模块名
-- 页面位置
-- 接口 URL
-- method
-- 请求字段
-- 响应字段
-- 前端绑定字段
-- 显隐逻辑
-- 格式化逻辑
-- 置信度
-- 证据来源
-
-### 5.5 交互 HTML 生成
-
-`flow.html` 是 v3 的核心交付，应为纯静态文件，不依赖项目运行或外部 CDN。
-
-推荐三栏布局：
-
-```txt
-┌──────────────┬─────────────────────────────┬────────────────────┐
-│ 左：业务流程  │ 中：手机页面原型 + 链路卡片   │ 右：数据来源面板     │
-└──────────────┴─────────────────────────────┴────────────────────┘
-```
-
-要求：
-
-- 左侧流程节点可点击。
-- 中间页面原型包含可点击热点，热点选中后高亮。
-- 右侧展示接口、字段、计算逻辑、证据行号、待确认点。
-- 支持角色切换和页面状态切换。
-- 中间区域设置 `overflow: auto` 和合理 `min-width`，避免信息被裁掉。
-- 生成后抽取内嵌 `<script>` 用 `node --check` 校验。
-
-示例交互数据结构：
-
-```js
-const detailMap = {
-  'workspace.card': {
-    title: '分销中心：身份收益卡',
-    api: 'POST /api/campus-distribution/workspace',
-    sourceType: 'response + computed',
-    fields: [
-      ['distributionData.balance', 'incomeSummary.totalIncomeAmount -> formatDistributionAmount']
-    ],
-    evidence: ['src/pagesA/distribution/index.vue:27', 'src/services/distribution.js:183'],
-    risks: []
-  }
-}
-```
-
-### 6. Markdown 输出
-
-Markdown 结构：
-
-```md
-# 页面接口映射分析
-
-## 可视化标注图
-
-![](./page.annotated.png)
-
-## 一、页面概览
-
-## 二、模块映射明细
-
-## 三、结构化 JSON
-
-## 四、visualSpec
-
-## 五、待后端确认点
-```
-
-## visualSpec 建议结构
-
-```json
-{
-  "pageName": "分销中心",
-  "pagePath": "src/pagesA/distribution/index.vue",
-  "prototype": {
-    "file": "distribution-index.prototype.html",
-    "viewport": { "width": 375, "height": 812 },
-    "states": ["partner-default"]
-  },
-  "assets": {
-    "annotatedImage": "distribution-index.annotated.png",
-    "prototypeHtml": "distribution-index.prototype.html"
-  },
-  "apis": [
-    {
-      "method": "POST",
-      "url": "/api/campus-distribution/workspace",
-      "requestFields": [],
-      "responseFields": [
-        "identityStatus.identityType",
-        "incomeSummary.availableAmount"
-      ]
-    }
-  ],
-  "modules": [
-    {
-      "id": 1,
-      "name": "身份收益卡",
-      "position": "顶部蓝色卡片",
-      "bindings": [
-        {
-          "uiLabel": "可提现",
-          "frontendField": "distributionData.withdrawableAmount",
-          "apiField": "incomeSummary.availableAmount",
-          "sourceType": "computed",
-          "logic": "formatDistributionAmount",
-          "confidence": "high"
-        }
-      ]
-    }
-  ],
-  "highlightRegions": [
-    {
-      "id": 1,
-      "moduleId": 1,
-      "rect": { "x": 20, "y": 72, "width": 335, "height": 150 },
-      "annotationCard": {
-        "title": "模块：身份收益卡",
-        "api": "POST /api/campus-distribution/workspace",
-        "fields": ["identityStatus", "incomeSummary"],
-        "dataSource": "response+computed"
-      }
-    }
-  ]
-}
-```
-
-## flowSpec 建议结构
-
-```json
-{
-  "featureName": "校园分销",
+  "featureName": "",
   "sourceFiles": [],
   "apiDocs": [],
-  "roles": ["ambassador", "partner"],
+  "roles": [],
+  "roleStateMatrix": [
+    {
+      "role": "",
+      "state": "",
+      "entry": "",
+      "screens": [],
+      "defaultApis": [],
+      "visibleModules": [],
+      "disabledModules": [],
+      "next": []
+    }
+  ],
+  "apiInventory": [
+    {
+      "id": "",
+      "method": "POST",
+      "url": "",
+      "purpose": "",
+      "triggers": [],
+      "requestFields": [],
+      "responseFields": [],
+      "usedByModules": [],
+      "evidence": []
+    }
+  ],
   "flows": [],
   "screens": [],
+  "modules": [],
   "details": [],
-  "pendingQuestions": []
+  "pendingQuestions": [],
+  "qualityNotes": []
 }
 ```
 
-其中 `details` 是可点击热点的数据来源说明，必须包含接口、字段、逻辑和证据。
+## HTML 信息架构
 
-## 降级策略
-
-1. 有真实截图：直接标真实截图。
-2. 无截图但能生成原型：生成 HTML 原型并标注。
-3. 无法渲染原型：生成结构化 SVG 标注图。
-
-降级时必须写清楚：
-
-```md
-> 未提供页面截图，本图为根据源码生成的静态原型标注图。
-```
-
-或者：
-
-```md
-> 当前环境无法渲染页面原型，本图为结构化模块标注图，不代表真实页面截图。
-```
-
-## v2 验收标准
-
-一份合格输出应满足：
-
-- 能看到接近真实页面的布局。
-- 每个主要模块都有红框。
-- 每个红框都有接口字段说明。
-- 字段来源明确区分 response / request / computed / static。
-- 文档与前端不一致的地方单独列出。
-- Markdown 中能直接看到图片。
-- 生成物可以发给后端联调。
-
-## 已更新的 skill 文件
+建议布局：
 
 ```txt
-/Users/Zhuanz/.codex/skills/page-interface-skill/SKILL.md
+┌────────────────────────────────────────────────────────────┐
+│ 顶部摘要：页面/状态、接口清单、待确认点                    │
+├───────────────┬───────────────────────────┬────────────────┤
+│ 紧凑流程轴/矩阵 │ 页面模块结构图/原型         │ 模块数据来源     │
+│ API 清单       │ 可点击模块卡片/热点         │ 字段/证据/风险   │
+└───────────────┴───────────────────────────┴────────────────┘
 ```
 
-该路径是软链，实际文件位于：
+必要能力：
+
+- 点击流程节点，并让中间结构图滚动到对应模块。
+- 点击模块卡片或热点，并让左侧流程同步到对应流程；没有对应流程时取消流程高亮。
+- 左侧流程区使用紧凑流程轴、stepper 或导航轨，不使用与中间模块相同的大卡片视觉。
+- 左侧流程节点只表达步骤名、页面/状态、触发方式和对应模块，不重复模块摘要、字段详情、风险详情或完整接口清单。
+- 切换角色、状态、tab、弹窗状态。
+- 右侧先展示模块结论，再展示字段表。
+- 右侧窄面板展示字段溯源时使用字段卡片，而不是 6 列以上表格；表格只能放在宽区域或单独 Tab 中。
+- 左侧导航、中间结构图、右侧详情面板应各自独立滚动；外层页面允许保留总滚动条作为小屏兜底。独立滚动是主路径，整页滚动是兜底。
+- 风险面板独立可见。
+
+## 可视化选择规则
 
 ```txt
-/Users/Zhuanz/.skills-manager/skills/page-interface-skill/SKILL.md
+有真实截图 -> 截图标注
+可运行页面 -> 浏览器/小程序截图或 DOM 测量后标注
+只有源码 -> 模块结构图 + 静态原型
+源码结构复杂且样式难还原 -> 模块结构图，不强行手机仿真
 ```
+
+## 默认报告骨架
+
+任何新任务默认生成以下信息架构，除非用户明确要求换一种展示：
+
+```txt
+Top summary：页面/状态、核心接口、待确认风险
+Left rail：紧凑流程轴，只展示步骤级信息
+Center map：页面模块结构图，只展示模块级信息
+Right detail：接口、字段、computed/normalize、证据、风险
+```
+
+这四块必须从同一个 `flowSpec` 渲染，不能在 HTML 字符串里临时写一套解释。
+
+## 质量检查清单
+
+每次交付前必须确认：
+
+- `flowSpec` 包含 layoutContract、traceabilityContract、qualityGates，保证新会话也能按同一标准生成。
+- `flow.html` 点击流程和模块不会报错。
+- 流程选中态和模块高亮态一致，不出现左侧流程 A、中间模块 B 的错位。
+- 左侧流程区是紧凑时间线/导航轨，中间才是模块卡片；两栏视觉形态不同。
+- 左侧流程列表与中间模块卡信息分工清楚，无大段重复信息。
+- 内嵌 JS 通过 `node --check`。
+- 每个热点都有 detail。
+- 每个 detail 有证据行号。
+- 每个接口至少说明用途和触发点。
+- 每个字段有中文 `displayLabel`。
+- 每个字段有 `traceChain`，computed/local/static 字段的链路能追到依赖来源或明确说明无接口来源。
+- 右侧窄面板字段区使用字段卡片，不使用 6 列以上宽表格。
+- 左侧列表、中间结构图、右侧详情面板分别可独立滚动；外层滚动只作为兜底。
+- 待确认点在首页摘要可见。
+- 没有真实截图时明确标注“非真机截图”。
+- 没有使用无依据的漂浮红框。
+- `rg` 能搜索到关键接口、关键字段、关键风险。
+
+建议自动校验：
+
+```txt
+node --check 生成脚本
+解析 flow.html 内嵌 JS
+读取 flowSpec.json，断言 fieldTraces 全部存在 displayLabel 和 traceChain
+rg "field-trace-card|traceChain|基于源码生成，非真机截图|核心接口|待确认"
+```
+
+## 不做什么
+
+- 不生成只靠视觉但没有字段证据的页面。
+- 不复制整段后端文档。
+- 不把所有字段塞进一个超长表格。
+- 不为了“像手机截图”牺牲清晰度。
+- 不把业务特定规则写死进 skill；具体业务只进入本次生成的 flowSpec。
