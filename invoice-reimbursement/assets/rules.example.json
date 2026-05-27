@@ -1,0 +1,82 @@
+{
+  "_doc": [
+    "报销规则配置文件。S3 规则引擎读取此文件判断一张发票是否可报销。",
+    "首次运行引导（M0）会把这份配置复制到 ~/.invoice-reimbursement/rules.json，用户后续可手动编辑。",
+    "",
+    "字段命名约定：",
+    "  - 以 '_doc' 开头的字段是注释，S3 读取时忽略",
+    "  - 数值为 null 表示该项不限制",
+    "  - 列表类型支持多值，匹配模式见各字段 _doc"
+  ],
+
+  "version": 1,
+
+  "buyer": {
+    "_doc": "购买方校验：发票必须开给这家公司才能报销。company_name 子串匹配；tax_id 完全匹配。",
+    "company_name": "杭州找北智职智能科技有限公司",
+    "tax_id": "91330105MAELDNK7XF"
+  },
+
+  "platform": {
+    "_doc": "平台白名单：行程单标题中包含任一关键词即视为可接受。",
+    "title_keyword_whitelist": ["高德地图", "AMAP"]
+  },
+
+  "location": {
+    "_doc": "起终点限制",
+    "city_whitelist": {
+      "_doc": "城市白名单。空列表 [] 表示不限。",
+      "values": ["杭州市"]
+    },
+    "endpoint_match": {
+      "_doc": [
+        "起点 / 终点关键词匹配。mode 选项：",
+        "  either        : 起点或终点任一包含 keywords 中任一关键词即通过",
+        "  both          : 起点和终点都必须包含 keywords 中至少一个",
+        "  origin_in     : 仅起点必须匹配（当前用此模式）",
+        "  destination_in: 仅终点必须匹配",
+        "  none          : 不校验",
+        "keywords 内的关键词按子串匹配（不区分大小写）。",
+        "需要新增允许的出发点，往 keywords 里追加即可。"
+      ],
+      "_keyword_note": "keywords 由每个员工 onboard 时填写自己常用的出发地址关键词（子串匹配）。示例: '中国杭州人力资源服务产业园'",
+      "mode": "origin_in",
+      "keywords": [
+        "<your-departure-location>"
+      ]
+    }
+  },
+
+  "time_window": {
+    "_doc": [
+      "行程开始时间限制（看的是行程单的'行程时间起'，不是开票日期）。",
+      "mode 选项：",
+      "  none          : 不限制",
+      "  hour_range    : start_hour ~ end_hour 之间。支持跨午夜，例 start=22, end=6 表示 22:00 - 次日 06:00",
+      "  weekends_only : 仅周六周日",
+      "  weekdays_only : 仅工作日（周一至周五）",
+      "",
+      "当前规则：每日 22:00 之后出发可报。end_hour=6 是默认上限（次日凌晨 6 点之前都算'当天晚上'）。",
+      "若你公司只允许凌晨 4 点之前的打车，把 end_hour 改为 4；若整夜都算（直到次日工作时间），改为 8 或更晚。"
+    ],
+    "mode": "hour_range",
+    "start_hour": 22,
+    "end_hour": 6
+  },
+
+  "amount": {
+    "_doc": "金额上限（价税合计，单位元）。null 表示不限。当前规则：不限。",
+    "max_per_trip": null,
+    "max_per_day_total": null
+  },
+
+  "invoice_validity": {
+    "_doc": [
+      "发票本身的合规性校验。这些是硬性条件，不通过直接拒收。",
+      "invoice_type_keywords：发票'项目名称'列必须同时包含所有关键词，确保是打车（客运）类发票，不是餐饮、住宿等其他类型。"
+    ],
+    "must_have_invoice_number": true,
+    "buyer_name_must_match": true,
+    "invoice_type_keywords": ["运输服务", "客运服务费"]
+  }
+}

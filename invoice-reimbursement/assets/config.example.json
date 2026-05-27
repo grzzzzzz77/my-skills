@@ -1,0 +1,49 @@
+{
+  "_doc": [
+    "发票报销 Skill 用户配置文件 — 找北智职公司内部版.",
+    "本文件放置于 ~/.invoice-reimbursement/config.json.",
+    "首次使用前推荐运行 python3 cli.py onboard 交互式填写,",
+    "或手动编辑下方各字段, 完成后运行 python3 cli.py validate 检查.",
+    "",
+    "字段说明:",
+    "  - imap: 你的邮箱凭据 (用于拉取高德发票邮件; QQ邮箱需用IMAP授权码而非登录密码)",
+    "  - feishu.app_id / app_secret: 公司共用的内部应用凭证, app_secret 找管理员私聊获取",
+    "  - feishu.user_id: 你自己的飞书 open_id (ou_xxx)",
+    "  - feishu.*_definition_code / purchase_entity: 公司审批流程的固定值, 已预填",
+    "",
+    "以 '_doc' 开头的字段是注释, 校验时忽略."
+  ],
+
+  "imap": {
+    "_doc": "IMAP 邮箱凭据. 用于拉取高德发票邮件.",
+    "host": "imap.qq.com",
+    "port": 993,
+    "ssl": true,
+    "account": "<your-email@qq.com>",
+    "password": "<your-imap-auth-code>",
+    "senders": [
+      "itinerary@ridesharing.amap.com"
+    ]
+  },
+
+  "feishu": {
+    "_doc": "飞书审批配置. 标 <fill-me> 的字段需你自己填; 其他已预填公司通用值.",
+
+    "app_id": "cli_aa8000f2827a9cbc",
+    "app_secret": "<ask-admin-for-this>",
+
+    "user_id": "<your-feishu-open-id-ou_xxx>",
+    "department_id": null,
+
+    "definition_code": "868B710A-A742-45EE-9E6D-C61D0BF5963F",
+    "expense_definition_code": "FAB04EBA-8365-46CA-B273-2F9CF1355460",
+
+    "purchase_entity": {
+      "_doc": "采购主体 — '找北智职' option, 公司通用值.",
+      "key": "mp3dpnnw-07gunm764bby-0",
+      "text": "找北智职"
+    },
+
+    "default_reason": "高德打车费报销"
+  }
+}

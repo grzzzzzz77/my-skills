@@ -1,7 +1,7 @@
 {
   "metadata": {
     "description": "Skills backup synced by Skills Manager",
-    "version": "2026.05.13"
+    "version": "2026.05.27"
   },
   "name": "my-skills",
   "owner": {
@@ -108,6 +108,15 @@
       "strict": false
     },
     {
+      "description": "Automate Feishu taxi-invoice reimbursement (v0.1, Amap / 高德打车 only). Use when the user wants to process today's 高德 taxi invoices, submit reimbursement, or continue a reimbursement after the first Feishu approval has passed. Flow runs in two conversations — first to read email, parse PDFs and submit the first approval; second (after user receives Feishu \"approved\" notification) to verify and submit the second approval.",
+      "name": "invoice-reimbursement",
+      "skills": [
+        "./"
+      ],
+      "source": "./invoice-reimbursement",
+      "strict": false
+    },
+    {
       "description": "MySQL development best practices for schema design, query optimization, and database administration",
       "name": "mysql-best-practices",
       "skills": [
@@ -126,7 +135,7 @@
       "strict": false
     },
     {
-      "description": "Analyze frontend pages, service code, business flows, and backend API docs to produce page-to-interface mappings, static prototypes, annotated visuals, and interactive traceable HTML flow maps. Use when asked to map UI modules to API fields, explain data sources, annotate pages, or generate an interactive HTML that links business process steps, page hotspots, frontend bindings, service normalize logic, API request/response fields, evidence lines, and pending backend questions.",
+      "description": "Analyze frontend pages, service code, business flows, and backend API docs to produce page-to-interface mappings, module-level UI/API traceability, role/state matrices, annotated visuals, and interactive HTML flow maps. Use when asked to map UI modules to API fields, explain data sources, annotate pages, audit frontend/backend field alignment, or generate a traceable HTML for product, QA, and engineering handoff.",
       "name": "page-interface-skill",
       "skills": [
         "./"
