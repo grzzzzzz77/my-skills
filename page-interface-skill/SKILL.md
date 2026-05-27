@@ -192,6 +192,40 @@ computed 字段必须呈现为链路，而不是一句概述：
 6. 证据：index.vue:205-229；distribution.js:163-201；接口文档:498-534
 ```
 
+前端判断型状态必须把“判断过程”作为独立字段卡，而不是只写最终 UI 状态。尤其是这些场景：
+
+- 接口只返回日志、历史消息、原始 JSON、文本、数组，前端通过扫描、解析、关键词匹配、正则、分组、去重、计数、阈值判断后得到状态。
+- 页面状态由接口字段和本地交互共同决定，例如“历史已反馈 1 次 + 当前再点 1 次 = 达到 2 次阈值”。
+- 前端兼容多个可选字段，例如 `data.count || data.total || snapshot.count || localCount`。
+- 接口文档没有明确列出最终状态字段，前端靠历史消息或本地状态恢复。
+
+这种字段卡必须额外写清楚：
+
+```txt
+历史不满意次数恢复
+1. UI：老师卡片只在 message.kind === teacher 时展示
+2. 原始接口字段：GET /api/job-recommendations/session -> historyConversation.recentMessages[].content
+3. 前端解析：遍历 USER_MESSAGE，调用 isHistoryFeedbackText / applyHistoryFeedbackToLastJobsMessage
+4. 命中规则：文本包含“不满意/换一批/反馈”，或命中结构化反馈字段、反馈原因、下一批意向
+5. 计数：每命中一次 restoredFeedbackCount += 1，回填 dislikeCount
+6. 阈值：用户再点一次后 dislikeCount >= 2，appendTeacherMessage()
+7. 风险：不是后端显式返回 count=1，文案格式变化会影响恢复结果
+8. 证据：页面解析函数行号、service 方法、接口文档 recentMessages 字段
+```
+
+禁止把这种逻辑简写成：
+
+```txt
+老师卡片展示 | mentorTrigger.triggered / dislikeCount | 达到两次展示
+```
+
+正确写法要拆成至少两条：
+
+```txt
+历史不满意次数恢复 | historyResult.feedbackCount | recentMessages[].content | 前端解析历史 USER_MESSAGE 文本并计数
+老师卡片展示门禁 | message.kind === teacher | historyResult.feedbackCount + local dislikeCount + mentorTrigger.triggered | 三条触发路径分别说明
+```
+
 #### 4.1 原子字段拆分规则（强制）
 
 字段溯源必须按“页面上用户能看到的单个文案/数值/状态/输入项”拆成原子字段卡，禁止把多个 UI 数据合并成一条模糊字段。
@@ -227,6 +261,7 @@ computed 字段必须呈现为链路，而不是一句概述：
 - `fieldTraces[*].field` 不应只有数组容器名，例如 `teamStats[]`、`currentStats`、`withdrawalRecords[]`、`pageData.structure`，除非该字段卡只描述“数组生成规则”且同模块已经有每个展示字段的原子卡。
 - 每个模块的 `fieldTraces` 数量要覆盖该模块模板内所有用户可见的动态数据点；若无法覆盖，必须在 `pendingQuestions` 或 `qualityNotes` 写明遗漏原因。
 - 右侧详情默认先显示“字段索引/一眼总览”，每张字段卡顶部必须直接展示 `displayLabel -> frontend field -> API field -> service/normalize`，避免用户打开完整链路才能知道来源。
+- 对“前端判断型状态”，质量门禁必须检查是否写明原始接口字段、解析函数、命中规则、计数/阈值、本地状态合并、文档缺口和证据行号；不能只写最终状态字段或最终 UI 文案。
 
 ### 5. 业务流程建模
 
