@@ -226,6 +226,27 @@ computed 字段必须呈现为链路，而不是一句概述：
 老师卡片展示门禁 | message.kind === teacher | historyResult.feedbackCount + local dislikeCount + mentorTrigger.triggered | 三条触发路径分别说明
 ```
 
+#### 4.0.1 触发型模块门禁必须归属到当前模块
+
+如果一个模块本身是“达到条件才出现”的状态模块，例如人工介入卡、联系客服卡、审核驳回说明、冻结提示、升级入口、二次确认弹窗、风控拦截、老师/客服/运营介入卡，右侧详情不能只写模块出现后的展示字段（例如二维码、电话、老师名称）。必须把“为什么这个模块会出现”的触发门禁作为该模块的第一组字段卡。
+
+强制拆分：
+
+```txt
+触发门禁总览 | message.kind === teacher / showServiceCard | mentorTrigger.triggered + local count + history parse | 后端触发、本地点击、历史恢复三条路径
+当前会话点击计数 | dislikeCount / message.feedbackCounted | - | 第一次点击打开反馈，第二次点击达到阈值追加卡片
+历史会话恢复计数 | historyResult.feedbackCount | recentMessages[].content + data.dislikeCount | 原始字段、解析函数、命中规则、计数合并、阈值
+模块展示字段 | supportContact.qrcodeUrl / phone | data.qrcodeUrl / phone | 模块出现后才读取或展示的接口字段
+```
+
+质量要求：
+
+- 触发型模块的 `fieldTraces[0]` 应回答“这个模块为什么出现”，而不是从联系方式、金额、图片等展示字段开始。
+- 如果触发来源跨越当前会话、本地点击次数、历史会话恢复、后端显式 trigger，必须分别拆成字段卡，且在“总门禁”字段卡里汇总所有路径。
+- 对“点击两次/达到阈值/连续失败/累计次数”这类门禁，必须写出防重复计数条件，例如 `message.feedbackOpen`、`message.feedbackCounted`、`locked`、`submitted` 等如何避免同一模块重复计数。
+- 如果历史恢复依赖文本、日志、JSON 字符串或消息数组解析，必须写出原始接口字段、解析函数、命中关键词/结构化字段、初始 count 与解析 count 的合并公式、阈值判断和兜底追加逻辑。
+- 模块的流程轴文案也必须同步体现触发来源，不能只写“点击人工圈岗浮窗”这种出现后的入口。
+
 #### 4.1 原子字段拆分规则（强制）
 
 字段溯源必须按“页面上用户能看到的单个文案/数值/状态/输入项”拆成原子字段卡，禁止把多个 UI 数据合并成一条模糊字段。
@@ -262,6 +283,7 @@ computed 字段必须呈现为链路，而不是一句概述：
 - 每个模块的 `fieldTraces` 数量要覆盖该模块模板内所有用户可见的动态数据点；若无法覆盖，必须在 `pendingQuestions` 或 `qualityNotes` 写明遗漏原因。
 - 右侧详情默认先显示“字段索引/一眼总览”，每张字段卡顶部必须直接展示 `displayLabel -> frontend field -> API field -> service/normalize`，避免用户打开完整链路才能知道来源。
 - 对“前端判断型状态”，质量门禁必须检查是否写明原始接口字段、解析函数、命中规则、计数/阈值、本地状态合并、文档缺口和证据行号；不能只写最终状态字段或最终 UI 文案。
+- 对“触发型模块”，质量门禁必须检查当前模块详情里是否包含触发门禁字段卡。若用户点击该模块时右侧只出现二维码、电话、金额、图片等展示字段，而没有出现条件、计数、阈值和历史恢复逻辑，则视为未通过。
 
 ### 5. 业务流程建模
 
