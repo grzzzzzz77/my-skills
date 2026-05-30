@@ -1,7 +1,7 @@
 {
   "metadata": {
     "description": "Skills backup synced by Skills Manager",
-    "version": "2026.05.27"
+    "version": "2026.05.30"
   },
   "name": "my-skills",
   "owner": {
@@ -33,6 +33,15 @@
         "./"
       ],
       "source": "./antfu",
+      "strict": false
+    },
+    {
+      "description": "Use this skill to review code. It supports both local changes (staged or working tree) and remote Pull Requests (by ID or URL). It focuses on correctness, maintainability, and adherence to project standards.",
+      "name": "code-reviewer",
+      "skills": [
+        "./"
+      ],
+      "source": "./code-reviewer",
       "strict": false
     },
     {
