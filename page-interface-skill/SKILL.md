@@ -17,6 +17,7 @@ description: Analyze frontend pages, service code, business flows, and backend A
 
 - `layoutContract`：说明当前报告采用的布局角色，例如左侧紧凑流程轴、中间模块结构图、右侧字段溯源。
 - `traceabilityContract`：说明字段必须包含 displayLabel、sourceType、apiField、frontendLogic、traceChain、evidence。
+- `displayDataIndexContract`：说明本报告是否按“前端显示数据”建立索引；复杂页面或用户关心“数据从哪来”时必须启用。
 - `qualityGates`：记录本次已执行或应执行的校验项。
 - `uncertainties` / `pendingQuestions`：没有证据的地方必须作为待确认点，不得靠猜测补齐。
 
@@ -34,7 +35,7 @@ description: Analyze frontend pages, service code, business flows, and backend A
 ## 输入
 
 - 页面文件：`.vue`、`.wxml`、`.tsx`、`.jsx`、`.js`、`.ts`、`.json`、`.scss`、`.css`、`.wxss`
-- 服务层：`services/*`、`api/*`、request/http 封装、normalize/format 工具
+- 服务层：`services/*`、`api/*`、request/http 封装、字段整理/格式化 工具
 - 后端文档：OpenAPI、Swagger、Postman、Markdown、HTML、PDF
 - 业务描述：入口、角色、状态、跳转、提交、审核、分享、支付、提现、列表筛选等
 - 可选截图或可运行页面：有真实截图或可浏览器渲染时优先使用真实视觉；否则生成结构化原型
@@ -78,7 +79,7 @@ description: Analyze frontend pages, service code, business flows, and backend A
 - 模块：导航、卡片、表单、列表、tab、筛选、弹窗、二维码、海报、按钮、空态、错误态
 - 状态：角色、审核、冻结、空列表、有列表、弹窗打开、表单禁用、tab/scope 选中
 - 交互：点击、提交、跳转、分享、保存、预览、刷新、下钻、返回
-- API：方法名、method、URL、请求体、响应模型、normalize/format、错误/禁用逻辑
+- API：方法名、method、URL、请求体、响应模型、字段整理/格式化、错误/禁用逻辑
 - 风险：字段缺失、枚举不一致、文档口径与前端不一致、接口未覆盖 UI、UI 仅前端计算
 
 ### 2. 角色/状态矩阵
@@ -135,7 +136,7 @@ description: Analyze frontend pages, service code, business flows, and backend A
 -> template 绑定 / v-model / 事件
 -> script ref/reactive/computed
 -> service 方法
--> normalize/format 函数
+-> 字段整理/格式化 函数
 -> API method/url
 -> request/response 字段
 -> 接口文档位置
@@ -153,7 +154,7 @@ description: Analyze frontend pages, service code, business flows, and backend A
 字段表必须包含：
 
 ```txt
-中文展示/页面文案 | 前端字段 | sourceType | service/normalize | API 字段 | 前端计算逻辑 | 证据 | 置信度
+中文展示/页面文案 | 前端字段 | sourceType | 源头URL/本地来源 | API 字段 | 前端计算逻辑 | 证据 | 置信度
 ```
 
 字段不是后端直接返回时，禁止只写 `computed/local/static` 作为 API 字段。必须继续说明前端来源和计算逻辑：
@@ -169,14 +170,14 @@ static   | incomeRuleMap.partner.rules 前端静态规则文案
 - **sourceType**：`response`、`request`、`computed`、`local`、`static`、`derived-risk`
 - **displayLabel**：页面上对应的中文文案、业务含义或产品叫法；不能只写变量名。页面没有直接文案时，用业务中文名，如“身份标题”“累计收益”“团队直属大使名称”。
 - **apiField**：直连后端字段；没有直连字段时写 `-`
-- **frontendLogic**：computed/ref/reactive/normalize/格式化/分组/过滤/静态配置的具体规则
-- **traceChain**：字段溯源链路，至少列出 UI 绑定、页面状态/computed、service/normalize、API 字段、证据行号。尤其是 computed 字段，必须写出它依赖哪个 ref/computed，以及这个依赖最终来自哪个接口字段。
+- **frontendLogic**：computed/ref/reactive/字段整理/格式化/分组/过滤/静态配置的具体规则
+- **traceChain**：字段溯源链路，至少列出 UI 绑定、页面状态/computed、接口 URL 或本地来源、API 字段、证据行号。尤其是 computed 字段，必须写出它依赖哪个 ref/computed，以及这个依赖最终来自哪个接口字段。完整链路里也不得用 `APIxxx -> processingFn` 代替接口 URL。
 - **evidence**：源码行号或文档位置
 
-如果字段经过 service normalize 或页面 computed 二次加工，要同时写后端原字段和前端加工逻辑，例如：
+如果字段经过 service 字段整理 或页面 computed 二次加工，要同时写后端原字段和前端加工逻辑，例如：
 
 ```txt
-累计收益 | distributionData.balance | totalIncomeAmount | normalizeWorkspace -> formatDistributionAmount(totalIncomeAmount) | distribution.js:176-181
+累计收益 | distributionData.balance | totalIncomeAmount | workspace字段整理 -> formatDistributionAmount(totalIncomeAmount) | distribution.js:176-181
 团队直属大使分组 | teamAmbassadors | records[].promoterUid | teamUsers 按 promoterUid/promoterAgentNo 分组 | register-detail.vue:137-153
 ```
 
@@ -186,8 +187,8 @@ computed 字段必须呈现为链路，而不是一句概述：
 身份标题
 1. UI：模板展示 roleView.title
 2. computed：roleView = roleViewMap[distributionData.role]
-3. 页面状态：distributionData 来自 APIgetDistributionWorkspace()
-4. normalize：normalizeWorkspace 将 identityStatus.identityType 归一化为 role
+3. 页面状态：distributionData 来自 POST /api/campus-distribution/workspace
+4. 字段整理：workspace字段整理 将 identityStatus.identityType 归一化为 role
 5. API：POST /api/campus-distribution/workspace -> identityStatus.identityType
 6. 证据：index.vue:205-229；distribution.js:163-201；接口文档:498-534
 ```
@@ -247,6 +248,72 @@ computed 字段必须呈现为链路，而不是一句概述：
 - 如果历史恢复依赖文本、日志、JSON 字符串或消息数组解析，必须写出原始接口字段、解析函数、命中关键词/结构化字段、初始 count 与解析 count 的合并公式、阈值判断和兜底追加逻辑。
 - 模块的流程轴文案也必须同步体现触发来源，不能只写“点击人工圈岗浮窗”这种出现后的入口。
 
+#### 4.0.2 显示数据优先的源头索引
+
+当用户问“每一个显示在前端的数据来源是什么”“溯源到源头”“接口哪个字段”时，报告必须从 API 清单模式切换为“显示数据索引模式”。这时 `fieldTraces` 的主语必须是页面上用户看见的单个数据、文案、状态、按钮、输入提示、图片或空/加载态，而不是接口、模块或数组容器。
+
+每条显示数据字段卡至少包含：
+
+```txt
+displayLabel | displayScene | sourceType | sourceRoot | field | apiField | frontendLogic | traceChain | evidence
+```
+
+字段含义：
+
+- `displayLabel`：屏幕上看到的中文文案、业务含义或可见状态，例如“岗位名称”“老师二维码”“继续推荐按钮禁用态”。
+- `displayScene`：出现位置和条件，例如“推荐岗位卡片”“人工卡片出现后”“历史详情老师卡”。
+- `sourceType`：`response`、`request`、`computed`、`local`、`static`、`derived-risk`。
+- `sourceRoot`：最短源头答案，必须放在字段卡顶部。例如 `POST /api/job-recommendations -> data.jobs[].title`、`template static`、`computed: canSubmitFeedback`、`local ref: selectedReasons`。
+- `field`：前端绑定字段、computed、ref、配置键、方法返回值或模板表达式。
+- `apiField`：后端字段或请求字段；没有后端直连时写 `-`，不能写成模糊的 `data`。
+- `frontendLogic`：所有前端判断、兜底、格式化、过滤、计数、阈值、展示条件。
+- `traceChain`：从 UI 绑定到接口/静态配置/本地状态的完整链路。
+- `evidence`：源码行号、接口文档位置或明确文件路径。
+
+后端响应字段必须写成：
+
+```txt
+源头：METHOD /api/path -> response.data.xxx.yyy
+接口字段：data.xxx.yyy
+前端逻辑：字段整理 / computed / v-if / fallback
+```
+
+首层源头禁止写成 service 函数名或 前端处理函数名，例如不要写：
+
+```txt
+serviceFn -> data.qrcodeUrl
+processingFn -> data.infoPoolSummary
+selectionParserFn -> recentMessages[].content
+```
+
+应写成：
+
+```txt
+GET /api/support/contact -> response.data.qrcodeUrl
+GET /api/job-recommendations/session?sessionId={sessionId} -> response.data.infoPoolSummary / response.snapshot.infoPoolSummary
+GET /api/job-recommendations/session?sessionId={sessionId} -> response.historyConversation.recentMessages[].content；前端 getHistoryBaseConditionSelections/getHistoryDynamicConditionSelections 解析
+```
+
+service 函数名、前端处理函数名和解析函数名只能放在 `frontendLogic`、`traceChain` 或证据链中，用来说明前端如何处理接口数据；不能代替接口地址。
+
+前端生成字段必须写成：
+
+```txt
+源头：template static / local ref / computed / route query / storage / config
+接口字段：-
+前端逻辑：具体表达式、依赖变量、命中条件和兜底值
+```
+
+条件展示字段必须同时写“数据源”和“出现条件”。例如二维码字段不能只写 `data.qrcodeUrl`，还要写 `message.kind === 'teacher'`、`qrcodeUrl` 为空时显示什么、何时调用 `GET /support/contact`。
+
+质量门禁：
+
+- 必须扫描模板内的 `{{ }}`、`v-if`、`v-show`、`v-for`、`:disabled`、`:class`、`:src`、`placeholder`、按钮文案、空态、加载态、错误态；每个业务相关可见数据都要有字段卡，或在 `qualityNotes` 说明为什么合并/排除。
+- 右侧详情字段卡第一屏必须直接出现 `sourceRoot`，用户不展开完整链路也能知道“来自哪个接口哪个字段/哪个前端逻辑”。
+- 对 `response` / `request` / `parse` / `derived-risk` 类型字段，`sourceRoot` 必须以 `METHOD /api/...` 或明确的非网络来源开头，质量门禁要检查是否仍残留 service 函数名、前端处理函数名、selection 解析函数名作为首层源头。
+- `fieldTraces` 不得只覆盖接口响应字段；静态文案、本地状态、computed 状态、提交请求字段和 fallback 文案也要标明源头。
+- 如果某个 UI 展示由多个来源合并，例如“后端 count + 历史消息解析 + 本地点击次数”，必须拆出总门禁字段和各来源字段，不能只写最终变量。
+
 #### 4.1 原子字段拆分规则（强制）
 
 字段溯源必须按“页面上用户能看到的单个文案/数值/状态/输入项”拆成原子字段卡，禁止把多个 UI 数据合并成一条模糊字段。
@@ -272,7 +339,7 @@ computed 字段必须呈现为链路，而不是一句概述：
 
 ```txt
 发展大使 | teamStats[0].value | directAmbassadorCount | teamStats computed 读取 distributionData.directAmbassadorCount
-达标大使 | teamStats[1].value | rewardReachedCount | normalizeWorkspace 优先 workspace.rewardReachedCount，缺失回退 growthRewardProgress
+达标大使 | teamStats[1].value | rewardReachedCount | workspace字段整理 优先 workspace.rewardReachedCount，缺失回退 growthRewardProgress
 团队注册 | teamStats[2].value | teamRegisterCount | teamStats computed 读取 distributionData.teamRegisterCount
 团队订单 | teamStats[3].value | teamVipOrderCount | teamStats computed 读取 distributionData.teamVipOrderCount
 ```
@@ -281,7 +348,7 @@ computed 字段必须呈现为链路，而不是一句概述：
 
 - `fieldTraces[*].field` 不应只有数组容器名，例如 `teamStats[]`、`currentStats`、`withdrawalRecords[]`、`pageData.structure`，除非该字段卡只描述“数组生成规则”且同模块已经有每个展示字段的原子卡。
 - 每个模块的 `fieldTraces` 数量要覆盖该模块模板内所有用户可见的动态数据点；若无法覆盖，必须在 `pendingQuestions` 或 `qualityNotes` 写明遗漏原因。
-- 右侧详情默认先显示“字段索引/一眼总览”，每张字段卡顶部必须直接展示 `displayLabel -> frontend field -> API field -> service/normalize`，避免用户打开完整链路才能知道来源。
+- 右侧详情默认先显示“字段索引/一眼总览”，每张字段卡顶部必须直接展示 `displayLabel -> frontend field -> API field -> METHOD /api/...`，避免用户打开完整链路才能知道来源。
 - 对“前端判断型状态”，质量门禁必须检查是否写明原始接口字段、解析函数、命中规则、计数/阈值、本地状态合并、文档缺口和证据行号；不能只写最终状态字段或最终 UI 文案。
 - 对“触发型模块”，质量门禁必须检查当前模块详情里是否包含触发门禁字段卡。若用户点击该模块时右侧只出现二维码、电话、金额、图片等展示字段，而没有出现条件、计数、阈值和历史恢复逻辑，则视为未通过。
 
@@ -356,7 +423,7 @@ computed 字段必须呈现为链路，而不是一句概述：
 - 顶部必须有“此功能涉及接口”和“待确认点”摘要。
 - 右侧详情先显示“模块结论”，再显示字段表，不要一上来塞满表格。
 - 字段溯源在窄侧栏里优先使用“字段卡片/两行式布局”，不要强行塞多列表格，避免中文标题被挤成竖排；只有主内容区足够宽时才使用完整表格。
-- 字段卡片内的 `API 字段`、`接口 / normalize`、`前端逻辑` 等标签不得使用过窄左列，不能把中文挤成逐字换行或竖排。优先使用“标签在上、内容在下”的上下式字段块；若使用左右两列，标签列必须能完整容纳常见标签，并设置 `white-space: nowrap` 或等价防断行策略。
+- 字段卡片内的 `sourceRoot`、`API 字段`、`前端逻辑` 等标签不得使用过窄左列，不能把中文挤成逐字换行或竖排。优先使用“标签在上、内容在下”的上下式字段块；若使用左右两列，标签列必须能完整容纳常见标签，并设置 `white-space: nowrap` 或等价防断行策略。
 - 右侧详情面板宽度不足时，字段信息宁可纵向堆叠，也不要压缩标签列。大屏可以切换为两列字段块，但每个字段块内部仍保持标签完整可读。
 - 三栏/多卡片布局默认采用“大屏工作台 + 面板内滚动”：桌面端内容区建议设置 `min-width: 1440px`（复杂报告可到 1560px+），三栏宽度要给足，左侧流程、中间模块、右侧详情都保留独立滚动条，形成稳定的工具界面。
 - 面板不能矮：不要把主内容锁在很短的 `height: calc(100vh - ...)` 里。桌面端三栏可视高度建议不低于 `820px`，或使用 `height: calc(100vh - compactHeaderHeight)` + `min-height: 820px`；顶部摘要要紧凑，给三栏留下足够高度。
@@ -375,7 +442,7 @@ computed 字段必须呈现为链路，而不是一句概述：
 顶部摘要：页面/状态、核心接口、待确认点（保持紧凑，避免占掉大面积首屏）
 左侧：紧凑流程轴 / stepper / nav rail，只显示步骤、页面、触发、定位模块
 中间：页面模块结构图，使用模块卡片展示模块摘要和接口 chip
-右侧：模块详情，使用字段卡片展示接口、字段、computed/normalize、证据和风险
+右侧：模块详情，使用字段卡片展示接口、字段、computed/字段整理、证据和风险
 ```
 
 职责边界：
@@ -401,19 +468,21 @@ computed 字段必须呈现为链路，而不是一句概述：
 
 字段溯源卡：
   第一行：中文字段名 + sourceType badge + confidence badge
-  核心区：前端字段、API 字段（两列信息块，窄屏自动单列）
-  摘要区：接口/normalize、前端逻辑（短段落，默认展开）
+  核心区：源头 sourceRoot、前端字段、API 字段（两列信息块，窄屏自动单列）
+  摘要区：前端逻辑（短段落，默认展开）
   折叠区：完整 traceChain、证据 evidence、字段风险（默认可折叠）
 ```
 
 右侧字段卡片必须遵守：
 
-- 默认只展开能帮助读者判断口径的核心信息：字段名、来源类型、前端字段、API 字段、接口/normalize、前端逻辑。
+- 默认只展开能帮助读者判断口径的核心信息：字段名、来源类型、sourceRoot、前端字段、API 字段、前端逻辑。
+- `sourceRoot` 是第一优先级信息。后端/请求字段必须直接显示接口 URL 和字段路径，例如 `GET /api/support/contact -> response.data.qrcodeUrl`；不得显示 service 函数名、前端处理函数名或 selection 解析函数名作为首层来源。
 - `traceChain` 和 `evidence` 默认放进 `<details>`、折叠面板、展开行或等价结构中；不要让 6 步链路和 8 个证据 chip 一上来撑满卡片。
 - 字段卡片不要使用大段编号列表作为主视觉。编号链路只出现在“完整链路”折叠区。
-- 每张字段卡最多优先展示 2 个主字段块：`frontend field` 与 `API field`。`serviceLogic`、`frontendLogic` 用独立摘要块展示。
+- 每张字段卡最多优先展示 2 个主字段块：`frontend field` 与 `API field`。接口来源必须使用 `sourceRoot` 的 URL 写法，前端处理逻辑用独立摘要块展示。
 - `sourceType` 与 `confidence` 使用 badge，不要混在正文里。
 - 证据 chip 保留，但默认折叠；展开后允许换行，不要在右侧面板制造横向滚动。
+- 长 URL、长字段名、长函数名、英文 token 必须设置 `overflow-wrap:anywhere`、`word-break:break-word` 或等价规则；字段卡、kv 块、sourceRoot、logic、traceChain、证据 chip 都不能把右侧面板撑宽。窄屏时两列字段块必须自动变成单列。
 - 风险只在存在时展示，且放在字段卡底部独立黄色提示块，不要混入逻辑摘要。
 - 如果字段很多，右侧字段区可加“字段数量/筛选/分组”，但不能退化成一张宽表。
 
@@ -423,12 +492,13 @@ computed 字段必须呈现为链路，而不是一句概述：
 
 - **结构数据驱动**：HTML 只能从 `flowSpec` 渲染，不要把重要业务解释只写在 HTML 字符串里；`flowSpec.json` 必须单独输出。
 - **字段卡片而非窄表格**：右侧详情面板里的字段溯源默认使用分层卡片。卡片必须包含中文名、前端字段、sourceType、API 字段、来源接口、置信度、前端计算逻辑、traceChain；其中 traceChain/evidence 默认可折叠，不作为卡片主视觉。
+- **接口 URL 优先**：`response` / `request` / `parse` / `derived-risk` 字段的首层 sourceRoot 必须是 `METHOD /api/... -> response/request 字段`；字段卡主视觉、完整链路、Markdown 表格里都不能用 service 函数名或 前端处理函数名代替接口地址。
 - **traceChain 全覆盖**：每个字段都必须有 `traceChain`，且链路至少 4 步；computed 字段必须追到最终 API 字段或明确说明无 API 字段。
 - **中文展示全覆盖**：每个字段都必须有 `displayLabel`，不能只显示变量名。
 - **以前端页面为准**：字段中文名必须优先来自模板实际文案、动态 label、按钮文案或页面截图。不要用后端字段语义反推页面展示。遇到 `roleView.leftAmountLabel + distributionData.pendingAmount` 这类“动态中文名 + 复用数值字段”时，必须把 label 和 value 分成两条溯源，并把文案与后端字段源头不一致列为风险。
 - **模块中文名全覆盖**：`roleStateMatrix.visibleModules`、`roleStateMatrix.disabledModules`、`flows[*].module`、`hotspots[*].label` 必须能展示中文模块名。优先使用 `modules[*].title`，对 `workspace.*`、`register.team-*` 这类通配符在 `flowSpec.moduleDisplayNames` 里补中文兜底。
 - **滚动体验**：桌面端默认三栏内部滚动条必须存在且可用，左侧列表、中间模块结构、右侧详情面板分别滚动；外层页面滚动只做兜底。主要面板高度要足够大，避免出现短小、难用的内滚区域。
-- **横向溢出控制**：整页不应出现横向滚动条；长 token、接口路径、模块 ID、字段链路应在所属卡片或 chip strip 内部横向滚动，或用合理换行/截断展示。
+- **横向溢出控制**：整页不应出现横向滚动条；长 token、接口路径、模块 ID、字段链路应在所属卡片内换行，必要时才在 chip strip 内部横向滚动。字段卡主内容默认使用换行，不允许长函数名或长字段路径穿出卡片。
 - **接口路径展示**：模块卡片、摘要 chip 中的接口 URL 默认省略公共前缀 `/api`；若仍然过长，优先换行或缩短标签，不要在普通模块卡片底部出现横向滚动条。
 - **矩阵展示**：角色/状态矩阵默认使用卡片和标签，不使用会把中文压成竖排的宽表格作为主展示。
 - **无低可信视觉**：没有真实截图/DOM 测量时，不使用漂浮红框和手写坐标。
@@ -445,7 +515,9 @@ computed 字段必须呈现为链路，而不是一句概述：
 3. 检查 flowSpec.flows[*].module 都能命中 modules[*].id。
 4. 检查 flowSpec.modules[*].fieldTraces[*].displayLabel 非空。
 5. 检查每个 fieldTrace.traceChain 至少 4 步，computed/local/static 字段不得只有来源类型。
-6. 检查 HTML 包含 flow-rail 或等价流程轴、module-card、field-trace-card。
+6. 检查 response/request/parse 字段的 sourceRoot、traceChain、Markdown 明细和 HTML 主视觉都不以 service 函数名或 前端处理函数名代替 URL。
+7. 检查 HTML 包含 flow-rail 或等价流程轴、module-card、field-trace-card。
+8. 检查字段卡长 token 换行规则存在：sourceRoot、API 字段、前端字段、traceChain、证据 chip 都不会撑出右侧面板。
 7. 检查左侧流程区没有重复渲染模块摘要、完整接口清单或字段详情。
 3. 检查 flowSpec.modules[*].fieldTraces[*].traceChain 长度 >= 4。
 4. rg 搜索关键接口、关键字段、关键风险、"基于源码生成，非真机截图"。
@@ -481,15 +553,15 @@ computed 字段必须呈现为链路，而不是一句概述：
 {
   "displayLabel": "累计收益",
   "field": "distributionData.balance",
-  "sourceType": "response+normalize",
+  "sourceType": "response+字段整理",
+  "sourceRoot": "POST /api/.../workspace -> response.incomeSummary.totalIncomeAmount",
   "apiField": "incomeSummary.totalIncomeAmount",
-  "serviceLogic": "normalizeWorkspace -> formatDistributionAmount",
   "frontendLogic": "身份卡展示格式化后的累计收益",
   "traceChain": [
     "UI：身份卡累计收益展示 distributionData.balance",
-    "页面状态：distributionData 来自 APIgetDistributionWorkspace()",
-    "service：normalizeWorkspace 读取 incomeSummary.totalIncomeAmount",
-    "API：POST /api/.../workspace -> incomeSummary.totalIncomeAmount",
+    "页面状态：distributionData 来自 POST /api/.../workspace",
+    "接口：POST /api/.../workspace -> response.incomeSummary.totalIncomeAmount",
+    "前端处理：读取 incomeSummary.totalIncomeAmount 并格式化为金额文案",
     "证据：index.vue:xx；distribution.js:xx；接口文档:xx"
   ],
   "evidence": ["index.vue:xx", "distribution.js:xx"],
