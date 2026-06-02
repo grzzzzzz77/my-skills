@@ -304,6 +304,15 @@
       ],
       "source": "./web-design-guidelines",
       "strict": false
+    },
+    {
+      "description": "Set up Xcode, iOS Simulator, and HBuilderX/uni-app iOS simulator debugging on macOS. Use when installing Xcode, fixing xcode-select, checking xcodebuild or simctl, downloading iOS simulator runtimes, running uni-app to iOS Simulator in HBuilderX, or resolving HBuilderX errors such as ARM64-only simulator runtime, iOS26 simulator base install failure, missing runtimes, or no iOS simulator devices.",
+      "name": "xcode-ios-simulator-setup",
+      "skills": [
+        "./"
+      ],
+      "source": "./xcode-ios-simulator-setup",
+      "strict": false
     }
   ]
 }

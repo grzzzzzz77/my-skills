@@ -20,7 +20,7 @@ Then install any skill you want:
 
 Browse all available skills with `/plugin` after adding the marketplace, or see the full list in [`.claude-plugin/marketplace.json`](./.claude-plugin/marketplace.json).
 
-## Skills (33)
+## Skills (34)
 
 | # | Skill | Description |
 |---|-------|-------------|
@@ -57,4 +57,4 @@ Browse all available skills with `/plugin` after adding the marketplace, or see 
 | 31 | **vue-best-practices** | Vue 3 and Vue.js best practices for TypeScript, vue-tsc, and Volar. This skill should be used when writing, reviewing, or refactoring Vue components to ensure correct typing patterns. Triggers on tasks involving Vue components, props extraction, wrapper components, template type checking, or Volar configuration. |
 | 32 | **vueuse-functions** | Apply VueUse composables where appropriate to build concise, maintainable Vue.js / Nuxt features. |
 | 33 | **web-design-guidelines** | Review UI code for Web Interface Guidelines compliance. Use when asked to "review my UI", "check accessibility", "audit design", "review UX", or "check my site against best practices". |
-
+| 34 | **xcode-ios-simulator-setup** | Set up Xcode, iOS Simulator, and HBuilderX/uni-app iOS simulator debugging on macOS. Use when installing Xcode, fixing xcode-select, checking xcodebuild or simctl, downloading iOS simulator runtimes, running uni-app to iOS Simulator in HBuilderX, or resolving HBuilderX errors such as ARM64-only simulator runtime, iOS26 simulator base install failure, missing runtimes, or no iOS simulator devices. |
