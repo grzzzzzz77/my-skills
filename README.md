@@ -20,7 +20,7 @@ Then install any skill you want:
 
 Browse all available skills with `/plugin` after adding the marketplace, or see the full list in [`.claude-plugin/marketplace.json`](./.claude-plugin/marketplace.json).
 
-## Skills (35)
+## Skills (36)
 
 | # | Skill | Description |
 |---|-------|-------------|
@@ -59,3 +59,4 @@ Browse all available skills with `/plugin` after adding the marketplace, or see 
 | 33 | **vueuse-functions** | Apply VueUse composables where appropriate to build concise, maintainable Vue.js / Nuxt features. |
 | 34 | **web-design-guidelines** | Review UI code for Web Interface Guidelines compliance. Use when asked to "review my UI", "check accessibility", "audit design", "review UX", or "check my site against best practices". |
 | 35 | **xcode-ios-simulator-setup** | Set up Xcode, iOS Simulator, and HBuilderX/uni-app iOS simulator debugging on macOS. Use when installing Xcode, fixing xcode-select, checking xcodebuild or simctl, downloading iOS simulator runtimes, running uni-app to iOS Simulator in HBuilderX, or resolving HBuilderX errors such as ARM64-only simulator runtime, iOS26 simulator base install failure, missing runtimes, or no iOS simulator devices. |
+| 36 | **resume-deep-report** | 面向求职者本人，根据简历和求职需求生成中性的深度简历分析、职业发展规划、市场分析、简历诊断、行动建议和资源指引报告；与面向服务老师且含服务承接的 career-report 区分。 |
