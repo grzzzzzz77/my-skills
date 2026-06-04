@@ -8,7 +8,7 @@ M4: 验证第一审批状态并提交飞书第二个审批 (费用报销)  —  
   - PENDING   → 告知用户仍在审批中，不处理
 
 Usage:
-    python3 submit_second_approval.py [--dry-run] [--pretty]
+    python3 submit_second_approval.py [--reimbursement-reason TEXT] [--dry-run] [--pretty]
 
 Exit codes:
   0  处理成功 (或没有待处理项)
@@ -68,7 +68,8 @@ def upload_attachment(filepath: Path, app_id: str, app_secret: str,
 # ---------- 表单组装 ----------
 
 def _build_form(pending: list, item_file_codes: dict,
-                first_instance_code: str, submit_date: str) -> str:
+                first_instance_code: str, submit_date: str,
+                reimbursement_reason: str) -> str:
     """组装费用报销表单 JSON 字符串.
 
     item_file_codes: {invoice_number: [code1, code2]} — 每张发票对应的 PDF codes
@@ -88,7 +89,7 @@ def _build_form(pending: list, item_file_codes: dict,
         ])
 
     form = [
-        {"id": W2_REASON,   "type": "textarea", "value": "打车"},
+        {"id": W2_REASON,   "type": "textarea", "value": reimbursement_reason},
         {"id": W2_RELATE,   "type": "connect",  "value": [first_instance_code]},
         {"id": W2_COMPANY,  "type": "radioV2",
          "value": COMPANY_KEY,
@@ -96,6 +97,36 @@ def _build_form(pending: list, item_file_codes: dict,
         {"id": W2_FIELDLIST,"type": "fieldList", "value": fieldlist_rows},
     ]
     return json.dumps(form, ensure_ascii=False)
+
+
+def _normalize_text(value: Optional[str]) -> str:
+    return (value or "").strip()
+
+
+def _resolve_reimbursement_reason(pending: list,
+                                  reimbursement_reason: Optional[str]) -> str:
+    """优先使用显式传入的报销事由，其次使用 M3 写入 state.json 的值."""
+    explicit = _normalize_text(reimbursement_reason)
+    if explicit:
+        return explicit
+
+    saved_reasons = {
+        _normalize_text(item.get("reimbursement_reason"))
+        for item in pending
+        if _normalize_text(item.get("reimbursement_reason"))
+    }
+    if len(saved_reasons) == 1:
+        return next(iter(saved_reasons))
+    if len(saved_reasons) > 1:
+        raise RuntimeError(
+            "state.json 中存在多个不同的 reimbursement_reason, "
+            "请通过 --reimbursement-reason 明确本次费用报销的报销事由。"
+        )
+    raise RuntimeError(
+        "缺少报销事由. 提交费用报销前请先询问用户'报销事由是什么', "
+        "并通过 --reimbursement-reason 传入; 如果走自动 watcher, "
+        "需在 submit-1 时通过 --reimbursement-reason 写入 state.json。"
+    )
 
 
 # ---------- 创建审批实例 ----------
@@ -116,6 +147,7 @@ def _create_instance(body: dict, app_id: str, app_secret: str,
 def submit_second_approval(
     *,
     storage: Storage,
+    reimbursement_reason: str = None,
     dry_run: bool = False,
 ) -> dict:
     """查询第一审批状态，APPROVED 则提交费用报销。返回摘要 dict."""
@@ -144,6 +176,12 @@ def submit_second_approval(
         raise RuntimeError(
             "config.json 缺少 feishu.app_id / app_secret (v2 上传需要)."
         )
+
+    explicit_reimbursement_reason = _normalize_text(reimbursement_reason)
+    if explicit_reimbursement_reason and not dry_run:
+        for item in pending:
+            item["reimbursement_reason"] = explicit_reimbursement_reason
+        storage.save_state(state)
 
     # 所有 pending 项共用同一个第一审批实例 code
     first_instance_code = pending[0].get("first_approval_id")
@@ -176,6 +214,9 @@ def submit_second_approval(
         return result_summary
 
     # APPROVED → 上传 PDF 并创建费用报销
+    reimbursement_reason_text = _resolve_reimbursement_reason(
+        pending, explicit_reimbursement_reason
+    )
     today = date.today().isoformat()
     item_file_codes: dict = {}
     upload_errors = []
@@ -203,7 +244,10 @@ def submit_second_approval(
     if upload_errors:
         return {"ok": False, "message": "文件上传失败", "errors": upload_errors}
 
-    form_json = _build_form(pending, item_file_codes, first_instance_code, today)
+    form_json = _build_form(
+        pending, item_file_codes, first_instance_code, today,
+        reimbursement_reason_text
+    )
 
     body = {
         "approval_code": definition_code,
@@ -231,6 +275,7 @@ def submit_second_approval(
                                 "completed_at": today,
                                 "first_approval_id": first_instance_code,
                                 "second_approval_id": instance_code,
+                                "reimbursement_reason": reimbursement_reason_text,
                                 "amount": item["amount"]})
         completed_invoice_numbers.add(item["invoice_number"])
         for pdf_key in ("invoice_pdf", "trip_pdf"):
@@ -254,6 +299,7 @@ def submit_second_approval(
         "second_instance_code": instance_code,
         "items_completed": len(pending),
         "total_amount": round(sum(p["amount"] for p in pending), 2),
+        "reimbursement_reason": reimbursement_reason_text,
     })
     return result_summary
 
@@ -266,6 +312,9 @@ def main():
     )
     ap.add_argument("--dry-run", action="store_true",
                     help="跳过真实 API 调用，用 APPROVED 假设预览表单。")
+    ap.add_argument("--reimbursement-reason", "--expense-reason",
+                    dest="reimbursement_reason", default=None,
+                    help="报销事由文本 (用于飞书费用报销审批的'报销事由'字段)")
     ap.add_argument("--pretty", action="store_true")
     args = ap.parse_args()
 
@@ -274,6 +323,7 @@ def main():
     try:
         summary = submit_second_approval(
             storage=storage,
+            reimbursement_reason=args.reimbursement_reason,
             dry_run=args.dry_run,
         )
     except RuntimeError as e:

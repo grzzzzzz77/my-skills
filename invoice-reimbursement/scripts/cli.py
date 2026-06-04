@@ -412,6 +412,7 @@ def cmd_submit_1(args) -> int:
         summary = submit_first_approval(
             storage=storage,
             reason=args.reason,
+            reimbursement_reason=args.reimbursement_reason,
             dry_run=args.dry_run,
         )
     except RuntimeError as e:
@@ -429,6 +430,7 @@ def cmd_submit_2(args) -> int:
     try:
         summary = submit_second_approval(
             storage=storage,
+            reimbursement_reason=args.reimbursement_reason,
             dry_run=args.dry_run,
         )
     except RuntimeError as e:
@@ -610,10 +612,16 @@ def main():
 
     p_submit1 = sub.add_parser("submit-1", help="M3: upload PDFs + create first approval instance")
     p_submit1.add_argument("--reason", default=None, help="采购事由文本 (不指定则用 config 默认值)")
+    p_submit1.add_argument("--reimbursement-reason", "--expense-reason",
+                           dest="reimbursement_reason", default=None,
+                           help="报销事由文本 (必填, 写入 state.json 供 M4 费用报销使用)")
     p_submit1.add_argument("--dry-run", action="store_true", help="预览表单 JSON, 不上传也不真提交")
     p_submit1.set_defaults(func=cmd_submit_1)
 
     p_submit2 = sub.add_parser("submit-2", help="M4: check first approval status + create expense report")
+    p_submit2.add_argument("--reimbursement-reason", "--expense-reason",
+                           dest="reimbursement_reason", default=None,
+                           help="报销事由文本 (覆盖 state.json 中保存的报销事由)")
     p_submit2.add_argument("--dry-run", action="store_true",
                            help="假设第一审批 APPROVED，预览表单 JSON，不真提交")
     p_submit2.set_defaults(func=cmd_submit_2)

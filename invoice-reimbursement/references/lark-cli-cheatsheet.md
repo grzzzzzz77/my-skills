@@ -126,7 +126,7 @@ lark-cli api GET '/open-apis/approval/v4/instances/<instance_code>' --as user
 
 | Widget ID | 名称 | 类型 | 填写值 |
 |-----------|------|------|--------|
-| `widget16510509704570001` | 报销事由 | textarea | `"打车"` |
+| `widget16510509704570001` | 报销事由 | textarea | 用户确认的报销事由（由 `--reimbursement-reason` 传入，或读取 M3 保存到 `state.json` 的值） |
 | `widget17655881349660001` | 关联审批 | connect | 流程1 `instance_code` 字符串数组 |
 | `widget17786605192630001` | 公司主体 | radioV2 | option key `mp3sjs68-qm8docs1rm-0`（找北智职） |
 | `widget17786605494580001` | 费用明细 | fieldList | 每张发票一行，见下表 |

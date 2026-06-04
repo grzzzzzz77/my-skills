@@ -74,12 +74,16 @@ python3 scripts/validate_config.py --json
 4. **生成采购事由草稿**：`python3 scripts/cli.py submit-1 --generate-reason-draft`
    - 根据行程单数据自动生成事由文本，展示给用户确认
    - 用户可补充修改（如添加项目名称、工作内容等）
-5. **提交第一个审批**：`python3 scripts/cli.py submit-1 --reason "用户确认的采购事由"`
+5. **确认报销事由（必问）**：在正式提交前，Agent 必须问用户："这次报销事由写什么？"
+   - 这是飞书第二个审批「费用报销」里的 `报销事由` 字段，不能再默认写 `"打车"`
+   - 用户确认后，后续命令必须通过 `--reimbursement-reason "用户确认的报销事由"` 传入
+   - M3 会把该值写入 `state.json`，供后台 watcher 在第一审批通过后自动提交 M4 时使用
+6. **提交第一个审批**：`python3 scripts/cli.py submit-1 --reason "用户确认的采购事由" --reimbursement-reason "用户确认的报销事由"`
    - 上传发票+行程单 PDF（v2 endpoint，保证附件正常显示）
    - 组装采购申请表单（每张发票一行 fieldList，数量固定 1）
-   - 创建飞书审批实例，回填 `first_approval_id` 到 state.json
+   - 创建飞书审批实例，回填 `first_approval_id` 和 `reimbursement_reason` 到 state.json
    - 建议先 `--dry-run` 预览表单再正式提交
-6. **汇报结果**：提交了 N 条、合计金额、instance_code
+7. **汇报结果**：提交了 N 条、合计金额、instance_code
    - 提示用户等待飞书"审批通过"通知后再次触发
 
 ### 第二次对话：验证 → 提交第二个审批
@@ -89,11 +93,12 @@ python3 scripts/validate_config.py --json
 > 重启电脑会导致 watcher 失效, 此时手动跑 submit-2 兜底。
 
 1. **(可选) 查询 watcher 状态**: `python3 scripts/cli.py watcher-status`
-2. **手动触发 (兜底)**: `python3 scripts/cli.py submit-2 [--dry-run]`
+2. **手动触发 (兜底)**: `python3 scripts/cli.py submit-2 [--reimbursement-reason "用户确认的报销事由"] [--dry-run]`
    - 自动查询第一个审批状态：
      - `APPROVED` → 上传 PDF → 创建费用报销审批 → 写 history.json → 清理 tmp/
      - `REJECTED` → 标记 rejected，告知用户
      - `PENDING` → 跳过，告知用户仍在审批中
+   - 如果 `state.json` 里没有 M3 保存的 `reimbursement_reason`，或者用户想覆盖原事由，必须先询问用户并传入 `--reimbursement-reason`
 3. **汇报结果**：second_instance_code、完成条数、合计金额
 
 ### 首次使用引导
@@ -123,8 +128,8 @@ python3 scripts/cli.py lookup-open-id --email someone@example.com --json
 | `scripts/rules.py` | 规则引擎（company/tax/location/time/amount） |
 | `scripts/parse_and_filter.py` | M2 编排器（pair → rules → history → state） |
 | `scripts/feishu_upload.py` | 飞书 v2 endpoint 文件上传（解决 v4 上传显示 "unknown-file"） |
-| `scripts/submit_first_approval.py` | M3 — 上传附件 + 创建采购申请审批 + spawn watcher |
-| `scripts/submit_second_approval.py` | M4 — 查询第一审批状态 + 创建费用报销审批 |
+| `scripts/submit_first_approval.py` | M3 — 上传附件 + 创建采购申请审批 + 保存报销事由 + spawn watcher |
+| `scripts/submit_second_approval.py` | M4 — 查询第一审批状态 + 创建费用报销审批，并填入用户确认的报销事由 |
 | `scripts/approval_watcher.py` | 后台守护 — M3 后 1h 轮询审批状态, APPROVED 自动触发 M4 |
 | `scripts/lookup_open_id.py` | 通过手机号/邮箱反查 user_open_id (onboard 内置 + 独立子命令) |
 | `scripts/cli.py` | CLI 统一入口（init/status/validate/onboard/fetch/parse/submit-1/submit-2/watcher-status/watcher-stop/lookup-open-id） |

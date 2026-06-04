@@ -10,7 +10,7 @@ M3: 提交飞书第一个审批 (采购申请)  —  v0.1
   - 支持 --dry-run 预览表单不真提交
 
 Usage:
-    python3 submit_first_approval.py [--reason TEXT] [--dry-run] [--pretty]
+    python3 submit_first_approval.py [--reason TEXT] [--reimbursement-reason TEXT] [--dry-run] [--pretty]
 
 Exit codes:
   0  提交成功 (或没有待提交项)
@@ -120,6 +120,7 @@ def submit_first_approval(
     *,
     storage: Storage,
     reason: str = None,
+    reimbursement_reason: str = None,
     dry_run: bool = False,
 ) -> dict:
     """上传附件并提交采购申请审批. 返回摘要 dict."""
@@ -152,6 +153,13 @@ def submit_first_approval(
     dept_id = feishu.get("department_id")
 
     reason_text = reason or feishu.get("default_reason", "高德打车费报销")
+    reimbursement_reason_text = (reimbursement_reason or "").strip()
+    if not reimbursement_reason_text and not dry_run:
+        raise RuntimeError(
+            "缺少报销事由. 提交 M3 前请先询问用户'报销事由是什么', "
+            "并通过 --reimbursement-reason 传入; 该文本会写入 state.json, "
+            "供 watcher 自动提交 M4 费用报销时填入飞书'报销事由'字段。"
+        )
 
     # 3. 上传所有 PDF (v2 endpoint)
     file_codes = []
@@ -205,6 +213,7 @@ def submit_first_approval(
         item["first_approval_id"] = instance_code
         item["status"] = "first_approval_pending"
         item["submitted_at"] = today
+        item["reimbursement_reason"] = reimbursement_reason_text
     storage.save_state(state)
 
     # 7. spawn 后台 watcher: 1 小时轮询审批状态, 通过即自动触发 M4
@@ -216,6 +225,7 @@ def submit_first_approval(
         "instance_code": instance_code,
         "items_submitted": len(pending),
         "total_amount": round(sum(p["amount"] for p in pending), 2),
+        "reimbursement_reason": reimbursement_reason_text,
         "file_codes": file_codes,
         "watcher_pid": watcher_pid,
     }
@@ -255,6 +265,9 @@ def main():
     )
     ap.add_argument("--reason", default=None,
                     help="采购事由文本 (可选, 不指定则用 config 默认值)")
+    ap.add_argument("--reimbursement-reason", "--expense-reason",
+                    dest="reimbursement_reason", default=None,
+                    help="报销事由文本 (必填, 会写入 state.json 并用于 M4 费用报销审批)")
     ap.add_argument("--generate-reason-draft", action="store_true",
                     help="根据 state.json 行程数据生成采购事由草稿并打印, 不提交.")
     ap.add_argument("--dry-run", action="store_true",
@@ -275,6 +288,7 @@ def main():
         summary = submit_first_approval(
             storage=storage,
             reason=args.reason,
+            reimbursement_reason=args.reimbursement_reason,
             dry_run=args.dry_run,
         )
     except RuntimeError as e:
