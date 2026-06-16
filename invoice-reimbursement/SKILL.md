@@ -1,11 +1,11 @@
 ---
 name: invoice-reimbursement
-description: Automate Feishu taxi-invoice reimbursement (v0.1, Amap / 高德打车 only). Use when the user wants to process today's 高德 taxi invoices, submit reimbursement, or continue a reimbursement after the first Feishu approval has passed. Flow runs in two conversations — first to read email, parse PDFs and submit the first approval; second (after user receives Feishu "approved" notification) to verify and submit the second approval.
+description: Automate Feishu taxi-invoice reimbursement (v0.1, Amap / 高德打车 only). Use when the user wants to process today's 高德 taxi invoices, parse invoice PDFs from email, ask for the reimbursement reason, and directly submit a Feishu expense reimbursement. Legacy double-approval continuation is kept only as a fallback.
 ---
 
 # Invoice Reimbursement Skill
 
-> v0.1 — 高德打车发票 → 飞书双审批报销自动化
+> v0.1 — 高德打车发票 → 飞书费用报销自动化
 
 ## Version & Supported Platforms
 
@@ -53,7 +53,7 @@ python3 scripts/validate_config.py --json
 ```
 
 校验范围：
-- `config.json`：imap 节 (host/port/account/password/senders)、feishu 节 (definition_code/user_id/purchase_entity.key/app_id/app_secret)
+- `config.json`：imap 节 (host/port/account/password/senders)、feishu 节 (expense_definition_code/user_id/reimburse_entity.key/text/expense_type.key/text/app_id/app_secret)
 - `rules.json`：存在 + 合法 JSON + 必要字段 (buyer.company_name/tax_id)
 - `feishu.app_id` + `app_secret`：**实测能换到 tenant_access_token** (工作流硬性依赖)
 - `lark-cli`：可选 warning — 没有也行, onboard 现在自带 `lookup-open-id` 用手机号反查
@@ -63,7 +63,7 @@ python3 scripts/validate_config.py --json
 
 ## High-level flow
 
-### 第一次对话：读邮件 → 解析 → 提交第一个审批
+### 当前主流程：读邮件 → 解析 → 直接提交费用报销
 
 1. **运行配置预检**：`python3 scripts/validate_config.py --json`，不通过则阻断并引导修复
 2. **抓取邮件附件**：`python3 scripts/cli.py fetch [--days N] [--since YYYY-MM-DD]`
@@ -71,22 +71,17 @@ python3 scripts/validate_config.py --json
 3. **解析配对筛选**：`python3 scripts/cli.py parse`
    - 解析 PDF → 按金额配对 → 规则筛选 → history 去重 → 写入 `state.json`
    - 如果全被跳过，告知原因并结束
-4. **生成采购事由草稿**：`python3 scripts/cli.py submit-1 --generate-reason-draft`
-   - 根据行程单数据自动生成事由文本，展示给用户确认
-   - 用户可补充修改（如添加项目名称、工作内容等）
-5. **确认报销事由（必问）**：在正式提交前，Agent 必须问用户："这次报销事由写什么？"
-   - 这是飞书第二个审批「费用报销」里的 `报销事由` 字段，不能再默认写 `"打车"`
+4. **确认报销事由（必问）**：在正式提交前，Agent 必须问用户："这次报销事由写什么？"
+   - 这是飞书「费用报销」里的 `报销事由` 字段，不能默认写 `"打车"`
    - 用户确认后，后续命令必须通过 `--reimbursement-reason "用户确认的报销事由"` 传入
-   - M3 会把该值写入 `state.json`，供后台 watcher 在第一审批通过后自动提交 M4 时使用
-6. **提交第一个审批**：`python3 scripts/cli.py submit-1 --reason "用户确认的采购事由" --reimbursement-reason "用户确认的报销事由"`
+5. **直接提交费用报销**：`python3 scripts/cli.py submit-direct --reimbursement-reason "用户确认的报销事由"`
    - 上传发票+行程单 PDF（v2 endpoint，保证附件正常显示）
-   - 组装采购申请表单（每张发票一行 fieldList，数量固定 1）
-   - 创建飞书审批实例，回填 `first_approval_id` 和 `reimbursement_reason` 到 state.json
+   - 组装费用报销表单（每张发票一行费用明细）
+   - 创建飞书费用报销审批实例，写 history.json，清理 tmp/
    - 建议先 `--dry-run` 预览表单再正式提交
-7. **汇报结果**：提交了 N 条、合计金额、instance_code
-   - 提示用户等待飞书"审批通过"通知后再次触发
+6. **汇报结果**：提交了 N 条、合计金额、second_instance_code
 
-### 第二次对话：验证 → 提交第二个审批
+### 旧双审批兜底流程：验证 → 提交第二个审批
 
 > **自动接力**: M3 提交完成时已自动启动后台 watcher (1 小时轮询)，**通常无需手动跑 submit-2**。
 > 第一审批通过后 watcher 会自动触发 M4，结果写入 state.json + watcher.log。
@@ -129,10 +124,10 @@ python3 scripts/cli.py lookup-open-id --email someone@example.com --json
 | `scripts/parse_and_filter.py` | M2 编排器（pair → rules → history → state） |
 | `scripts/feishu_upload.py` | 飞书 v2 endpoint 文件上传（解决 v4 上传显示 "unknown-file"） |
 | `scripts/submit_first_approval.py` | M3 — 上传附件 + 创建采购申请审批 + 保存报销事由 + spawn watcher |
-| `scripts/submit_second_approval.py` | M4 — 查询第一审批状态 + 创建费用报销审批，并填入用户确认的报销事由 |
+| `scripts/submit_second_approval.py` | M4 / direct — 创建费用报销审批，并填入用户确认的报销事由；旧流程下也可查询第一审批状态 |
 | `scripts/approval_watcher.py` | 后台守护 — M3 后 1h 轮询审批状态, APPROVED 自动触发 M4 |
 | `scripts/lookup_open_id.py` | 通过手机号/邮箱反查 user_open_id (onboard 内置 + 独立子命令) |
-| `scripts/cli.py` | CLI 统一入口（init/status/validate/onboard/fetch/parse/submit-1/submit-2/watcher-status/watcher-stop/lookup-open-id） |
+| `scripts/cli.py` | CLI 统一入口（init/status/validate/onboard/fetch/parse/submit-direct/submit-1/submit-2/watcher-status/watcher-stop/lookup-open-id） |
 | `references/lark-cli-cheatsheet.md` | lark-cli 命令速查、双审批表单字段映射 |
 | `assets/config.example.json` | 配置模板（IMAP + 飞书 + 规则） |
 | `assets/rules.example.json` | 报销规则模板（公司/税号/起终点/时间窗口/金额上限） |

@@ -9,6 +9,7 @@ M4: 验证第一审批状态并提交飞书第二个审批 (费用报销)  —  
 
 Usage:
     python3 submit_second_approval.py [--reimbursement-reason TEXT] [--dry-run] [--pretty]
+    python3 submit_second_approval.py --direct [--reimbursement-reason TEXT] [--dry-run] [--pretty]
 
 Exit codes:
   0  处理成功 (或没有待处理项)
@@ -68,8 +69,12 @@ def upload_attachment(filepath: Path, app_id: str, app_secret: str,
 # ---------- 表单组装 ----------
 
 def _build_form(pending: list, item_file_codes: dict,
-                first_instance_code: str, submit_date: str,
-                reimbursement_reason: str) -> str:
+                first_instance_code: Optional[str], submit_date: str,
+                reimbursement_reason: str,
+                company_key: str = COMPANY_KEY,
+                company_text: str = "找北智职",
+                expense_type_key: str = EXPENSE_TYPE_KEY,
+                expense_type_text: str = "差旅费-打车费") -> str:
     """组装费用报销表单 JSON 字符串.
 
     item_file_codes: {invoice_number: [code1, code2]} — 每张发票对应的 PDF codes
@@ -80,8 +85,8 @@ def _build_form(pending: list, item_file_codes: dict,
         codes = item_file_codes.get(item["invoice_number"], [])
         fieldlist_rows.append([
             {"id": W2_EXPENSE_TYPE, "type": "radioV2",
-             "value": EXPENSE_TYPE_KEY,
-             "option": {"key": EXPENSE_TYPE_KEY, "text": "差旅费-打车费"}},
+             "value": expense_type_key,
+             "option": {"key": expense_type_key, "text": expense_type_text}},
             {"id": W2_DATE, "type": "date",
              "value": f"{submit_date}T00:00:00+08:00"},
             {"id": W2_AMOUNT, "type": "amount", "value": item["amount"]},
@@ -90,12 +95,13 @@ def _build_form(pending: list, item_file_codes: dict,
 
     form = [
         {"id": W2_REASON,   "type": "textarea", "value": reimbursement_reason},
-        {"id": W2_RELATE,   "type": "connect",  "value": [first_instance_code]},
         {"id": W2_COMPANY,  "type": "radioV2",
-         "value": COMPANY_KEY,
-         "option": {"key": COMPANY_KEY, "text": "找北智职"}},
+         "value": company_key,
+         "option": {"key": company_key, "text": company_text}},
         {"id": W2_FIELDLIST,"type": "fieldList", "value": fieldlist_rows},
     ]
+    if first_instance_code:
+        form.insert(1, {"id": W2_RELATE, "type": "connect", "value": [first_instance_code]})
     return json.dumps(form, ensure_ascii=False)
 
 
@@ -304,6 +310,131 @@ def submit_second_approval(
     return result_summary
 
 
+def _expense_form_config(feishu: dict) -> tuple[str, str, str, str]:
+    entity = feishu.get("reimburse_entity") or feishu.get("purchase_entity") or {}
+    expense_type = feishu.get("expense_type") or {}
+    return (
+        entity.get("key") or COMPANY_KEY,
+        entity.get("text") or "找北智职",
+        expense_type.get("key") or EXPENSE_TYPE_KEY,
+        expense_type.get("text") or "差旅费-打车费",
+    )
+
+
+def submit_expense_approval_direct(
+    *,
+    storage: Storage,
+    reimbursement_reason: str = None,
+    dry_run: bool = False,
+) -> dict:
+    """无第一审批时，直接把 parsed 项提交到费用报销审批."""
+    state = storage.load_state()
+    pending = [p for p in state.get("pending", []) if p.get("status") == "parsed"]
+
+    if not pending:
+        return {"ok": True, "message": "无待提交项 (no pending items with status=parsed).",
+                "instance_code": None}
+
+    reimbursement_reason_text = _resolve_reimbursement_reason(pending, reimbursement_reason)
+
+    config = storage.load_config()
+    feishu = config.get("feishu") or {}
+    definition_code = feishu.get("expense_definition_code",
+                                 "FAB04EBA-8365-46CA-B273-2F9CF1355460")
+    user_id = feishu.get("user_id")
+    dept_id = feishu.get("department_id")
+    app_id = feishu.get("app_id")
+    app_secret = feishu.get("app_secret")
+    if not user_id:
+        raise RuntimeError("config.json 缺少 feishu.user_id. 请在 config.json 中添加飞书配置。")
+    if not dry_run and (not app_id or not app_secret):
+        raise RuntimeError("config.json 缺少 feishu.app_id / app_secret (v2 上传需要).")
+
+    company_key, company_text, expense_type_key, expense_type_text = _expense_form_config(feishu)
+
+    today = date.today().isoformat()
+    item_file_codes: dict = {}
+    upload_errors = []
+
+    for item in pending:
+        codes = []
+        for pdf_key in ("invoice_pdf", "trip_pdf"):
+            path_str = item.get(pdf_key)
+            if not path_str:
+                continue
+            fp = Path(path_str)
+            if not fp.exists():
+                upload_errors.append(f"PDF 缺失: {fp}")
+                continue
+            if dry_run:
+                codes.append(f"DRYRUN-{fp.name}")
+            else:
+                try:
+                    code = upload_attachment(fp, app_id, app_secret, fp.name)
+                    codes.append(code)
+                except (RuntimeError, UploadError) as e:
+                    upload_errors.append(f"上传失败 {fp.name}: {e}")
+        item_file_codes[item["invoice_number"]] = codes
+
+    if upload_errors:
+        return {"ok": False, "message": "文件上传失败", "errors": upload_errors}
+
+    form_json = _build_form(
+        pending, item_file_codes, None, today, reimbursement_reason_text,
+        company_key, company_text, expense_type_key, expense_type_text
+    )
+
+    body = {
+        "approval_code": definition_code,
+        "open_id": user_id,
+        "form": form_json,
+    }
+    if dept_id:
+        body["department_id"] = dept_id
+
+    api_result = _create_instance(body, app_id=app_id, app_secret=app_secret, dry_run=dry_run)
+
+    if dry_run:
+        return {"ok": True, "dry_run": True, "direct": True, "form_body": body}
+
+    instance_code = (api_result.get("data") or {}).get("instance_code")
+    if not instance_code:
+        return {"ok": False, "message": "费用报销审批创建未返回 instance_code",
+                "api_response": api_result}
+
+    completed_invoice_numbers = set()
+    for item in pending:
+        storage.history_append({"invoice_number": item["invoice_number"],
+                                "completed_at": today,
+                                "second_approval_id": instance_code,
+                                "reimbursement_reason": reimbursement_reason_text,
+                                "amount": item["amount"]})
+        completed_invoice_numbers.add(item["invoice_number"])
+        for pdf_key in ("invoice_pdf", "trip_pdf"):
+            path_str = item.get(pdf_key)
+            if path_str:
+                fp = Path(path_str)
+                if fp.exists():
+                    try:
+                        fp.unlink()
+                    except OSError:
+                        pass
+
+    state["pending"] = [p for p in state.get("pending", [])
+                        if p.get("invoice_number") not in completed_invoice_numbers]
+    storage.save_state(state)
+
+    return {
+        "ok": True,
+        "direct": True,
+        "submitter_version": SUBMITTER_VERSION,
+        "second_instance_code": instance_code,
+        "items_completed": len(pending),
+        "total_amount": round(sum(p["amount"] for p in pending), 2),
+        "reimbursement_reason": reimbursement_reason_text,
+    }
+
+
 # ---------- CLI ----------
 
 def main():
@@ -315,17 +446,26 @@ def main():
     ap.add_argument("--reimbursement-reason", "--expense-reason",
                     dest="reimbursement_reason", default=None,
                     help="报销事由文本 (用于飞书费用报销审批的'报销事由'字段)")
+    ap.add_argument("--direct", action="store_true",
+                    help="无第一审批时，直接提交费用报销。")
     ap.add_argument("--pretty", action="store_true")
     args = ap.parse_args()
 
     storage = Storage()
 
     try:
-        summary = submit_second_approval(
-            storage=storage,
-            reimbursement_reason=args.reimbursement_reason,
-            dry_run=args.dry_run,
-        )
+        if args.direct:
+            summary = submit_expense_approval_direct(
+                storage=storage,
+                reimbursement_reason=args.reimbursement_reason,
+                dry_run=args.dry_run,
+            )
+        else:
+            summary = submit_second_approval(
+                storage=storage,
+                reimbursement_reason=args.reimbursement_reason,
+                dry_run=args.dry_run,
+            )
     except RuntimeError as e:
         print(f"[ERROR] {e}", file=sys.stderr)
         sys.exit(2)

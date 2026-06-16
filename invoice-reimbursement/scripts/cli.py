@@ -38,7 +38,7 @@ from init_storage import run_init  # noqa: E402
 from parse_and_filter import parse_and_filter  # noqa: E402
 from fetch_emails import fetch_emails  # noqa: E402
 from submit_first_approval import submit_first_approval  # noqa: E402
-from submit_second_approval import submit_second_approval  # noqa: E402
+from submit_second_approval import submit_second_approval, submit_expense_approval_direct  # noqa: E402
 from validate_config import validate  # noqa: E402
 from lookup_open_id import lookup_open_id, LookupError  # noqa: E402
 from uninstall import run as run_uninstall  # noqa: E402
@@ -442,6 +442,24 @@ def cmd_submit_2(args) -> int:
     return 0
 
 
+def cmd_submit_direct(args) -> int:
+    import json
+    storage = Storage(base_dir=Path(args.dir) if args.dir else None)
+    try:
+        summary = submit_expense_approval_direct(
+            storage=storage,
+            reimbursement_reason=args.reimbursement_reason,
+            dry_run=args.dry_run,
+        )
+    except RuntimeError as e:
+        print(f"[ERROR] {e}", file=sys.stderr)
+        return 2
+    print(json.dumps(summary, ensure_ascii=False, indent=2))
+    if not summary.get("ok"):
+        return 1
+    return 0
+
+
 def cmd_watcher_status(args) -> int:
     """显示 watcher 进程状态 + 最近日志."""
     import os
@@ -625,6 +643,14 @@ def main():
     p_submit2.add_argument("--dry-run", action="store_true",
                            help="假设第一审批 APPROVED，预览表单 JSON，不真提交")
     p_submit2.set_defaults(func=cmd_submit_2)
+
+    p_submit_direct = sub.add_parser("submit-direct", help="M4 direct: create expense report without first approval")
+    p_submit_direct.add_argument("--reimbursement-reason", "--expense-reason",
+                                 dest="reimbursement_reason", default=None,
+                                 help="报销事由文本 (用于飞书费用报销审批的'报销事由'字段)")
+    p_submit_direct.add_argument("--dry-run", action="store_true",
+                                 help="预览表单 JSON，不上传也不真提交")
+    p_submit_direct.set_defaults(func=cmd_submit_direct)
 
     p_ws = sub.add_parser("watcher-status", help="查询后台审批守护进程状态 + 最近一次轮询结果")
     p_ws.add_argument("--log-lines", type=int, default=10,

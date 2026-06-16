@@ -270,6 +270,14 @@ displayLabel | displayScene | sourceType | sourceRoot | field | apiField | front
 - `traceChain`：从 UI 绑定到接口/静态配置/本地状态的完整链路。
 - `evidence`：源码行号、接口文档位置或明确文件路径。
 
+展示字段命名必须以前端为准，而不是以后端接口文档为准：
+
+- `displayLabel` 必须优先取模板真实文案、`v-for` 行里的 `row.label`、`metric.label`、`path.title`、按钮文案、截图可见文案，或前端 normalize/config 中写死的中文 label。
+- 接口文档只用于确认字段来源、类型和接口路径，不能反向把页面字段名改成接口字段名或对象名。
+- 如果页面通过 computed/normalize 把一个对象拆成多行展示，例如 `normalizeRows([{ label:'报录比', value:data.xxx }])`，必须按每一个前端 label 拆字段卡，并映射到对应 value 读取的后端字段。
+- 如果接口文档只写到对象级，例如 `vip.interviewProbability`，但前端源码实际读取 `interviewProbability.interviewApplicationRatio`，字段卡仍应写页面展示名 `报录比（投递:录取）`，`apiField` 写实际代码读取路径；文档对象级说明放在 evidence 或 notes，不得把字段合并成“基础竞争指标 / data.vip.interviewProbability”。
+- 如果文档和代码都没有对应字段，才标记为 `derived-risk` 或 `pendingQuestions`；不要用接口文档里的近似对象名代替页面字段。
+
 后端响应字段必须写成：
 
 ```txt
@@ -321,6 +329,7 @@ service 函数名、前端处理函数名和解析函数名只能放在 `fronten
 必须拆分的场景：
 
 - `v-for` 数组展示多个业务指标时，每个 label/value 都是一条字段溯源。例如 `teamStats[]` 必须拆成“发展大使”“达标大使”“团队注册”“团队订单”，分别写出各自 API 字段。
+- `v-for` 展示由前端 normalize/config 生成的分析行时，也必须按前端 label 拆开。例如“报录比（投递:录取）”“网申通过率”“平均晋升周期”“管理序列”分别对应各自读取的字段，不能合并成“竞争比对象”“发展前景对象”。
 - 一个卡片同时展示标题、金额、状态、时间、账号、原因时，每个展示项都要拆开。例如提现记录必须拆成“提现金额”“申请时间”“提现状态”“收款方式”“收款账号”“审核时间/打款时间”“驳回原因”。
 - 一个 computed 数组或配置数组由多个后端字段 push/拼装而成时，不得只写数组名。例如 `pageData.structure` 必须拆成“个人推广佣金”“团队任务奖励”“团队订单分佣”“待结算”。
 - 列表项字段必须拆到列表项内部字段。例如用户卡片必须拆成“用户昵称”“注册时间”“来源渠道”“有效状态”；团队大使卡必须拆成“大使名称”“注册人数”“达标状态”。

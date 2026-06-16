@@ -134,31 +134,51 @@ def _validate_imap(imap_cfg: dict, result: ValidationResult):
 
 
 def _validate_feishu(feishu_cfg: dict, result: ValidationResult):
-    """校验 config.json feishu 节."""
+    """校验 config.json feishu 节.
+
+    当前主流程为直接提交费用报销，不再强制要求旧的采购申请
+    definition_code / purchase_entity 配置。
+    """
     if not feishu_cfg or not isinstance(feishu_cfg, dict):
         result.add("feishu", "config.json 缺少 'feishu' 节.",
                    fix_hint="在 config.json 中添加 feishu 配置. "
-                            "需要: definition_code, user_id, purchase_entity.key/text")
+                            "需要: expense_definition_code, user_id, "
+                            "reimburse_entity.key/text, expense_type.key/text")
         return
 
-    for key in ("definition_code", "user_id"):
-        if not feishu_cfg.get(key):
-            result.add(f"feishu.{key}",
-                       f"飞书 {key} 缺失.",
-                       fix_hint="从飞书开放平台后台获取 definition_code, "
-                                "从已通过的审批实例获取 user_id")
+    if not feishu_cfg.get("user_id"):
+        result.add("feishu.user_id",
+                   "飞书 user_id 缺失.",
+                   fix_hint="从已通过的审批实例获取 user_id, 或用 lookup-open-id 反查")
 
-    entity = feishu_cfg.get("purchase_entity")
+    if not feishu_cfg.get("expense_definition_code"):
+        result.add("feishu.expense_definition_code",
+                   "费用报销 expense_definition_code 缺失.",
+                   fix_hint="从飞书审批后台获取费用报销流程的 definition_code")
+
+    entity = feishu_cfg.get("reimburse_entity") or feishu_cfg.get("purchase_entity")
     if not entity or not isinstance(entity, dict):
-        result.add("feishu.purchase_entity",
-                   "飞书采购主体配置缺失.",
-                   fix_hint="添加 purchase_entity: {key: '...', text: '...'} 到 feishu 节")
+        result.add("feishu.reimburse_entity",
+                   "飞书报销主体配置缺失.",
+                   fix_hint="添加 reimburse_entity: {key: '...', text: '...'} 到 feishu 节")
     else:
         for ek in ("key", "text"):
             if not entity.get(ek):
-                result.add(f"feishu.purchase_entity.{ek}",
-                           f"采购主体 {ek} 缺失.",
-                           fix_hint="从已通过的采购申请表单中获取 option key 和显示文本")
+                result.add(f"feishu.reimburse_entity.{ek}",
+                           f"报销主体 {ek} 缺失.",
+                           fix_hint="从已通过的费用报销表单中获取 option key 和显示文本")
+
+    expense_type = feishu_cfg.get("expense_type")
+    if not expense_type or not isinstance(expense_type, dict):
+        result.add("feishu.expense_type",
+                   "飞书费用类型配置缺失.",
+                   fix_hint="添加 expense_type: {key: '...', text: '差旅费-打车费'} 到 feishu 节")
+    else:
+        for ek in ("key", "text"):
+            if not expense_type.get(ek):
+                result.add(f"feishu.expense_type.{ek}",
+                           f"费用类型 {ek} 缺失.",
+                           fix_hint="从已通过的费用报销表单中获取 option key 和显示文本")
 
     dept = feishu_cfg.get("department_id")
     if dept is not None and not isinstance(dept, str):
