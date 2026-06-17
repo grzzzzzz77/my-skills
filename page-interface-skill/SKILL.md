@@ -276,6 +276,8 @@ displayLabel | displayScene | sourceType | sourceRoot | field | apiField | front
 - 接口文档只用于确认字段来源、类型和接口路径，不能反向把页面字段名改成接口字段名或对象名。
 - 如果页面通过 computed/normalize 把一个对象拆成多行展示，例如 `normalizeRows([{ label:'报录比', value:data.xxx }])`，必须按每一个前端 label 拆字段卡，并映射到对应 value 读取的后端字段。
 - 如果接口文档只写到对象级，例如 `vip.interviewProbability`，但前端源码实际读取 `interviewProbability.interviewApplicationRatio`，字段卡仍应写页面展示名 `报录比（投递:录取）`，`apiField` 写实际代码读取路径；文档对象级说明放在 evidence 或 notes，不得把字段合并成“基础竞争指标 / data.vip.interviewProbability”。
+- 如果 service/adapter 先把后端原始 response key 映射成前端中间字段，例如 `raw['内推加成'] -> interviewReferralBoost`，字段卡必须区分两层：`apiField` / `sourceRoot` 写真实后端原始字段路径 `data.vip.interviewProbability['内推加成']`；`field` / `frontendLogic` / `traceChain` 再写前端归一化字段 `interviewReferralBoost`。除非接口文档或真实响应明确包含该英文 key，否则不得把前端中间字段写成后端 API 字段。
+- 如果 mapper 对同一展示字段兼容多个原始 key，例如 `raw['报录比投递录取'] ?? raw['报录比']`，`apiField` 写当前证据最强的主字段，兼容字段写进 `frontendLogic` 或风险说明；不要用“或者或者”的口吻替代主链路。
 - 如果文档和代码都没有对应字段，才标记为 `derived-risk` 或 `pendingQuestions`；不要用接口文档里的近似对象名代替页面字段。
 
 后端响应字段必须写成：
