@@ -1,7 +1,7 @@
 {
   "metadata": {
     "description": "Skills backup synced by Skills Manager",
-    "version": "2026.05.30"
+    "version": "2026.06.18"
   },
   "name": "my-skills",
   "owner": {
@@ -51,6 +51,15 @@
         "./"
       ],
       "source": "./code-reviewer",
+      "strict": false
+    },
+    {
+      "description": "Analyze a local Git repository's contribution history and generate evidence-backed project summaries, resume bullets, interview scripts, and claim-risk reports. Use when the user wants to understand what someone contributed to a codebase, package real project experience for a resume, prepare interview talking points, or audit whether contribution claims are safe under background checks.",
+      "name": "contrib-skill",
+      "skills": [
+        "./"
+      ],
+      "source": "./contrib-skill",
       "strict": false
     },
     {
