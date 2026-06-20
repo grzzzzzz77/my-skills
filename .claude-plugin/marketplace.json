@@ -1,7 +1,7 @@
 {
   "metadata": {
     "description": "Skills backup synced by Skills Manager",
-    "version": "2026.06.18"
+    "version": "2026.06.20"
   },
   "name": "my-skills",
   "owner": {
@@ -132,6 +132,15 @@
         "./"
       ],
       "source": "./frontend-design",
+      "strict": false
+    },
+    {
+      "description": "Use when helping a Chinese job seeker, especially students, interns, or early-career users, prepare job applications with an agent without fabricating experience, auto-submitting applications, scraping hiring platforms, or promising offers.",
+      "name": "job-ok",
+      "skills": [
+        "./"
+      ],
+      "source": "./job-ok",
       "strict": false
     },
     {
@@ -321,6 +330,15 @@
         "./"
       ],
       "source": "./web-design-guidelines",
+      "strict": false
+    },
+    {
+      "description": "Generate a reusable design.md or DESIGN.md from a live website by deeply inspecting the site with agent-browser and agent-browser eval, then synthesizing its visual language, layout system, interaction patterns, and content style into a structured markdown design system. Use when given website URLs and asked to analyze a site, reverse-engineer its design, extract its look and feel, write DESIGN.md, create a style guide, or capture UI rules for later AI-assisted design or implementation.",
+      "name": "website-to-design-md",
+      "skills": [
+        "./"
+      ],
+      "source": "./website-to-design-md",
       "strict": false
     },
     {

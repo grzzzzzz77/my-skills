@@ -1,0 +1,12 @@
+.DS_Store
+__pycache__/
+*.pyc
+.env
+.venv/
+venv/
+job-search-cases/
+raw/
+*.pdf
+*.docx
+*.xlsx
+*.csv.tmp
