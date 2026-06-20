@@ -20,7 +20,7 @@ Then install any skill you want:
 
 Browse all available skills with `/plugin` after adding the marketplace, or see the full list in [`.claude-plugin/marketplace.json`](./.claude-plugin/marketplace.json).
 
-## Skills (40)
+## Skills (43)
 
 | # | Skill | Description |
 |---|-------|-------------|
@@ -64,3 +64,6 @@ Browse all available skills with `/plugin` after adding the marketplace, or see 
 | 38 | **xcode-ios-simulator-setup** | Set up Xcode, iOS Simulator, and HBuilderX/uni-app iOS simulator debugging on macOS. Use when installing Xcode, fixing xcode-select, checking xcodebuild or simctl, downloading iOS simulator runtimes, running uni-app to iOS Simulator in HBuilderX, or resolving HBuilderX errors such as ARM64-only simulator runtime, iOS26 simulator base install failure, missing runtimes, or no iOS simulator devices. |
 | 39 | **resume-deep-report** | 面向求职者本人，根据简历和求职需求生成中性的深度简历分析、职业发展规划、市场分析、简历诊断、行动建议和资源指引报告；与面向服务老师且含服务承接的 career-report 区分。 |
 | 40 | **ian-xiaohei-illustrations** | 生成 Ian 风格的中文正文配图。用于中文文章、帖子、博客、Notion 文档、工作流文档、方法论、流程、结构、状态、隐喻或观点生成“小黑”“手绘”“正文配图”、配图建议和 shot list；默认小黑 IP、纯白手绘、少量红橙蓝批注、简洁清爽但天马行空的视觉风格。 |
+| 41 | **smart-interview-prep** | 全技术栈智能面试模拟器（13 个技术域）。支持交互式模拟面试与一键生成题库两种模式，提供 6 种面试官风格、编码题、JD 匹配分析、AI 辅助开发考察、自动追问和 1-10 分制加权评分报告。 |
+| 42 | **research-company** | 面向求职者的公司深度调研与背调报告技能。用于投递、面试或入职前了解目标公司做什么、产品与商业模式、市场位置、组织文化、领导层、招聘动机、岗位机会、风险点和可追问问题；要求来源引用，不确定信息需标记为未验证。 |
+| 43 | **qiaomu-novel-generator** | 中文原创短篇小说生成技能。把主题、人物设定、梗概、经典桥段灵感或已有片段，先整理成剧情钩子、人物欲望、冲突升级、大纲和可选策略，再生成完整、强吸引力、低 AI 味的中文故事；支持爽文、武侠、修仙、悬疑、科幻、现代组织内斗等方向，并强调不复制受版权保护内容。 |

@@ -349,6 +349,33 @@
       ],
       "source": "./xcode-ios-simulator-setup",
       "strict": false
+    },
+    {
+      "description": "全技术栈智能面试模拟器（13 个技术域）。支持交互式模拟面试与一键生成题库两种模式，提供 6 种面试官风格、编码题、JD 匹配分析、AI 辅助开发考察、自动追问和 1-10 分制加权评分报告。",
+      "name": "smart-interview-prep",
+      "skills": [
+        "./"
+      ],
+      "source": "./smart-interview-prep",
+      "strict": false
+    },
+    {
+      "description": "面向求职者的公司深度调研与背调报告技能。用于投递、面试或入职前了解目标公司做什么、产品与商业模式、市场位置、组织文化、领导层、招聘动机、岗位机会、风险点和可追问问题；要求来源引用，不确定信息需标记为未验证。",
+      "name": "research-company",
+      "skills": [
+        "./"
+      ],
+      "source": "./research-company",
+      "strict": false
+    },
+    {
+      "description": "中文原创短篇小说生成技能。把主题、人物设定、梗概、经典桥段灵感或已有片段，先整理成剧情钩子、人物欲望、冲突升级、大纲和可选策略，再生成完整、强吸引力、低 AI 味的中文故事；支持爽文、武侠、修仙、悬疑、科幻、现代组织内斗等方向，并强调不复制受版权保护内容。",
+      "name": "qiaomu-novel-generator",
+      "skills": [
+        "./"
+      ],
+      "source": "./qiaomu-novel-generator",
+      "strict": false
     }
   ]
 }
