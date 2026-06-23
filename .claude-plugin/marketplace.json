@@ -36,15 +36,6 @@
       "strict": false
     },
     {
-      "description": "供公司「服务老师」使用：根据服务老师提交的学生简历和求职需求，生成个性化的求职就业评估报告。当服务老师提供学生的简历（或简历中的关键信息）并希望获得就业分析、求职规划、市场评估、职业方向建议时触发此 skill。触发关键词包括：就业评估、求职报告、职业规划、就业分析、找工作建议、简历诊断、市场分析。也适用于服务老师上传学生简历后希望获得分析反馈的场景。开始生成前会先与服务老师确认信息是否补充完整。",
-      "name": "career-report",
-      "skills": [
-        "./"
-      ],
-      "source": "./career-report",
-      "strict": false
-    },
-    {
       "description": "Use this skill to review code. It supports both local changes (staged or working tree) and remote Pull Requests (by ID or URL). It focuses on correctness, maintainability, and adherence to project standards.",
       "name": "code-reviewer",
       "skills": [
