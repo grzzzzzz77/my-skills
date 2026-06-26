@@ -1,0 +1,5 @@
+interface:
+  display_name: "项目转简历"
+  short_description: "AST框架识别并强校验渲染简历亮点报告与改写Prompt"
+  brand_color: "#2563EB"
+  default_prompt: "Use $project-to-resume to analyze this local repository and generate a Chinese HTML report plus a downstream resume rewrite prompt pack."

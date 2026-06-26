@@ -1,0 +1,107 @@
+{
+  "project_name": "发票解析与报销自动化服务",
+  "summary": "面向企业报销场景的 Python 服务，负责读取票据文件、抽取结构化字段、校验金额一致性并生成报销录入结果。",
+  "target_role": "后端开发 / Python 工程师",
+  "readiness": "可直接整理为后端自动化项目经历，生产规模与准确率指标需要确认",
+  "role_assumption": "未确认，默认使用“负责核心模块开发/参与服务建设”等保守表述。",
+  "disclosure_assumption": "不写真实公司、员工、票据号码、内部审批链接或生产库信息。",
+  "keywords": ["Python", "FastAPI", "PDF 解析", "结构化抽取", "校验规则", "自动化流程"],
+  "facts": [
+    {
+      "label": "业务流",
+      "value": [
+        "上传/读取发票文件 -> 文本抽取 -> 字段解析 -> 金额/日期校验 -> 报销数据生成 -> 异常提示",
+        "人工报销材料整理流程被拆解为可复核的自动化步骤"
+      ]
+    },
+    {
+      "label": "模块证据",
+      "value": [
+        "app/main.py",
+        "app/services/invoice_parser.py",
+        "app/services/reimbursement.py",
+        "app/models/invoice.py",
+        "tests/test_invoice_parser.py"
+      ]
+    },
+    {
+      "label": "可确认指标",
+      "value": [
+        "单次处理票据数量",
+        "字段抽取准确率",
+        "人工整理时间节省",
+        "异常拦截数量"
+      ]
+    }
+  ],
+  "highlights": [
+    {
+      "title": "发票字段解析与校验链路",
+      "category": "数据与自动化",
+      "score": 16,
+      "risk": "safe",
+      "readiness": "direct",
+      "evidence": [
+        "app/services/invoice_parser.py",
+        "app/models/invoice.py",
+        "tests/test_invoice_parser.py"
+      ],
+      "safe_bullet": "负责发票解析核心模块开发，基于文本抽取、字段归一化和金额/日期校验规则，将票据内容转为可复核的结构化报销数据。",
+      "enhanced_bullet": "负责发票解析核心模块开发，支持单次处理 X 张票据，字段抽取准确率达到 Y%，将人工整理时间从 A 分钟缩短至 B 分钟。",
+      "why": "能体现后端数据处理、规则建模和自动化流程落地能力。",
+      "interview": {
+        "situation": "人工整理报销票据需要反复核对金额、日期和发票信息，容易漏填或填错。",
+        "task": "负责票据字段解析、数据归一化和基础校验链路。",
+        "action": "拆分文本抽取、字段解析、金额日期校验和异常提示模块，并补充解析规则测试。",
+        "result": "代码层面形成可复核的结构化报销数据生成流程；准确率和节省时间需用户确认。",
+        "tradeoff": "规则解析可解释性强，但对异常版式需要保留人工复核入口。"
+      },
+      "data_to_confirm": [
+        "单次处理票据数量",
+        "字段抽取准确率",
+        "人工整理耗时变化"
+      ],
+      "usage": "direct_paste"
+    },
+    {
+      "title": "报销流程异常兜底与质量门禁",
+      "category": "可靠性",
+      "score": 14,
+      "risk": "safe",
+      "readiness": "rewrite",
+      "evidence": [
+        "app/services/reimbursement.py",
+        "tests/test_invoice_parser.py",
+        "app/main.py"
+      ],
+      "safe_bullet": "设计报销数据生成的异常兜底逻辑，围绕金额缺失、日期异常和字段解析失败等场景输出明确错误提示，提升自动化流程的可复核性。",
+      "enhanced_bullet": "设计报销数据生成的异常兜底逻辑，覆盖 X 类异常场景，拦截 Y+ 条异常票据数据，减少人工返工约 Z%。",
+      "why": "能体现可靠性意识和真实业务流程中的异常处理能力。",
+      "interview": {
+        "situation": "票据来源和格式不稳定，自动化流程不能只处理理想输入。",
+        "task": "负责报销数据生成前的异常判断和错误提示。",
+        "action": "按字段缺失、金额不一致、日期异常和解析失败拆分校验规则，并用测试覆盖典型异常。",
+        "result": "异常票据能够被识别并提示人工复核；拦截数量和返工变化需确认。",
+        "tradeoff": "更严格的校验能降低错误录入，但可能增加部分边界票据的人工确认成本。"
+      },
+      "data_to_confirm": [
+        "异常场景数量",
+        "异常拦截数量",
+        "人工返工变化"
+      ],
+      "usage": "rewrite_candidate"
+    }
+  ],
+  "safe_bullets": [
+    "负责发票解析核心模块开发，基于文本抽取、字段归一化和金额/日期校验规则，将票据内容转为可复核的结构化报销数据。",
+    "设计报销数据生成的异常兜底逻辑，围绕金额缺失、日期异常和字段解析失败等场景输出明确错误提示，提升自动化流程的可复核性。"
+  ],
+  "confirmation_items": [
+    {
+      "title": "自动化收益指标",
+      "text": "确认票据处理量、字段抽取准确率、人工整理时间变化后，可写增强版 bullet。"
+    }
+  ],
+  "interview_stories": [],
+  "prompt_pack": ""
+}

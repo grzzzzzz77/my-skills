@@ -1,0 +1,107 @@
+{
+  "project_name": "运营后台权限与订单管理系统",
+  "summary": "面向运营和客服角色的后台管理项目，覆盖登录鉴权、菜单权限、订单列表、订单详情和异常处理等核心业务流。",
+  "target_role": "前端开发",
+  "readiness": "可直接整理为前端项目经历，业务效率指标需要用户确认",
+  "role_assumption": "未确认，默认使用“负责/参与模块开发”等保守表述。",
+  "disclosure_assumption": "不写真实客户名、内部订单量、营收或生产环境细节。",
+  "keywords": ["Vue", "TypeScript", "Pinia", "Vue Router", "权限体系", "订单管理", "组件化"],
+  "facts": [
+    {
+      "label": "业务流",
+      "value": [
+        "登录/刷新登录态 -> 路由守卫 -> 动态菜单 -> 订单列表 -> 订单详情 -> 异常兜底",
+        "运营按角色访问不同页面入口，客服处理订单查询与状态跟进"
+      ]
+    },
+    {
+      "label": "模块证据",
+      "value": [
+        "src/router/guard.ts",
+        "src/stores/user.ts",
+        "src/pages/order/list.vue",
+        "src/services/order.ts",
+        "src/components/TableFilter.vue"
+      ]
+    },
+    {
+      "label": "可确认指标",
+      "value": [
+        "角色数量",
+        "后台页面数量",
+        "订单查询接口数量",
+        "同类页面开发周期变化"
+      ]
+    }
+  ],
+  "highlights": [
+    {
+      "title": "后台权限与菜单访问控制",
+      "category": "权限与安全",
+      "score": 15,
+      "risk": "safe",
+      "readiness": "direct",
+      "evidence": [
+        "src/router/guard.ts",
+        "src/stores/user.ts",
+        "src/services/auth.ts"
+      ],
+      "safe_bullet": "负责后台权限与菜单访问控制模块开发，基于路由守卫、登录态校验和菜单配置封装页面访问链路，支撑多角色后台功能入口管理。",
+      "enhanced_bullet": "负责后台权限与菜单访问控制模块开发，覆盖 X 类角色和 Y+ 页面入口，将新增角色配置时间缩短约 Z%。",
+      "why": "能体现权限抽象、前端架构和业务后台复杂度，不只是页面开发。",
+      "interview": {
+        "situation": "后台页面数量增加后，不同运营角色需要看到不同功能入口。",
+        "task": "负责权限校验、菜单渲染和登录态异常处理链路。",
+        "action": "抽象路由守卫、用户权限状态、菜单配置和未授权兜底逻辑，并与接口层联调。",
+        "result": "代码层面支持多角色页面访问控制；角色数量和配置效率需用户确认。",
+        "tradeoff": "前端权限提升体验和可维护性，但关键数据权限仍需后端校验。"
+      },
+      "data_to_confirm": [
+        "角色数量",
+        "页面入口数量",
+        "新增角色配置耗时"
+      ],
+      "usage": "direct_paste"
+    },
+    {
+      "title": "订单列表与筛选组件复用",
+      "category": "业务交付",
+      "score": 13,
+      "risk": "safe",
+      "readiness": "rewrite",
+      "evidence": [
+        "src/pages/order/list.vue",
+        "src/components/TableFilter.vue",
+        "src/services/order.ts"
+      ],
+      "safe_bullet": "参与订单管理核心页面开发，封装列表筛选、分页查询和接口请求逻辑，沉淀可复用表格筛选组件，提升同类后台页面迭代效率。",
+      "enhanced_bullet": "参与订单管理核心页面开发，沉淀 X 个表格/筛选复用组件，支撑 Y+ 个后台页面复用，将同类页面开发周期缩短约 Z%。",
+      "why": "能体现前端组件化和业务页面交付能力。",
+      "interview": {
+        "situation": "后台订单类页面筛选条件多、分页和状态展示重复度高。",
+        "task": "负责订单列表页面和通用筛选能力沉淀。",
+        "action": "拆分筛选表单、表格列配置、分页请求和错误兜底逻辑，统一服务层请求入口。",
+        "result": "代码层面减少列表页重复实现；复用页面数量和效率提升需确认。",
+        "tradeoff": "组件过度抽象会影响特殊页面灵活性，因此保留配置扩展点。"
+      },
+      "data_to_confirm": [
+        "复用组件数量",
+        "复用页面数量",
+        "开发周期变化"
+      ],
+      "usage": "rewrite_candidate"
+    }
+  ],
+  "safe_bullets": [
+    "负责后台权限与菜单访问控制模块开发，基于路由守卫、登录态校验和菜单配置封装页面访问链路，支撑多角色后台功能入口管理。",
+    "参与订单管理核心页面开发，封装列表筛选、分页查询和接口请求逻辑，沉淀可复用表格筛选组件，提升同类后台页面迭代效率。"
+  ],
+  "confirmation_items": [
+    {
+      "title": "权限模块指标",
+      "text": "确认角色数量、页面入口数量和新增角色配置耗时后，可写增强版 bullet。"
+    }
+  ],
+  "interview_stories": [],
+  "prompt_pack": ""
+}

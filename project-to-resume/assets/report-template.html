@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{{PROJECT_NAME}} 项目转简历报告</title>
+  <style>
+    :root {
+      --bg:#f5f7fb;--panel:#fff;--ink:#172033;--muted:#667085;--line:#dce5f0;
+      --blue:#2563eb;--cyan:#0891b2;--green:#12805c;--amber:#b7791f;--red:#c24135;
+      --soft:#eef4ff;--soft-green:#ecfdf5;--soft-amber:#fffbeb;--shadow:0 16px 44px rgba(31,48,86,.10);
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;color:var(--ink);background:radial-gradient(circle at 8% 0,rgba(37,99,235,.13),transparent 28rem),linear-gradient(180deg,#fbfdff,var(--bg));letter-spacing:0}
+    .page{width:min(1240px,calc(100% - 32px));margin:0 auto;padding:32px 0 56px}
+    .hero,.panel,.toolbar,.card{background:rgba(255,255,255,.95);border:1px solid var(--line);border-radius:8px;box-shadow:var(--shadow)}
+    .hero{padding:28px;margin-bottom:18px}
+    .eyebrow{font-size:13px;color:var(--blue);font-weight:800}
+    .hero h1{margin:10px 0 12px;font-size:clamp(30px,4vw,48px);line-height:1.08}
+    .lead{color:var(--muted);line-height:1.75;max-width:920px}
+    .meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+    .pill,.tag{display:inline-flex;align-items:center;border:1px solid #d8e2ed;border-radius:999px;background:#f8fafc;padding:6px 10px;font-size:12px;font-weight:750;color:#344054}
+    .grid{display:grid;gap:16px}
+    .metrics{grid-template-columns:repeat(4,minmax(0,1fr));margin-bottom:16px}
+    .metric{padding:18px}.metric strong{font-size:28px}.metric span{display:block;color:var(--muted);font-size:13px;margin-top:6px}
+    .layout{display:grid;grid-template-columns:292px minmax(0,1fr);gap:16px}
+    .toolbar{position:sticky;top:14px;padding:14px;align-self:start}
+    .control-title{font-size:13px;font-weight:850;color:#344054;margin:12px 0 8px}
+    .control-title:first-child{margin-top:0}
+    .filter{width:100%;min-height:40px;margin:5px 0;border:1px solid #ccd7e4;background:#fff;border-radius:8px;padding:0 10px;font:inherit;text-align:left;cursor:pointer;color:#243044}
+    .filter.active{border-color:var(--blue);background:var(--soft);color:#1d4ed8;font-weight:850}
+    .search{width:100%;min-height:44px;border:1px solid #ccd7e4;border-radius:8px;padding:0 12px;font:inherit;margin:4px 0 10px;background:#fff}
+    .section-title{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:4px 0 14px}
+    .section-title h2{margin:0;font-size:22px}
+    .panel{padding:18px;margin-bottom:16px}
+    .facts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+    .fact{border:1px solid #e4ebf3;background:#f8fafc;border-radius:8px;padding:12px;line-height:1.65}
+    .cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+    .card{padding:18px}.card h3{margin:0 0 10px;font-size:18px}.card p,.card .evidence,.card .interview{line-height:1.7;color:#344054}
+    .card ul{margin:8px 0 0;padding-left:20px}
+    .bullet,.copy-box,.prompt-box{background:#f8fafc;border:1px solid #e4ebf3;border-radius:8px;padding:12px;line-height:1.75;white-space:pre-wrap;overflow-wrap:anywhere}
+    .prompt-box{max-height:420px;overflow:auto;background:#fff}
+    .safe{color:var(--green)}.needs_confirmation{color:var(--amber)}.risky{color:var(--red)}
+    .copy-row{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;margin:0 0 10px}
+    .copy-button{border:1px solid #b7c6d8;background:#fff;border-radius:8px;min-height:36px;padding:0 12px;font:inherit;font-weight:800;color:#1f3657;cursor:pointer}
+    .copy-button:hover{border-color:var(--blue);color:var(--blue)}
+    table{width:100%;border-collapse:collapse;font-size:14px}
+    th,td{padding:12px;border-bottom:1px solid #edf2f7;text-align:left;vertical-align:top;line-height:1.55}
+    th{background:#f8fbff;color:#344054}
+    @media(max-width:960px){.metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.layout{grid-template-columns:1fr}.toolbar{position:static}.cards,.facts{grid-template-columns:1fr}}
+    @media(max-width:560px){.page{width:min(100% - 20px,1240px);padding-top:20px}.hero,.panel,.card{padding:18px}.metrics{grid-template-columns:1fr}.section-title{align-items:flex-start;flex-direction:column}}
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section class="hero">
+      <div class="eyebrow">Project To Resume · 代码证据转简历亮点</div>
+      <h1>{{PROJECT_NAME}}</h1>
+      <p class="lead">{{SUMMARY}}</p>
+      <div class="meta">
+        <span class="pill">目标岗位：{{TARGET_ROLE}}</span>
+        <span class="pill">分析时间：{{GENERATED_AT}}</span>
+        <span class="pill">仓库：{{REPO_PATH}}</span>
+        <span class="pill">整体可用度：{{READINESS}}</span>
+      </div>
+    </section>
+
+    <section class="grid metrics">
+      {{METRIC_CARDS}}
+    </section>
+
+    <div class="layout">
+      <aside class="toolbar">
+        <input class="search" id="search" placeholder="搜索亮点、技术、模块" />
+
+        <div class="control-title">按类别</div>
+        <button class="filter active" data-category="all">全部类别</button>
+        {{CATEGORY_FILTERS}}
+
+        <div class="control-title">按风险</div>
+        <button class="filter active" data-risk="all">全部风险</button>
+        <button class="filter" data-risk="safe">可直接写</button>
+        <button class="filter" data-risk="needs_confirmation">需确认数据</button>
+        <button class="filter" data-risk="risky">不要直接写</button>
+
+        <div class="control-title">按可用性</div>
+        <button class="filter active" data-readiness="all">全部可用性</button>
+        {{READINESS_FILTERS}}
+      </aside>
+
+      <section>
+        <div class="panel">
+          <div class="section-title"><h2>项目事实包</h2><span class="tag">供简历改写使用</span></div>
+          <div class="facts">
+            {{PROJECT_FACTS}}
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="copy-row">
+            <div class="section-title" style="margin:0"><h2>直接可粘贴到简历</h2><span class="tag">{{SAFE_COUNT}} 条</span></div>
+            <button class="copy-button" data-copy-target="safe-bullets">复制安全版 bullet</button>
+          </div>
+          <div id="safe-bullets" class="copy-box">{{SAFE_BULLETS}}</div>
+        </div>
+
+        <div class="panel">
+          <div class="section-title"><h2>需要补充真实数据后再写</h2><span class="tag">增强版</span></div>
+          {{CONFIRMATION_ITEMS}}
+        </div>
+
+        <div class="section-title"><h2>亮点卡片</h2><span class="tag" id="count"></span></div>
+        <div class="cards" id="cards">
+          {{HIGHLIGHT_CARDS}}
+        </div>
+
+        <div class="panel" style="margin-top:16px">
+          <div class="copy-row">
+            <div class="section-title" style="margin:0"><h2>下游 Agent 简历改写 Prompt</h2><span class="tag">可复制</span></div>
+            <button class="copy-button" data-copy-target="pitch-prompt">复制 Prompt</button>
+          </div>
+          <pre id="pitch-prompt" class="prompt-box">{{PITCH_PROMPT}}</pre>
+        </div>
+
+        <div class="panel">
+          <div class="section-title"><h2>面试追问准备</h2></div>
+          {{INTERVIEW_STORIES}}
+        </div>
+
+        <div class="panel">
+          <div class="section-title"><h2>证据附录</h2></div>
+          {{EVIDENCE_APPENDIX}}
+        </div>
+      </section>
+    </div>
+  </main>
+  <script>
+    const state={category:'all',risk:'all',readiness:'all'};
+    const cards=[...document.querySelectorAll('.card[data-risk]')];
+    const search=document.getElementById('search');
+    const count=document.getElementById('count');
+    function setFilter(kind,value,button){
+      state[kind]=value;
+      document.querySelectorAll(`[data-${kind}]`).forEach(item=>item.classList.toggle('active',item===button));
+      render();
+    }
+    document.querySelectorAll('[data-category]').forEach(btn=>btn.addEventListener('click',()=>setFilter('category',btn.dataset.category,btn)));
+    document.querySelectorAll('[data-risk]').forEach(btn=>btn.addEventListener('click',()=>setFilter('risk',btn.dataset.risk,btn)));
+    document.querySelectorAll('[data-readiness]').forEach(btn=>btn.addEventListener('click',()=>setFilter('readiness',btn.dataset.readiness,btn)));
+    function render(){
+      const q=search.value.trim().toLowerCase();let shown=0;
+      cards.forEach(card=>{
+        const okCategory=state.category==='all'||card.dataset.category===state.category;
+        const okRisk=state.risk==='all'||card.dataset.risk===state.risk;
+        const okReadiness=state.readiness==='all'||card.dataset.readiness===state.readiness;
+        const okSearch=!q||card.textContent.toLowerCase().includes(q);
+        const ok=okCategory&&okRisk&&okReadiness&&okSearch;
+        card.style.display=ok?'block':'none';if(ok)shown++;
+      });
+      count.textContent=`当前显示 ${shown} / ${cards.length} 条`;
+    }
+    function fallbackCopy(text){
+      const area=document.createElement('textarea');area.value=text;area.style.position='fixed';area.style.left='-9999px';document.body.appendChild(area);area.focus();area.select();
+      try{document.execCommand('copy')}finally{document.body.removeChild(area)}
+    }
+    document.querySelectorAll('[data-copy-target]').forEach(btn=>btn.addEventListener('click',async()=>{
+      const target=document.getElementById(btn.dataset.copyTarget);if(!target)return;
+      const text=target.innerText||target.textContent||'';
+      try{await navigator.clipboard.writeText(text)}catch(e){fallbackCopy(text)}
+      const old=btn.textContent;btn.textContent='已复制';setTimeout(()=>btn.textContent=old,1200);
+    }));
+    search.addEventListener('input',render);render();
+  </script>
+</body>
+</html>
