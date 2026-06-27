@@ -11,8 +11,9 @@ v4 的重点不是更像某一个业务页面，而是让任何页面分析任�
 3. API 清单
 4. 业务流程节点
 5. 字段溯源 details
-6. 风险与待确认点
-7. 可点击 HTML 与标注图
+6. 后端接口字段一一映射矩阵
+7. 风险与待确认点
+8. 可点击 HTML 与标注图
 
 ## v3 暴露的问题
 
@@ -34,6 +35,7 @@ v4 报告必须能在一个全新会话里稳定复现同等质量。判断标�
 - 左侧默认是紧凑流程轴，不是模块卡片副本。
 - 中间默认是模块结构卡片，不承载完整流程说明。
 - 右侧默认是字段溯源卡片，不使用窄表格。
+- 当用户要求接口字段或后端字段时，默认生成 `apiFieldMappings`，字段来源主答案必须是 `METHOD /api/path -> response/request.field`，源码行号只作为证据。
 - 所有非直接响应字段都必须在 `traceChain` 里追到依赖来源或明确写“无接口来源”。
 - 所有人工判断必须进入 `pendingQuestions` 或 `qualityNotes`，不能只留在聊天上下文。
 
@@ -45,6 +47,7 @@ v4 报告必须能在一个全新会话里稳定复现同等质量。判断标�
 
 - `roleStateMatrix`
 - `apiInventory`
+- `apiFieldMappings`
 - `modules`
 - `flows`
 - `details`
@@ -245,6 +248,7 @@ Right detail：接口、字段、computed/normalize、证据、风险
 - 没有真实截图时明确标注“非真机截图”。
 - 没有使用无依据的漂浮红框。
 - `rg` 能搜索到关键接口、关键字段、关键风险。
+- 用户要求后端字段映射时，`apiFieldMappings` 非空；每条 response/request mapping 都包含 URL、方向、后端字段路径、前端字段、加工逻辑和证据。
 
 建议自动校验：
 

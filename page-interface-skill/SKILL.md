@@ -16,7 +16,8 @@ description: Analyze frontend pages, service code, business flows, and backend A
 每次生成前必须把以下内容显式写进 `flowSpec`，HTML 只能从这些结构渲染：
 
 - `layoutContract`：说明当前报告采用的布局角色，例如左侧紧凑流程轴、中间模块结构图、右侧字段溯源。
-- `traceabilityContract`：说明字段必须包含 displayLabel、sourceType、apiField、frontendLogic、traceChain、evidence。
+- `traceabilityContract`：说明字段必须包含 displayLabel、sourceType、sourceRoot、apiField、frontendLogic、traceChain、evidence。
+- `apiFieldMappingContract`：说明本报告是否建立“页面显示字段 -> 后端接口字段”的一一映射矩阵；当用户要求接口字段、后端字段、字段来源、PRD 给 AI 读时必须启用。
 - `displayDataIndexContract`：说明本报告是否按“前端显示数据”建立索引；复杂页面或用户关心“数据从哪来”时必须启用。
 - `qualityGates`：记录本次已执行或应执行的校验项。
 - `uncertainties` / `pendingQuestions`：没有证据的地方必须作为待确认点，不得靠猜测补齐。
@@ -324,6 +325,57 @@ service 函数名、前端处理函数名和解析函数名只能放在 `fronten
 - `fieldTraces` 不得只覆盖接口响应字段；静态文案、本地状态、computed 状态、提交请求字段和 fallback 文案也要标明源头。
 - 如果某个 UI 展示由多个来源合并，例如“后端 count + 历史消息解析 + 本地点击次数”，必须拆出总门禁字段和各来源字段，不能只写最终变量。
 
+#### 4.0.3 后端接口字段一一映射矩阵（强制）
+
+当用户明确要求“接口字段”“后端字段”“字段来源一一对应”“给 AI 足够上下文不用再读代码”时，报告必须额外建立 `apiFieldMappings`，并且右侧字段卡、字段索引表、Markdown 明细都以它为主数据源。源码行号只能作为 `evidence`，不能作为字段来源的主答案。
+
+`apiFieldMappings` 每一条必须回答：
+
+```txt
+页面显示字段 -> 后端接口 URL -> response/request 字段路径 -> 前端字段 -> 加工逻辑 -> 展示条件 -> 证据
+```
+
+结构建议：
+
+```json
+{
+  "id": "practice.question-title",
+  "moduleId": "practice.question-objective",
+  "displayLabel": "题干内容",
+  "displayScene": "答题页题目区域",
+  "direction": "response",
+  "apiName": "APIGetPracticeRecordDetail / APIGeneratePracticeBySearch / APIRetryPractice",
+  "method": "POST",
+  "url": "/question/bank/practice-detail",
+  "sourceRoot": "POST /question/bank/practice-detail -> response.data.questions[].content",
+  "apiField": "data.questions[].content",
+  "apiFieldMeaning": "题目题干",
+  "frontendField": "currentQuestion.content",
+  "frontendLogic": "currentQuestion = questions[currentIndex]；record/search/retry 三种加载模式都会写入 questions",
+  "displayCondition": "questions.length > 0",
+  "fallback": "-",
+  "evidence": ["practice.vue:30", "practice.vue:173-176", "practice.vue:630-744"],
+  "confidence": "high"
+}
+```
+
+拆分规则：
+
+- 一个页面显示项对应一个 mapping，不要把多个后端字段合并成“题目对象”“记录对象”“结果统计对象”。
+- 列表字段必须写数组路径，例如 `response.data[].fileName`、`response.data.questions[].options[].value`；同时写前端 item 字段，例如 `item.fileName`、`option.value`。
+- 提交字段也要进入矩阵，`direction` 写 `request`，例如 `POST /question/bank/update-answer -> request.userAnswer`。
+- 同一 UI 字段可能来自多个入口接口时，必须列出多个 `sourceRoot` 或拆成多条 mapping，并说明入口条件。例如答题页题目来自 record/search/retry 三个接口。
+- 如果是本地状态、静态文案、computed、storage 或 route query，`apiField` 写 `-`，`sourceRoot` 写 `route query -> practiceId`、`storage questionBankSearchHistory`、`template static` 等明确非后端来源。
+- 如果目前只能从前端代码推断后端响应字段，没有 OpenAPI/Swagger 证据，`confidence` 不能写满；在 `pendingQuestions` 标注“后端 schema 待确认”。
+- 字段卡顶部必须优先展示 `sourceRoot` 与 `apiField`。如果顶部只出现 `index.vue:xx`、`computed`、`APIGetXxx` 等而没有 URL 和字段路径，对 response/request 字段视为不合格。
+
+HTML 交付要求：
+
+- 主报告必须有一个宽区块叫“后端字段映射矩阵”或等价名称，列出 `页面显示字段 / 接口 / 后端字段 / 前端字段 / 加工逻辑 / 证据`。
+- 右侧详情点击某个模块时，必须只显示该模块相关 mappings，并在第一屏直接看到后端接口字段。
+- `flowSpec.modules[*]` 应使用 `fieldTraces` 或 `mappingIds` 关联 `apiFieldMappings`；不要只放旧式 `fields: [{ name, source, usage }]`。
+- 质量门禁必须检查：`apiFieldMappings.length > 0`；每条 response/request mapping 的 `sourceRoot` 以 `METHOD /path` 开头；每条 response/request mapping 的 `apiField` 不为空且不等于笼统 `data`。
+
 #### 4.1 原子字段拆分规则（强制）
 
 字段溯源必须按“页面上用户能看到的单个文案/数值/状态/输入项”拆成原子字段卡，禁止把多个 UI 数据合并成一条模糊字段。
@@ -502,6 +554,7 @@ service 函数名、前端处理函数名和解析函数名只能放在 `fronten
 生成 `*.flow.html` 时必须满足这些可检查约束，不能只凭主观感觉：
 
 - **结构数据驱动**：HTML 只能从 `flowSpec` 渲染，不要把重要业务解释只写在 HTML 字符串里；`flowSpec.json` 必须单独输出。
+- **后端字段矩阵驱动**：用户要求接口字段/后端字段/字段来源时，必须生成 `apiFieldMappings`，并由它驱动右侧字段卡和字段索引。源码行号只是证据，不能替代 `METHOD /api/path -> response/request.field`。
 - **字段卡片而非窄表格**：右侧详情面板里的字段溯源默认使用分层卡片。卡片必须包含中文名、前端字段、sourceType、API 字段、来源接口、置信度、前端计算逻辑、traceChain；其中 traceChain/evidence 默认可折叠，不作为卡片主视觉。
 - **接口 URL 优先**：`response` / `request` / `parse` / `derived-risk` 字段的首层 sourceRoot 必须是 `METHOD /api/... -> response/request 字段`；字段卡主视觉、完整链路、Markdown 表格里都不能用 service 函数名或 前端处理函数名代替接口地址。
 - **traceChain 全覆盖**：每个字段都必须有 `traceChain`，且链路至少 4 步；computed 字段必须追到最终 API 字段或明确说明无 API 字段。
@@ -523,10 +576,12 @@ service 函数名、前端处理函数名和解析函数名只能放在 `fronten
 ```txt
 1. 解析 HTML 内嵌脚本，确认不报语法错。
 2. 检查 flowSpec.layoutContract / traceabilityContract / qualityGates 存在。
+2. 检查用户要求后端字段时，flowSpec.apiFieldMappingContract 存在，且 flowSpec.apiFieldMappings.length > 0。
 3. 检查 flowSpec.flows[*].module 都能命中 modules[*].id。
 4. 检查 flowSpec.modules[*].fieldTraces[*].displayLabel 非空。
 5. 检查每个 fieldTrace.traceChain 至少 4 步，computed/local/static 字段不得只有来源类型。
 6. 检查 response/request/parse 字段的 sourceRoot、traceChain、Markdown 明细和 HTML 主视觉都不以 service 函数名或 前端处理函数名代替 URL。
+6. 检查 response/request 类型的 apiFieldMappings[*].sourceRoot 以 `METHOD /path -> response/request.` 开头，apiField 不为空、不等于 `data`，且 detail 面板第一屏能看到这些值。
 7. 检查 HTML 包含 flow-rail 或等价流程轴、module-card、field-trace-card。
 8. 检查字段卡长 token 换行规则存在：sourceRoot、API 字段、前端字段、traceChain、证据 chip 都不会撑出右侧面板。
 7. 检查左侧流程区没有重复渲染模块摘要、完整接口清单或字段详情。
@@ -549,6 +604,8 @@ service 函数名、前端处理函数名和解析函数名只能放在 `fronten
   "roles": [],
   "roleStateMatrix": [],
   "apiInventory": [],
+  "apiFieldMappingContract": "",
+  "apiFieldMappings": [],
   "flows": [],
   "screens": [],
   "modules": [],
