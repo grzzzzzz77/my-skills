@@ -66,4 +66,4 @@ Browse all available skills with `/plugin` after adding the marketplace, or see 
 | 40 | **smart-interview-prep** | 全技术栈智能面试模拟器（13 个技术域）。支持交互式模拟面试与一键生成题库两种模式，提供 6 种面试官风格、编码题、JD 匹配分析、AI 辅助开发考察、自动追问和 1-10 分制加权评分报告。 |
 | 41 | **research-company** | 面向求职者的公司深度调研与背调报告技能。用于投递、面试或入职前了解目标公司做什么、产品与商业模式、市场位置、组织文化、领导层、招聘动机、岗位机会、风险点和可追问问题；要求来源引用，不确定信息需标记为未验证。 |
 | 42 | **qiaomu-novel-generator** | 中文原创短篇小说生成技能。把主题、人物设定、梗概、经典桥段灵感或已有片段，先整理成剧情钩子、人物欲望、冲突升级、大纲和可选策略，再生成完整、强吸引力、低 AI 味的中文故事；支持爽文、武侠、修仙、悬疑、科幻、现代组织内斗等方向，并强调不复制受版权保护内容。 |
-| 43 | **project-to-resume** | 本地代码项目转简历亮点技能。支持轻量模式直接写 3-8 条项目 bullet，也支持 strict 模式生成证据校验 JSON、可筛选中文 HTML 报告、STAR 面试话术和下游改写 Prompt；增强 UniApp/小程序、Node 后端、AI Agent/RAG/工具调用等项目识别。 |
+| 43 | **project-to-resume** | 本地代码项目转简历亮点技能。支持轻量模式直接写 3-8 条项目 bullet，也支持 strict 模式生成证据校验 JSON、带左侧阅读目录/复制区的中文 HTML 报告、STAR 面试话术和下游改写 Prompt；默认输出技术术语优先的项目亮点，如 Stale Response 防护、Incremental Renderer、Schema-driven Form、Request Gateway、Frontend Observability。 |

@@ -94,3 +94,58 @@ Look for facts that a downstream resume-writing agent can safely reuse:
 - Role-relevant keywords.
 - 3-5 strongest bullets, not an exhaustive feature list.
 - Data that needs user confirmation before becoming a resume claim.
+
+## Anti-Generic Highlight Test
+
+A highlight is too generic if it only says:
+
+- Used a framework or common tool.
+- Built a module without naming the hard state, edge case, protocol, or abstraction.
+- "Supported" a business scenario without explaining what the code changed or prevented.
+- Lists many capabilities in one sentence but has no interview story.
+
+Before accepting a highlight, rewrite it through this lens:
+
+```text
+业务矛盾 / 技术风险 -> 具体机制 -> 覆盖范围 -> 可验证结果或需确认结果
+```
+
+Prefer:
+
+- Request race control, stale response prevention, pagination state boundaries.
+- AI streaming protocol parsing, markdown chunk rendering, long-session list virtualization.
+- Payment unlock states, order polling, fallback and entitlement gating.
+- Structured field mapping, multi-step form orchestration, skip/edit/confirm state transitions.
+- Upload permission, OSS signing, media type routing, retry/error exposure.
+- Cross-page renderer/composable/request-layer reuse with concrete consumers.
+
+Avoid safe bullets shaped like:
+
+```text
+参与某模块开发，封装 A/B/C，支撑 X/Y/Z 场景。
+```
+
+That pattern can appear in a project overview, but it is usually too flat for a final resume bullet unless the mechanism and edge case are also named.
+
+When the user explicitly asks for a stronger packaged story, the enhanced bullet may include a plausible product-result direction, but it must stay under confirmation unless the metric or ownership is verified.
+
+## Technical Term Priority
+
+In strict reports, phrase each accepted highlight as a technical capability first, not a business module first.
+
+Good title patterns:
+
+- `Stale Response 防护与列表状态一致性`
+- `WebSocket 消息协议适配与长会话渲染`
+- `Incremental Markdown Renderer`
+- `Schema-driven Form Flow`
+- `Request Gateway 与 API Telemetry`
+
+Weak title patterns:
+
+- `职位检索和筛选`
+- `AI 小北聊天`
+- `简历上传流程`
+- `会员付费功能`
+
+The body can mention the product scenario, but the title and first clause should expose the professional technical essence.

@@ -6,59 +6,494 @@
   <title>{{PROJECT_NAME}} 项目转简历报告</title>
   <style>
     :root {
-      --bg:#f5f7fb;--panel:#fff;--ink:#172033;--muted:#667085;--line:#dce5f0;
-      --blue:#2563eb;--cyan:#0891b2;--green:#12805c;--amber:#b7791f;--red:#c24135;
-      --soft:#eef4ff;--soft-green:#ecfdf5;--soft-amber:#fffbeb;--shadow:0 16px 44px rgba(31,48,86,.10);
-      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+      --page: #f4f6f8;
+      --paper: #ffffff;
+      --paper-2: #f8fafc;
+      --ink: #172033;
+      --muted: #667085;
+      --line: #d8e1ea;
+      --line-soft: #e8eef4;
+      --blue: #2563eb;
+      --blue-soft: #edf4ff;
+      --teal: #0f766e;
+      --teal-soft: #e8faf6;
+      --green: #12805c;
+      --green-soft: #ecfdf5;
+      --amber: #b7791f;
+      --amber-soft: #fff7df;
+      --red: #c24135;
+      --red-soft: #fff1ef;
+      --shadow: 0 14px 34px rgba(20, 34, 54, .08);
+      --radius: 8px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
     }
-    *{box-sizing:border-box}
-    body{margin:0;color:var(--ink);background:radial-gradient(circle at 8% 0,rgba(37,99,235,.13),transparent 28rem),linear-gradient(180deg,#fbfdff,var(--bg));letter-spacing:0}
-    .page{width:min(1240px,calc(100% - 32px));margin:0 auto;padding:32px 0 56px}
-    .hero,.panel,.toolbar,.card{background:rgba(255,255,255,.95);border:1px solid var(--line);border-radius:8px;box-shadow:var(--shadow)}
-    .hero{padding:28px;margin-bottom:18px}
-    .eyebrow{font-size:13px;color:var(--blue);font-weight:800}
-    .hero h1{margin:10px 0 12px;font-size:clamp(30px,4vw,48px);line-height:1.08}
-    .lead{color:var(--muted);line-height:1.75;max-width:920px}
-    .meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
-    .pill,.tag{display:inline-flex;align-items:center;border:1px solid #d8e2ed;border-radius:999px;background:#f8fafc;padding:6px 10px;font-size:12px;font-weight:750;color:#344054}
-    .grid{display:grid;gap:16px}
-    .metrics{grid-template-columns:repeat(4,minmax(0,1fr));margin-bottom:16px}
-    .metric{padding:18px}.metric strong{font-size:28px}.metric span{display:block;color:var(--muted);font-size:13px;margin-top:6px}
-    .layout{display:grid;grid-template-columns:292px minmax(0,1fr);gap:16px}
-    .toolbar{position:sticky;top:14px;padding:14px;align-self:start}
-    .control-title{font-size:13px;font-weight:850;color:#344054;margin:12px 0 8px}
-    .control-title:first-child{margin-top:0}
-    .filter{width:100%;min-height:40px;margin:5px 0;border:1px solid #ccd7e4;background:#fff;border-radius:8px;padding:0 10px;font:inherit;text-align:left;cursor:pointer;color:#243044}
-    .filter.active{border-color:var(--blue);background:var(--soft);color:#1d4ed8;font-weight:850}
-    .search{width:100%;min-height:44px;border:1px solid #ccd7e4;border-radius:8px;padding:0 12px;font:inherit;margin:4px 0 10px;background:#fff}
-    .section-title{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:4px 0 14px}
-    .section-title h2{margin:0;font-size:22px}
-    .panel{padding:18px;margin-bottom:16px}
-    .facts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-    .fact{border:1px solid #e4ebf3;background:#f8fafc;border-radius:8px;padding:12px;line-height:1.65}
-    .cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
-    .card{padding:18px}.card h3{margin:0 0 10px;font-size:18px}.card p,.card .evidence,.card .interview{line-height:1.7;color:#344054}
-    .card ul{margin:8px 0 0;padding-left:20px}
-    .bullet,.copy-box,.prompt-box{background:#f8fafc;border:1px solid #e4ebf3;border-radius:8px;padding:12px;line-height:1.75;white-space:pre-wrap;overflow-wrap:anywhere}
-    .prompt-box{max-height:420px;overflow:auto;background:#fff}
-    .safe{color:var(--green)}.needs_confirmation{color:var(--amber)}.risky{color:var(--red)}
-    .copy-row{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;margin:0 0 10px}
-    .copy-button{border:1px solid #b7c6d8;background:#fff;border-radius:8px;min-height:36px;padding:0 12px;font:inherit;font-weight:800;color:#1f3657;cursor:pointer}
-    .copy-button:hover{border-color:var(--blue);color:var(--blue)}
-    table{width:100%;border-collapse:collapse;font-size:14px}
-    th,td{padding:12px;border-bottom:1px solid #edf2f7;text-align:left;vertical-align:top;line-height:1.55}
-    th{background:#f8fbff;color:#344054}
-    @media(max-width:960px){.metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.layout{grid-template-columns:1fr}.toolbar{position:static}.cards,.facts{grid-template-columns:1fr}}
-    @media(max-width:560px){.page{width:min(100% - 20px,1240px);padding-top:20px}.hero,.panel,.card{padding:18px}.metrics{grid-template-columns:1fr}.section-title{align-items:flex-start;flex-direction:column}}
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: linear-gradient(180deg, #fbfcfe 0%, var(--page) 340px, var(--page) 100%);
+      letter-spacing: 0;
+    }
+    a { color: inherit; text-decoration: none; }
+    code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      font-size: 12px;
+      color: #334155;
+      background: #f1f5f9;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      padding: 2px 5px;
+      overflow-wrap: anywhere;
+    }
+    button, input { font: inherit; }
+
+    .page {
+      width: min(1440px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 24px 0 56px;
+    }
+    .hero {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 26px;
+      margin-bottom: 16px;
+    }
+    .eyebrow {
+      color: var(--teal);
+      font-size: 13px;
+      font-weight: 850;
+      margin-bottom: 8px;
+    }
+    h1 {
+      margin: 0;
+      font-size: 42px;
+      line-height: 1.14;
+    }
+    .lead {
+      max-width: 980px;
+      margin: 12px 0 0;
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.75;
+    }
+    .hero-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 18px;
+    }
+    .pill, .tag {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      border: 1px solid #d6e1eb;
+      border-radius: 999px;
+      background: #f8fafc;
+      color: #344054;
+      padding: 5px 10px;
+      font-size: 12px;
+      font-weight: 750;
+      line-height: 1.2;
+    }
+    .tag.safe { color: var(--green); background: var(--green-soft); border-color: #bee8d4; }
+    .tag.needs_confirmation { color: var(--amber); background: var(--amber-soft); border-color: #f5dda0; }
+    .tag.risky { color: var(--red); background: var(--red-soft); border-color: #f2c7c2; }
+
+    .report-layout {
+      display: grid;
+      grid-template-columns: 300px minmax(0, 1fr);
+      gap: 16px;
+      align-items: start;
+    }
+    .sidebar {
+      position: sticky;
+      top: 14px;
+      display: grid;
+      gap: 12px;
+    }
+    .side-panel, .section, .stat-card, .highlight-card, .story-card {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+    .side-panel { padding: 14px; }
+    .side-title {
+      margin: 0 0 10px;
+      color: #344054;
+      font-size: 13px;
+      font-weight: 850;
+    }
+    .toc {
+      display: grid;
+      gap: 4px;
+    }
+    .nav-link {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 38px;
+      border: 1px solid transparent;
+      border-radius: var(--radius);
+      color: #344054;
+      padding: 8px 10px;
+      font-size: 14px;
+      line-height: 1.2;
+    }
+    .nav-link:hover {
+      background: var(--paper-2);
+      border-color: var(--line-soft);
+    }
+    .nav-link.active {
+      color: #155e55;
+      background: var(--teal-soft);
+      border-color: #9bd8cf;
+      font-weight: 850;
+    }
+    .nav-link .index {
+      color: var(--muted);
+      font-size: 12px;
+      font-variant-numeric: tabular-nums;
+    }
+    .nav-link.active .index { color: #155e55; }
+
+    .main {
+      min-width: 0;
+      display: grid;
+      gap: 16px;
+    }
+    .section {
+      padding: 20px;
+      scroll-margin-top: 16px;
+    }
+    .section-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+    .section-kicker {
+      color: var(--teal);
+      font-size: 12px;
+      font-weight: 850;
+      margin-bottom: 4px;
+    }
+    h2 {
+      margin: 0;
+      font-size: 24px;
+      line-height: 1.25;
+    }
+    .section-desc {
+      margin: 7px 0 0;
+      color: var(--muted);
+      line-height: 1.65;
+      font-size: 14px;
+    }
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .stat-card {
+      padding: 16px;
+      box-shadow: none;
+      background: linear-gradient(180deg, #fff, #fbfdff);
+    }
+    .stat-card strong {
+      display: block;
+      font-size: 28px;
+      line-height: 1;
+      font-variant-numeric: tabular-nums;
+    }
+    .stat-card span {
+      display: block;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+      margin-top: 7px;
+    }
+    .facts {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+    .fact {
+      border: 1px solid var(--line-soft);
+      border-radius: var(--radius);
+      background: var(--paper-2);
+      padding: 13px;
+      line-height: 1.68;
+      min-width: 0;
+    }
+    .fact strong {
+      display: block;
+      color: #344054;
+      font-size: 13px;
+      margin-bottom: 5px;
+    }
+    .fact ul {
+      margin: 0;
+      padding-left: 18px;
+    }
+
+    .copy-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+    .copy-button {
+      min-height: 36px;
+      border: 1px solid #b7c6d8;
+      border-radius: var(--radius);
+      background: #fff;
+      color: #1f3657;
+      padding: 0 12px;
+      cursor: pointer;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+    .copy-button:hover {
+      color: var(--blue);
+      border-color: var(--blue);
+      background: var(--blue-soft);
+    }
+    .copy-box, .prompt-box, .bullet, .enhanced-item {
+      border: 1px solid var(--line-soft);
+      border-radius: var(--radius);
+      background: var(--paper-2);
+      padding: 14px;
+      color: #263241;
+      line-height: 1.78;
+      overflow-wrap: anywhere;
+      white-space: pre-wrap;
+    }
+    .prompt-box {
+      margin: 0;
+      max-height: 460px;
+      overflow: auto;
+      background: #fff;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      font-size: 13px;
+    }
+    .enhanced-list, .story-list {
+      display: grid;
+      gap: 10px;
+    }
+    .bullet, .enhanced-item {
+      white-space: normal;
+    }
+    .needs_confirmation { color: var(--amber); font-weight: 750; }
+    .safe { color: var(--green); }
+    .risky { color: var(--red); }
+
+    .highlight-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .cards {
+      display: grid;
+      gap: 12px;
+    }
+    .highlight-card {
+      padding: 0;
+      overflow: hidden;
+      box-shadow: none;
+    }
+    .highlight-card[hidden] { display: none; }
+    .card-main {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 260px;
+      gap: 16px;
+      padding: 18px;
+    }
+    .card-title-row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+    .highlight-card h3 {
+      margin: 0;
+      font-size: 19px;
+      line-height: 1.35;
+    }
+    .card-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin: 0 0 12px;
+    }
+    .card-value {
+      margin: 0 0 12px;
+      color: #344054;
+      line-height: 1.7;
+    }
+    .bullet-compare {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+    .bullet-block {
+      border: 1px solid var(--line-soft);
+      border-radius: var(--radius);
+      background: var(--paper-2);
+      padding: 12px;
+      line-height: 1.72;
+      color: #263241;
+    }
+    .bullet-block strong {
+      display: block;
+      margin-bottom: 5px;
+      color: #344054;
+      font-size: 13px;
+    }
+    .card-aside {
+      border-left: 1px solid var(--line-soft);
+      padding-left: 16px;
+      display: grid;
+      align-content: start;
+      gap: 10px;
+    }
+    .aside-box {
+      border: 1px solid var(--line-soft);
+      border-radius: var(--radius);
+      background: #fff;
+      padding: 10px;
+      color: var(--muted);
+      line-height: 1.58;
+      font-size: 13px;
+    }
+    .aside-box strong {
+      display: block;
+      color: #344054;
+      margin-bottom: 4px;
+    }
+    .card-details {
+      border-top: 1px solid var(--line-soft);
+      background: #fbfdff;
+      padding: 0 18px 16px;
+    }
+    details {
+      border: 1px solid var(--line-soft);
+      border-radius: var(--radius);
+      background: #fff;
+      margin-top: 12px;
+      overflow: hidden;
+    }
+    summary {
+      cursor: pointer;
+      min-height: 42px;
+      display: flex;
+      align-items: center;
+      padding: 0 12px;
+      color: #344054;
+      font-weight: 850;
+      list-style: none;
+    }
+    summary::-webkit-details-marker { display: none; }
+    summary::after {
+      content: "+";
+      margin-left: auto;
+      color: var(--muted);
+      font-weight: 850;
+    }
+    details[open] summary::after { content: "-"; }
+    details ul {
+      margin: 0;
+      padding: 0 14px 14px 28px;
+      line-height: 1.72;
+      color: #344054;
+    }
+    .interview-notes {
+      padding: 0 14px 14px;
+      color: #344054;
+      line-height: 1.72;
+    }
+    .interview-notes ul {
+      padding: 0 0 0 20px;
+    }
+
+    .story-card {
+      padding: 14px;
+      box-shadow: none;
+      line-height: 1.72;
+    }
+    .story-card strong {
+      display: block;
+      margin-bottom: 6px;
+      color: #263241;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+    th, td {
+      padding: 12px;
+      border-bottom: 1px solid var(--line-soft);
+      text-align: left;
+      vertical-align: top;
+      line-height: 1.62;
+      overflow-wrap: anywhere;
+    }
+    th {
+      width: 150px;
+      color: #344054;
+      background: var(--paper-2);
+    }
+    .empty-state {
+      display: none;
+      border: 1px dashed #cbd5e1;
+      border-radius: var(--radius);
+      background: #fff;
+      color: var(--muted);
+      padding: 24px;
+      text-align: center;
+    }
+
+    @media (max-width: 1100px) {
+      .report-layout { grid-template-columns: 1fr; }
+      .sidebar { position: static; }
+      .stat-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (max-width: 820px) {
+      .page { width: min(100% - 20px, 1440px); padding-top: 14px; }
+      .hero, .section { padding: 18px; }
+      h1 { font-size: 30px; }
+      h2 { font-size: 21px; }
+      .facts, .bullet-compare, .card-main { grid-template-columns: 1fr; }
+      .card-aside { border-left: 0; border-top: 1px solid var(--line-soft); padding: 14px 0 0; }
+      .copy-row, .section-head, .highlight-toolbar { align-items: flex-start; flex-direction: column; }
+      .copy-button { width: 100%; }
+    }
+    @media (max-width: 560px) {
+      .stat-grid { grid-template-columns: 1fr; }
+      .hero-meta { display: grid; }
+      th { width: 112px; }
+    }
   </style>
 </head>
 <body>
   <main class="page">
-    <section class="hero">
-      <div class="eyebrow">Project To Resume · 代码证据转简历亮点</div>
+    <section class="hero" id="top">
+      <div class="eyebrow">Project To Resume · 代码证据转专业技术亮点</div>
       <h1>{{PROJECT_NAME}}</h1>
       <p class="lead">{{SUMMARY}}</p>
-      <div class="meta">
+      <div class="hero-meta">
         <span class="pill">目标岗位：{{TARGET_ROLE}}</span>
         <span class="pill">分析时间：{{GENERATED_AT}}</span>
         <span class="pill">仓库：{{REPO_PATH}}</span>
@@ -66,111 +501,170 @@
       </div>
     </section>
 
-    <section class="grid metrics">
-      {{METRIC_CARDS}}
-    </section>
-
-    <div class="layout">
-      <aside class="toolbar">
-        <input class="search" id="search" placeholder="搜索亮点、技术、模块" />
-
-        <div class="control-title">按类别</div>
-        <button class="filter active" data-category="all">全部类别</button>
-        {{CATEGORY_FILTERS}}
-
-        <div class="control-title">按风险</div>
-        <button class="filter active" data-risk="all">全部风险</button>
-        <button class="filter" data-risk="safe">可直接写</button>
-        <button class="filter" data-risk="needs_confirmation">需确认数据</button>
-        <button class="filter" data-risk="risky">不要直接写</button>
-
-        <div class="control-title">按可用性</div>
-        <button class="filter active" data-readiness="all">全部可用性</button>
-        {{READINESS_FILTERS}}
+    <div class="report-layout">
+      <aside class="sidebar" aria-label="报告导航">
+        <nav class="side-panel" aria-label="阅读目录">
+          <h2 class="side-title">阅读目录</h2>
+          <div class="toc">
+            <a class="nav-link active" href="#overview" data-section-link="overview"><span>项目画像</span><span class="index">01</span></a>
+            <a class="nav-link" href="#safe" data-section-link="safe"><span>直接可写</span><span class="index">02</span></a>
+            <a class="nav-link" href="#confirm" data-section-link="confirm"><span>待确认增强</span><span class="index">03</span></a>
+            <a class="nav-link" href="#highlights" data-section-link="highlights"><span>技术亮点</span><span class="index">04</span></a>
+            <a class="nav-link" href="#prompt" data-section-link="prompt"><span>改写 Prompt</span><span class="index">05</span></a>
+            <a class="nav-link" href="#interview" data-section-link="interview"><span>面试追问</span><span class="index">06</span></a>
+            <a class="nav-link" href="#appendix" data-section-link="appendix"><span>证据附录</span><span class="index">07</span></a>
+          </div>
+        </nav>
       </aside>
 
-      <section>
-        <div class="panel">
-          <div class="section-title"><h2>项目事实包</h2><span class="tag">供简历改写使用</span></div>
+      <section class="main">
+        <section class="section" id="overview" data-section>
+          <div class="section-head">
+            <div>
+              <div class="section-kicker">Overview</div>
+              <h2>项目画像</h2>
+              <p class="section-desc">先看项目规模、技术栈、角色假设和可公开边界，再决定哪些内容能进入简历。</p>
+            </div>
+            <span class="tag">证据优先</span>
+          </div>
+          <div class="stat-grid">
+            {{METRIC_CARDS}}
+          </div>
           <div class="facts">
             {{PROJECT_FACTS}}
           </div>
-        </div>
+        </section>
 
-        <div class="panel">
+        <section class="section" id="safe" data-section>
           <div class="copy-row">
-            <div class="section-title" style="margin:0"><h2>直接可粘贴到简历</h2><span class="tag">{{SAFE_COUNT}} 条</span></div>
-            <button class="copy-button" data-copy-target="safe-bullets">复制安全版 bullet</button>
+            <div>
+              <div class="section-kicker">Resume Bullets</div>
+              <h2>直接可粘贴到简历</h2>
+              <p class="section-desc">优先展示技术术语明确、证据可追溯、不会把未确认业务数据写成事实的安全版表达。</p>
+            </div>
+            <div>
+              <span class="tag">{{SAFE_COUNT}} 条</span>
+              <button class="copy-button" data-copy-target="safe-bullets" type="button">复制安全版 bullet</button>
+            </div>
           </div>
           <div id="safe-bullets" class="copy-box">{{SAFE_BULLETS}}</div>
-        </div>
+        </section>
 
-        <div class="panel">
-          <div class="section-title"><h2>需要补充真实数据后再写</h2><span class="tag">增强版</span></div>
-          {{CONFIRMATION_ITEMS}}
-        </div>
+        <section class="section" id="confirm" data-section>
+          <div class="section-head">
+            <div>
+              <div class="section-kicker">Needs Confirmation</div>
+              <h2>需要补充真实数据后再写</h2>
+              <p class="section-desc">这里适合你回忆真实负责范围、上线范围、效果指标，再升级成更有结果感的简历写法。</p>
+            </div>
+            <span class="tag needs_confirmation">增强版</span>
+          </div>
+          <div class="enhanced-list">
+            {{CONFIRMATION_ITEMS}}
+          </div>
+        </section>
 
-        <div class="section-title"><h2>亮点卡片</h2><span class="tag" id="count"></span></div>
-        <div class="cards" id="cards">
-          {{HIGHLIGHT_CARDS}}
-        </div>
+        <section class="section" id="highlights" data-section>
+          <div class="section-head">
+            <div>
+              <div class="section-kicker">Evidence Explorer</div>
+              <h2>专业技术亮点</h2>
+              <p class="section-desc">每张卡片先给出技术本质，再展开项目场景、证据路径、简历表达和面试讲法。</p>
+            </div>
+            <span class="tag" id="highlightCount"></span>
+          </div>
+          <div class="highlight-toolbar">
+            <span>提示：标题优先看技术术语，详情里看证据路径和 STAR 追问。</span>
+          </div>
+          <div class="cards" id="highlightCards">
+            {{HIGHLIGHT_CARDS}}
+          </div>
+        </section>
 
-        <div class="panel" style="margin-top:16px">
+        <section class="section" id="prompt" data-section>
           <div class="copy-row">
-            <div class="section-title" style="margin:0"><h2>下游 Agent 简历改写 Prompt</h2><span class="tag">可复制</span></div>
-            <button class="copy-button" data-copy-target="pitch-prompt">复制 Prompt</button>
+            <div>
+              <div class="section-kicker">Handoff Prompt</div>
+              <h2>下游 Agent 简历改写 Prompt</h2>
+              <p class="section-desc">把这段交给后续简历改写 Agent，它会知道哪些能写、哪些必须先确认。</p>
+            </div>
+            <button class="copy-button" data-copy-target="pitch-prompt" type="button">复制 Prompt</button>
           </div>
           <pre id="pitch-prompt" class="prompt-box">{{PITCH_PROMPT}}</pre>
-        </div>
+        </section>
 
-        <div class="panel">
-          <div class="section-title"><h2>面试追问准备</h2></div>
-          {{INTERVIEW_STORIES}}
-        </div>
+        <section class="section" id="interview" data-section>
+          <div class="section-head">
+            <div>
+              <div class="section-kicker">Interview Stories</div>
+              <h2>面试追问准备</h2>
+              <p class="section-desc">优先准备这些可落到技术细节的故事，避免只会背简历 bullet。</p>
+            </div>
+          </div>
+          <div class="story-list">
+            {{INTERVIEW_STORIES}}
+          </div>
+        </section>
 
-        <div class="panel">
-          <div class="section-title"><h2>证据附录</h2></div>
+        <section class="section" id="appendix" data-section>
+          <div class="section-head">
+            <div>
+              <div class="section-kicker">Appendix</div>
+              <h2>证据附录</h2>
+              <p class="section-desc">这里保留代码扫描信号和安全说明，方便回查报告依据。</p>
+            </div>
+          </div>
           {{EVIDENCE_APPENDIX}}
-        </div>
+        </section>
       </section>
     </div>
   </main>
+
   <script>
-    const state={category:'all',risk:'all',readiness:'all'};
-    const cards=[...document.querySelectorAll('.card[data-risk]')];
-    const search=document.getElementById('search');
-    const count=document.getElementById('count');
-    function setFilter(kind,value,button){
-      state[kind]=value;
-      document.querySelectorAll(`[data-${kind}]`).forEach(item=>item.classList.toggle('active',item===button));
-      render();
+    const cards = Array.from(document.querySelectorAll('.highlight-card'));
+    const count = document.getElementById('highlightCount');
+    if (count) count.textContent = `共 ${cards.length} 条`;
+
+    function fallbackCopy(text) {
+      const area = document.createElement('textarea');
+      area.value = text;
+      area.style.position = 'fixed';
+      area.style.left = '-9999px';
+      document.body.appendChild(area);
+      area.focus();
+      area.select();
+      try { document.execCommand('copy'); } finally { document.body.removeChild(area); }
     }
-    document.querySelectorAll('[data-category]').forEach(btn=>btn.addEventListener('click',()=>setFilter('category',btn.dataset.category,btn)));
-    document.querySelectorAll('[data-risk]').forEach(btn=>btn.addEventListener('click',()=>setFilter('risk',btn.dataset.risk,btn)));
-    document.querySelectorAll('[data-readiness]').forEach(btn=>btn.addEventListener('click',()=>setFilter('readiness',btn.dataset.readiness,btn)));
-    function render(){
-      const q=search.value.trim().toLowerCase();let shown=0;
-      cards.forEach(card=>{
-        const okCategory=state.category==='all'||card.dataset.category===state.category;
-        const okRisk=state.risk==='all'||card.dataset.risk===state.risk;
-        const okReadiness=state.readiness==='all'||card.dataset.readiness===state.readiness;
-        const okSearch=!q||card.textContent.toLowerCase().includes(q);
-        const ok=okCategory&&okRisk&&okReadiness&&okSearch;
-        card.style.display=ok?'block':'none';if(ok)shown++;
+
+    document.querySelectorAll('[data-copy-target]').forEach(button => {
+      button.addEventListener('click', async () => {
+        const target = document.getElementById(button.dataset.copyTarget);
+        if (!target) return;
+        const text = target.innerText || target.textContent || '';
+        try { await navigator.clipboard.writeText(text); } catch (error) { fallbackCopy(text); }
+        const old = button.textContent;
+        button.textContent = '已复制';
+        setTimeout(() => { button.textContent = old; }, 1200);
       });
-      count.textContent=`当前显示 ${shown} / ${cards.length} 条`;
+    });
+
+    const sectionLinks = Array.from(document.querySelectorAll('[data-section-link]'));
+    const sections = Array.from(document.querySelectorAll('[data-section]'));
+    function setActiveSection(id) {
+      sectionLinks.forEach(link => link.classList.toggle('active', link.dataset.sectionLink === id));
     }
-    function fallbackCopy(text){
-      const area=document.createElement('textarea');area.value=text;area.style.position='fixed';area.style.left='-9999px';document.body.appendChild(area);area.focus();area.select();
-      try{document.execCommand('copy')}finally{document.body.removeChild(area)}
+    if ('IntersectionObserver' in window) {
+      const observer = new IntersectionObserver(entries => {
+        const visible = entries
+          .filter(entry => entry.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+        if (visible) setActiveSection(visible.target.id);
+      }, { rootMargin: '-18% 0px -65% 0px', threshold: [0.1, 0.2, 0.4] });
+      sections.forEach(section => observer.observe(section));
     }
-    document.querySelectorAll('[data-copy-target]').forEach(btn=>btn.addEventListener('click',async()=>{
-      const target=document.getElementById(btn.dataset.copyTarget);if(!target)return;
-      const text=target.innerText||target.textContent||'';
-      try{await navigator.clipboard.writeText(text)}catch(e){fallbackCopy(text)}
-      const old=btn.textContent;btn.textContent='已复制';setTimeout(()=>btn.textContent=old,1200);
-    }));
-    search.addEventListener('input',render);render();
+    sectionLinks.forEach(link => {
+      link.addEventListener('click', () => setActiveSection(link.dataset.sectionLink));
+    });
   </script>
 </body>
 </html>

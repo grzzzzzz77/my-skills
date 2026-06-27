@@ -88,6 +88,75 @@ Enhanced, needs confirmation:
 参与后台管理系统核心模块开发，沉淀列表/筛选/表单等 10+ 通用组件，将同类页面开发周期缩短约 X%。
 ```
 
+## Strong Highlight Pattern
+
+For final resume bullets, prefer a "conflict and mechanism" sentence over a feature inventory.
+
+Weak:
+
+```text
+接入文件上传和语音上传能力，支撑多个业务场景。
+```
+
+Stronger:
+
+```text
+围绕简历上传、聊天语音输入和网申附件补全 3 类入口，封装媒体选择、录音权限、OSS 签名上传、识别结果回填和错误曝光链路，降低多页面重复处理上传状态的成本。
+```
+
+Weak:
+
+```text
+参与 uni-app 小程序架构落地，支撑多个业务入口。
+```
+
+Stronger:
+
+```text
+按高频 Tab 与低频重流程拆分 uni-app 主包/分包，将职位、聊天、会员等入口与简历编辑、AI 读岗、题库等长流程分层组织，降低 100+ 页面项目的路由配置和交付复杂度。
+```
+
+Before writing a safe bullet, check whether it names at least two of:
+
+- A concrete user flow.
+- A hard edge case or state transition.
+- A reusable mechanism or abstraction.
+- A code-derived scope number.
+- A result that follows directly from the mechanism.
+
+If it does not, keep it as a project fact rather than a resume highlight.
+
+## Technical-First Wording
+
+Default strict-report highlights should lead with the technical concept, then explain the project context.
+
+Preferred shape:
+
+```text
+技术术语 / 中文本质：基于机制 A、机制 B 和机制 C，解决场景 X 下的问题 Y。
+```
+
+Examples:
+
+- `异步请求竞态治理 / Stale Response 防护`
+- `WebSocket 消息协议适配 / 长会话渲染管线`
+- `Incremental Markdown Renderer / 流式富文本渲染`
+- `Schema-driven Form / 字段映射驱动采集`
+- `Upload Pipeline / 多媒体上传管线抽象`
+- `Request Gateway / 小程序请求网关`
+- `Frontend Observability / 前端可观测性链路`
+- `Payment State Reconciliation / 支付后权益同步`
+- `Subpackage Routing Governance / uni-app 分包治理`
+
+Avoid titles that are only business descriptions:
+
+- `职位检索模块开发`
+- `简历资料完善链路`
+- `会员付费功能`
+- `AI 工具页开发`
+
+The business scenario may appear after the technical term, but the first impression should be professional frontend engineering capability.
+
 ## Interview STAR Notes
 
 For each strong bullet, prepare:

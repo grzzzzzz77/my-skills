@@ -125,7 +125,7 @@ def build_metric_cards(evidence: dict, analysis: dict) -> str:
         if isinstance(item, dict):
             cards.append((item.get("label", ""), item.get("value", ""), item.get("note", "")))
     return "\n".join(
-        f'<div class="panel metric"><strong>{h(value)}</strong><span>{h(label)} · {h(note)}</span></div>'
+        f'<article class="stat-card"><strong>{h(value)}</strong><span>{h(label)} · {h(note)}</span></article>'
         for label, value, note in cards[:8]
     )
 
@@ -176,7 +176,10 @@ def build_filter_buttons(highlights: list[dict], field: str, labels: dict | None
     rows = []
     for value in values:
         label = labels.get(value, value) if labels else value
-        rows.append(f'<button class="filter" data-{field}="{h(value)}">{h(label)}</button>')
+        rows.append(
+            f'<button class="filter-chip" data-filter-kind="{h(field)}" '
+            f'data-filter-value="{h(value)}" type="button">{h(label)}</button>'
+        )
     return "\n".join(rows)
 
 
@@ -198,17 +201,20 @@ def build_confirmation_items(highlights: list[dict], analysis: dict) -> str:
     rows = []
     for item in as_list(analysis.get("confirmation_items")):
         if isinstance(item, str):
-            rows.append(f'<div class="bullet">{h(item)}</div>')
+            rows.append(f'<div class="enhanced-item">{h(item)}</div>')
         elif isinstance(item, dict):
-            rows.append(f'<div class="bullet"><strong>{h(item.get("title", "待确认"))}</strong><br>{h(item.get("text", ""))}</div>')
+            rows.append(
+                f'<div class="enhanced-item"><strong>{h(item.get("title", "待确认"))}</strong><br>'
+                f'{h(item.get("text", ""))}</div>'
+            )
     for item in highlights:
         if item["risk"] == "needs_confirmation" and item.get("enhanced_bullet"):
             confirm = "；".join(str(x) for x in item.get("data_to_confirm", []) if str(x).strip())
             rows.append(
-                f'<div class="bullet"><strong>{h(item["title"])}</strong><br>{h(item["enhanced_bullet"])}'
+                f'<div class="enhanced-item"><strong>{h(item["title"])}</strong><br>{h(item["enhanced_bullet"])}'
                 f'<br><span class="needs_confirmation">需确认：{h(confirm or "真实数据/负责边界")}</span></div>'
             )
-    return "\n".join(rows) or '<div class="bullet">暂无增强版 bullet。</div>'
+    return "\n".join(rows) or '<div class="enhanced-item">暂无增强版 bullet。</div>'
 
 
 def render_interview_notes(notes: Any) -> str:
@@ -232,27 +238,45 @@ def build_highlight_cards(highlights: list[dict]) -> str:
     for item in highlights:
         evidence = as_list(item.get("evidence"))
         data_to_confirm = as_list(item.get("data_to_confirm"))
-        evidence_html = "<ul>" + "".join(f"<li><code>{h(path)}</code></li>" for path in evidence[:8]) + "</ul>" if evidence else "未提供"
+        evidence_html = "<ul>" + "".join(f"<li><code>{h(path)}</code></li>" for path in evidence[:8]) + "</ul>" if evidence else "<div class=\"interview-notes\">未提供</div>"
         confirm_html = "；".join(str(x) for x in data_to_confirm if str(x).strip()) or "无"
         rows.append(f"""
-          <article class="card" data-category="{h(item['category'])}" data-risk="{h(item['risk'])}" data-readiness="{h(item['readiness'])}">
-            <div class="meta">
-              <span class="tag">{h(item['category'])}</span>
-              <span class="tag {h(item['risk'])}">{h(RISK_LABELS[item['risk']])}</span>
-              <span class="tag">{h(READINESS_LABELS[item['readiness']])}</span>
-              <span class="tag">评分：{h(item.get('score') or '未评')}</span>
+          <article class="highlight-card" data-category="{h(item['category'])}" data-risk="{h(item['risk'])}" data-readiness="{h(item['readiness'])}">
+            <div class="card-main">
+              <div>
+                <div class="card-title-row">
+                  <h3>{h(item['title'])}</h3>
+                </div>
+                <div class="card-tags">
+                  <span class="tag">{h(item['category'])}</span>
+                  <span class="tag {h(item['risk'])}">{h(RISK_LABELS[item['risk']])}</span>
+                  <span class="tag">{h(READINESS_LABELS[item['readiness']])}</span>
+                  <span class="tag">评分：{h(item.get('score') or '未评')}</span>
+                </div>
+                <p class="card-value">{h(item.get('why') or '待补充')}</p>
+                <div class="bullet-compare">
+                  <div class="bullet-block"><strong>安全版</strong>{h(item.get('safe_bullet') or '待补充')}</div>
+                  <div class="bullet-block"><strong>增强版</strong>{h(item.get('enhanced_bullet') or '待确认数据后再写')}</div>
+                </div>
+              </div>
+              <aside class="card-aside">
+                <div class="aside-box"><strong>待确认</strong>{h(confirm_html)}</div>
+                <div class="aside-box"><strong>下游用途</strong>{h(item.get('usage') or '按风险标签决定')}</div>
+              </aside>
             </div>
-            <h3>{h(item['title'])}</h3>
-            <p><strong>价值：</strong>{h(item.get('why') or '待补充')}</p>
-            <div class="evidence"><strong>证据：</strong>{evidence_html}</div>
-            <div class="bullet"><strong>安全版：</strong><br>{h(item.get('safe_bullet') or '待补充')}</div>
-            <div class="bullet" style="margin-top:10px"><strong>增强版：</strong><br>{h(item.get('enhanced_bullet') or '待确认数据后再写')}</div>
-            <div class="interview"><strong>面试讲法：</strong>{render_interview_notes(item.get('interview'))}</div>
-            <p><strong>待确认：</strong>{h(confirm_html)}</p>
-            <p><strong>下游用途：</strong>{h(item.get('usage') or '按风险标签决定')}</p>
+            <div class="card-details">
+              <details>
+                <summary>证据路径</summary>
+                {evidence_html}
+              </details>
+              <details>
+                <summary>面试 STAR / 取舍</summary>
+                <div class="interview-notes">{render_interview_notes(item.get('interview')) or '待补充'}</div>
+              </details>
+            </div>
           </article>
         """)
-    return "\n".join(rows) or '<div class="panel">暂无亮点卡片。请补充 project_resume_analysis.json。</div>'
+    return "\n".join(rows) or '<div class="empty-state" style="display:block">暂无亮点卡片。请补充 project_resume_analysis.json。</div>'
 
 
 def build_interview_stories(highlights: list[dict], analysis: dict) -> str:
@@ -260,15 +284,15 @@ def build_interview_stories(highlights: list[dict], analysis: dict) -> str:
     rows = []
     for story in stories:
         if isinstance(story, dict):
-            rows.append(f'<div class="bullet"><strong>{h(story.get("title", "面试故事"))}</strong>{render_interview_notes(story.get("notes") or story)}</div>')
+            rows.append(f'<article class="story-card"><strong>{h(story.get("title", "面试故事"))}</strong>{render_interview_notes(story.get("notes") or story)}</article>')
         elif str(story).strip():
-            rows.append(f'<div class="bullet">{h(story)}</div>')
+            rows.append(f'<article class="story-card">{h(story)}</article>')
     if not rows:
         for item in highlights[:5]:
             notes = render_interview_notes(item.get("interview"))
             if notes:
-                rows.append(f'<div class="bullet"><strong>{h(item["title"])}</strong>{notes}</div>')
-    return "\n".join(rows) or '<div class="bullet">暂无 STAR 面试故事。</div>'
+                rows.append(f'<article class="story-card"><strong>{h(item["title"])}</strong>{notes}</article>')
+    return "\n".join(rows) or '<article class="story-card">暂无 STAR 面试故事。</article>'
 
 
 def build_evidence_appendix(evidence: dict) -> str:

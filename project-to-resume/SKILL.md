@@ -134,6 +134,19 @@ Use `references/highlight-rubric.md` to score candidate highlights. Prefer highl
 - Personal action: what the candidate actually did.
 - Impact: code-derived metric, verified metric, or clearly marked metric needing confirmation.
 
+Do not stop at feature inventory. A final highlight should expose the actual conflict or mechanism:
+
+- What state, edge case, protocol, or cross-page reuse made this harder than a normal page?
+- What abstraction, guard, renderer, request layer, payment state, upload path, or field mapping solved it?
+- What specific pages/services/components prove the story?
+- What result can be safely claimed from code, and what stronger result needs user confirmation?
+
+In strict reports, make the wording technical-first:
+
+- Use a professional term in the title or first clause, such as `Stale Response 防护`, `WebSocket 消息协议适配`, `Incremental Markdown Renderer`, `Schema-driven Form`, `Upload Pipeline`, `Request Gateway`, `Frontend Observability`, or `Payment State Reconciliation`.
+- Put the business scenario after the technical essence, not before it.
+- Avoid titles like "职位模块开发" or "简历流程优化" unless paired with a concrete engineering mechanism.
+
 Generate at least 8 candidate highlights when evidence allows, grouped into categories:
 
 - Business/product delivery
@@ -198,11 +211,31 @@ Use this structure:
 动词 + 技术/方法 + 业务对象 + 规模/指标 + 结果
 ```
 
+For strict reports, prefer this stronger shape when possible:
+
+```text
+业务矛盾/技术风险 + 具体机制 + 覆盖范围/代码规模 + 可验证价值
+```
+
+Even better when the user wants professional frontend wording:
+
+```text
+技术术语/工程机制 + 项目场景 + 关键实现 + 解决的问题
+```
+
 Good examples:
 
 - 负责订单模块重构，基于状态机拆分 6 类订单流转场景，沉淀可复用状态组件与异常兜底逻辑，降低后续需求改动成本。
 - 搭建后台权限与菜单配置体系，覆盖 4 类角色和 20+ 页面访问控制，支持运营后台按角色分配功能入口。
 - 封装统一请求、错误处理和登录态刷新链路，减少页面重复鉴权逻辑，提升接口联调与问题定位效率。
+
+Avoid generic but plausible wording:
+
+- "参与某模块开发，封装 A/B/C，支撑 X/Y/Z 场景。"
+- "基于 Vue/uni-app/Pinia 完成页面开发。"
+- "接入上传/支付/埋点能力。"
+
+These can be project facts, but a resume highlight should name the hard edge case, reusable mechanism, or measurable scope.
 
 Avoid unproven wording:
 
@@ -253,7 +286,7 @@ Use the renderer output as the final report. The report must include:
 
 - Project overview and target role.
 - Evidence summary.
-- Filterable highlight cards by category, risk, and resume readiness.
+- Left-side reading navigation with anchors for the major report sections and active-section highlighting.
 - Project fact pack for downstream resume rewrite.
 - Each highlight card with:
   - title
@@ -267,6 +300,13 @@ Use the renderer output as the final report. The report must include:
 - A “需要补充真实数据后再写” section.
 - A “下游 Agent 简历改写 Prompt” section.
 - A “面试追问准备” section.
+
+Report UX requirements:
+
+- The sidebar must not be a dead menu. It should jump to the matching right-side section and visibly track the current section while scrolling.
+- Keep the sidebar focused on reading navigation. Do not add a separate filter block unless the user explicitly asks for filtering.
+- Keep safe resume bullets early and copy-friendly. Put dense evidence paths and STAR details behind readable card structure or expandable details.
+- The report should feel like a working review document, not a loose dump of every extracted fact.
 
 Final chat response should be short: link the HTML file, link the prompt pack when generated, list the best 3-5 bullets, and mention any data that still needs confirmation.
 
@@ -282,7 +322,7 @@ Before final delivery:
 - Confirm `project_resume_analysis.json` passes `scripts/validate_analysis.py --evidence project_evidence.json --strict` in report mode.
 - Confirm the final report was rendered by `scripts/render_resume_report.py --strict`.
 - For skill maintenance, run `scripts/check_golden_fixtures.py` to verify each golden example can strict-render against its paired evidence fixture.
-- Confirm the HTML opens as a static file and the filters work.
+- Confirm the HTML opens as a static file, sidebar section links work, active section highlighting updates while scrolling, and copy buttons work.
 - Run no build/test command unless required for understanding or explicitly requested. Static scanning and Git commands are enough by default.
 
 ## References

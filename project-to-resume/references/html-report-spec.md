@@ -29,10 +29,9 @@ For final delivery, render with `--strict` so invalid `project_resume_analysis.j
    - Tests/config/docs signals
 
 3. Highlight Explorer
-   - Filter by category
-   - Filter by risk label
-   - Filter by resume readiness
-   - Search keyword
+   - Show all highlight cards by default.
+   - Show technical-first highlight titles, category, risk label, resume readiness, visible count, safe bullet, enhanced bullet, evidence paths, and STAR notes.
+   - Use expandable details for dense evidence/interview content.
 
 4. Project Fact Pack
    - One-line project summary.
@@ -57,6 +56,16 @@ For final delivery, render with `--strict` so invalid `project_resume_analysis.j
    - File paths and counts.
    - Mention that secrets and sensitive content were not included.
 
+## Information Architecture Requirements
+
+- The left sidebar has one job: **reading navigation**.
+- Sidebar links must jump to major report sections and update active-section highlighting while scrolling.
+- Do not add a separate highlight filter block unless the user explicitly asks for filtering.
+- Major sections must have stable anchors: overview, safe bullets, confirmation items, highlight explorer, downstream prompt, interview stories, and evidence appendix.
+- Keep the report scannable: show the safest resume material early, keep dense evidence and STAR notes behind expandable detail areas when practical.
+- The highlight explorer must show the total highlight count.
+- Highlight titles should expose professional technical essence first, such as `Stale Response 防护`, `Incremental Markdown Renderer`, `Request Gateway`, or `Frontend Observability`.
+
 ## Card Fields
 
 Each highlight card must include:
@@ -80,6 +89,7 @@ Each highlight card must include:
 - Responsive layout.
 - No external JavaScript dependency.
 - Cards with 8px border radius or less unless consistent with the design.
-- Custom filter controls for category/risk/readiness, not browser-default select styling when practical.
 - Copy controls for safe bullets and the downstream prompt when practical.
+- Left sidebar reading nav and right-side content must be interactive and aligned through anchors/active states.
+- Dense card details should be progressively disclosed with expandable evidence/interview sections instead of forcing everything into one visual block.
 - Text must not overflow on mobile.
