@@ -1,0 +1,69 @@
+{
+  "generated_at": "2026-06-27T00:00:00",
+  "repo": "/fixture/node-agent",
+  "project_name": "智能客服 Agent 编排服务",
+  "files_total": 7,
+  "file_index": [
+    "src/routes/chat.ts",
+    "src/agents/customerAgent.ts",
+    "src/tools/ticketTool.ts",
+    "src/retrieval/knowledgeBase.ts",
+    "src/services/llmClient.ts",
+    "src/services/sessionStore.ts",
+    "tests/customerAgent.test.ts"
+  ],
+  "file_index_truncated": false,
+  "evidence_paths_index": [
+    "src/routes/chat.ts",
+    "src/agents/customerAgent.ts",
+    "src/tools/ticketTool.ts",
+    "src/retrieval/knowledgeBase.ts",
+    "src/services/llmClient.ts",
+    "src/services/sessionStore.ts",
+    "tests/customerAgent.test.ts"
+  ],
+  "lines_total_estimate": 980,
+  "extensions": [[".ts", 7]],
+  "languages_by_lines": [["TypeScript", 980]],
+  "top_directories": [["src", 6], ["tests", 1]],
+  "key_files": ["package.json", "tsconfig.json"],
+  "manifests": {
+    "package.json": {
+      "name": "node-agent-fixture",
+      "scripts": ["dev", "test"],
+      "dependencies": ["@modelcontextprotocol/sdk", "express", "openai", "redis"],
+      "devDependencies": ["typescript", "vitest"]
+    }
+  },
+  "docs": [],
+  "framework_profiles": [
+    {"name": "Node API", "role": "backend", "confidence": 0.9, "signals": ["dependency:express", "pattern:router\\.(get|post|put|delete)"]},
+    {"name": "AI Agent", "role": "ai_agent", "confidence": 0.95, "signals": ["dependency:openai", "dependency:@modelcontextprotocol", "pattern:tool_call|function_call|tools\\s*[:=]"]}
+  ],
+  "specialized_signals": {
+    "node_backend": {"dependencies": ["express", "redis"], "confidence": 0.82, "basis": "dependency+source", "layer_candidates": {"routes": ["src/routes/chat.ts"], "services": ["src/services/llmClient.ts", "src/services/sessionStore.ts"]}},
+    "ai_agent": {"dependencies": ["@modelcontextprotocol/sdk", "openai"], "confidence": 0.9, "basis": "dependency+source", "file_candidates": {"agents": ["src/agents/customerAgent.ts"], "tools": ["src/tools/ticketTool.ts"], "rag_retrieval": ["src/retrieval/knowledgeBase.ts"]}, "pattern_counts": {"tool_calling": 2, "rag_retrieval": 1, "memory_state": 1}}
+  },
+  "resume_pitch_inputs": {
+    "description_candidates": ["面向客服知识问答和工单预处理场景的 Node.js AI 应用服务。"],
+    "tech_keywords": ["Node.js", "TypeScript", "OpenAI", "AI Agent", "RAG", "Tool Calling"],
+    "metric_candidates": [],
+    "sensitivity_signals": [],
+    "truth_questions": ["你在这个项目中的真实角色/负责边界是什么？"]
+  },
+  "patterns": {
+    "counts": {"frontend_pages": 0, "components": 0, "api_routes": 1, "services": 2, "state": 0, "tests": 1, "docs": 0, "ci_devops": 0, "auth_security": 0, "data_ai": 2, "agent_ai": 4},
+    "examples": {"api_routes": ["src/routes/chat.ts"], "services": ["src/services/llmClient.ts", "src/services/sessionStore.ts"], "tests": ["tests/customerAgent.test.ts"], "data_ai": ["src/retrieval/knowledgeBase.ts"], "agent_ai": ["src/agents/customerAgent.ts", "src/tools/ticketTool.ts"]}
+  },
+  "code_graph": {
+    "scanned_code_files": 7,
+    "entrypoints": [],
+    "routes": [{"source": "src/routes/chat.ts", "method": "POST", "path": "/chat"}],
+    "api_calls": [],
+    "local_import_edges": [{"source": "src/routes/chat.ts", "target": "../agents/customerAgent"}],
+    "ast_summaries": [],
+    "business_flow_candidates": [{"domain": "customeragent", "score": 3, "groups": {"other": ["src/agents/customerAgent.ts"], "service_or_api": ["src/services/llmClient.ts"]}}]
+  },
+  "git": {"is_git": false},
+  "highlight_seeds": []
+}

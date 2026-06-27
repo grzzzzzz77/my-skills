@@ -198,7 +198,7 @@
       "strict": false
     },
     {
-      "description": "Analyze a local project/repository deeply and turn real code, docs, architecture, Git history, AST/framework/code-graph signals, modules, business flows, and technical decisions into validated structured resume analysis JSON, resume-ready project highlights, quantified resume bullets, STAR interview stories, claim-risk labels, a downstream resume-rewrite prompt pack, and a strict script-rendered filterable Chinese HTML report. Includes golden analysis examples and strict warning/error validation. Use when the user asks to read a local code project thoroughly, mine project亮点, package code experience for a resume, write project bullets, extract resume-ready achievements, generate a prompt for another resume-writing agent, or generate a codebase-to-resume report.",
+      "description": "Turn local code projects into evidence-backed resume bullets, project highlights, STAR interview stories, optional HTML reports, and downstream resume-rewrite prompt packs. Use for codebase-to-resume, 项目亮点, 简历项目描述, project bullets, contribution packaging, and portfolio/interview story extraction across frontend/uni-app, Node/backend, AI/Agent, data automation, and full-stack projects.",
       "name": "project-to-resume",
       "skills": [
         "./"

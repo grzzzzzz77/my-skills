@@ -1,20 +1,21 @@
 ---
 name: project-to-resume
-description: Analyze a local project/repository deeply and turn real code, docs, architecture, Git history, framework/AST/code-graph signals, modules, business flows, and technical decisions into validated structured resume analysis JSON, resume-ready project highlights, quantified resume bullets, STAR interview stories, claim-risk labels, a downstream resume-rewrite prompt pack, and a strict script-rendered filterable Chinese HTML report. Use when the user asks to read a local code project thoroughly, mine project亮点, package code experience for a resume, write project bullets, extract resume-ready achievements, generate a prompt for another resume-writing agent, or generate a codebase-to-resume report.
+description: Turn local code projects into evidence-backed resume bullets, project highlights, STAR interview stories, optional HTML reports, and downstream resume-rewrite prompt packs. Use for codebase-to-resume, 项目亮点, 简历项目描述, project bullets, contribution packaging, and portfolio/interview story extraction across frontend/uni-app, Node/backend, AI/Agent, data automation, and full-stack projects.
 ---
 
 # Project To Resume
 
-Use this skill to turn a real local code project into credible resume material. The primary output is a Chinese HTML report containing categorized, selectable resume highlights and bullet points. Also generate a copy-friendly downstream prompt pack when the user may want another agent to merge the project into an existing resume.
+Use this skill to turn a real local code project into credible resume material. Match the output depth to the user's request: quick bullets for lightweight asks, structured analysis for normal project packaging, and a Chinese HTML report plus prompt pack for full deliverables.
 
 ## Core Promise
 
 Do not merely beautify wording. First build an evidence trail from the repository, then write resume bullets that can survive interview follow-up and background checks.
 
-Optimize for two use cases:
+Optimize for three use cases:
 
-1. **Direct resume material**: safe bullets, enhanced bullets, and interview stories in the HTML report.
-2. **Resume merge handoff**: a prompt pack containing project facts, writing constraints, role assumptions, keywords, and uncertainty notes for a downstream resume-writing agent.
+1. **Quick resume bullets**: 3-8 evidence-backed bullets in chat when the user only asks for a few project descriptions.
+2. **Direct resume material**: safe bullets, enhanced bullets, and interview stories in a structured analysis or HTML report.
+3. **Resume merge handoff**: a prompt pack containing project facts, writing constraints, role assumptions, keywords, and uncertainty notes for a downstream resume-writing agent.
 
 Each final highlight must include:
 
@@ -40,6 +41,20 @@ Ask only for missing essentials that cannot be inferred:
 
 ## Workflow
 
+### 0. Choose Execution Mode
+
+Choose the lightest mode that satisfies the user request:
+
+- **Quick mode**: Use when the user asks for a small number of bullets, a quick polish, or "帮我写 5 条项目描述". Run `collect_project_evidence.py`, read only the strongest evidence files, and answer in chat with bullets plus short caveats. Do not create JSON, HTML, or prompt pack unless the user asks.
+- **Standard mode**: Use when the user wants a reusable project analysis, categorized highlights, STAR stories, or a handoff prompt. Generate `project_resume_analysis.json`, validate it, and optionally render a prompt pack.
+- **Strict report mode**: Use when the user asks for an HTML report, deliverable, uploadable/package-quality skill output, or stable repeatable result. Generate evidence, structured JSON, run evidence-aware strict validation, then render the HTML and prompt pack through the scripts.
+
+If the user did not specify a final artifact, infer from wording:
+
+- "写几条/5 条/bullet/项目描述" -> Quick mode.
+- "分析项目/整理亮点/面试讲法" -> Standard mode.
+- "HTML 报告/漂亮报告/可筛选/交付/上传" -> Strict report mode.
+
 ### 1. Evidence Collection
 
 Run the bundled script first unless the repository is inaccessible:
@@ -61,7 +76,11 @@ Read the script outputs:
 Use these evidence sections before choosing files to inspect:
 
 - `project_evidence.json.framework_profiles`: framework-specific signals and confidence.
+- `project_evidence.json.specialized_signals`: UniApp/mobile, Node backend, and AI Agent/RAG/tool-call signals.
 - `project_evidence.json.code_graph`: route candidates, API call candidates, local import edges, entrypoints, AST summaries, and business-flow candidates.
+- `project_evidence.json.evidence_paths_index`: complete lightweight path index used by strict evidence-path validation.
+
+The collector intentionally excludes `examples/`, `references/`, `assets/`, and `docs/` from framework/business signal scoring so bundled samples and documentation do not masquerade as source-code evidence. Docs are still collected as documentation context.
 
 Then inspect targeted files directly. At minimum read:
 
@@ -92,11 +111,11 @@ Create a concise project model:
 - Primary users and business flows.
 - Tech stack and architecture.
 - Core modules and data flow.
-- Integration points: API, database, auth, payment, third-party services, AI/model calls, file upload, message, map, charts, etc.
+- Integration points: API, database, auth, payment, third-party services, AI/model calls, tool calls, RAG/retrieval, file upload, message, map, charts, etc.
 - Engineering quality signals: tests, types, lint, CI, modularization, error handling, caching, performance, observability.
 - Personal contribution signals if an author is specified.
 
-For frontend projects, also map pages/components to business flows. For backend projects, map endpoints/services/models/jobs. For full-stack projects, connect frontend flows to backend APIs.
+For frontend projects, map pages/components to business flows. For UniApp or mini-program projects, inspect `pages.json`, `manifest.json`, subpackages, tabBar, platform conditional compilation, `uni.login`, payment, map/location, upload, and uView/uni-ui usage. For backend projects, map routes/controllers/services/models/jobs/middleware/auth/cache/database. For Node backends, explicitly check Express/Koa/Fastify/Hono/NestJS, Prisma/TypeORM/Sequelize/Mongoose, queue/cache and validation layers. For AI/Agent projects, map prompt/model/tool/RAG/memory/workflow/evaluation flows. For full-stack projects, connect frontend flows to backend APIs.
 
 Capture at least one explicit flow map before writing final bullets:
 
@@ -104,6 +123,7 @@ Capture at least one explicit flow map before writing final bullets:
 - Backend: route/controller -> service -> model/repository -> external dependency -> business scenario.
 - Full-stack: frontend flow -> API endpoint -> backend service -> data persistence.
 - AI/data project: input -> processing/prompt/model -> output -> evaluation/guardrail.
+- AI Agent project: user task -> prompt/context -> model -> tool/RAG/memory/workflow -> validation/guardrail -> business output.
 
 ### 4. Mine Resume Highlights
 
@@ -143,11 +163,12 @@ This JSON is the handoff between deep project understanding and deterministic re
 
 Do not manually replace placeholders in `assets/report-template.html` for final delivery. Use the render script in step 9.
 
-Validate the JSON before rendering:
+Validate the JSON before rendering. When `project_evidence.json` is available, pass it so strict mode can verify that evidence paths really came from the repository scan:
 
 ```bash
 python3 <skill_dir>/scripts/validate_analysis.py \
   --analysis /path/to/project_resume_analysis.json \
+  --evidence /path/to/project_evidence.json \
   --strict
 ```
 
@@ -258,7 +279,9 @@ Before final delivery:
 - Confirm no sensitive secrets from the repo are copied into the report.
 - Confirm role assumptions and disclosure assumptions are visible when not user-confirmed.
 - Confirm `project_resume_analysis.json` exists and passes `scripts/validate_analysis.py --strict`.
+- Confirm `project_resume_analysis.json` passes `scripts/validate_analysis.py --evidence project_evidence.json --strict` in report mode.
 - Confirm the final report was rendered by `scripts/render_resume_report.py --strict`.
+- For skill maintenance, run `scripts/check_golden_fixtures.py` to verify each golden example can strict-render against its paired evidence fixture.
 - Confirm the HTML opens as a static file and the filters work.
 - Run no build/test command unless required for understanding or explicitly requested. Static scanning and Git commands are enough by default.
 
@@ -272,5 +295,7 @@ Before final delivery:
 - Evidence collector: `scripts/collect_project_evidence.py`
 - Analysis validator: `scripts/validate_analysis.py`
 - Report renderer: `scripts/render_resume_report.py`
+- Golden fixture check: `scripts/check_golden_fixtures.py`
 - Report template: `assets/report-template.html`
-- Golden examples: `examples/vue-admin-golden-analysis.json`, `examples/python-api-golden-analysis.json`
+- Golden examples: `examples/vue-admin-golden-analysis.json`, `examples/python-api-golden-analysis.json`, `examples/node-agent-golden-analysis.json`
+- Golden evidence fixtures: `examples/fixtures/*-project_evidence.json`

@@ -1,0 +1,71 @@
+{
+  "generated_at": "2026-06-27T00:00:00",
+  "repo": "/fixture/vue-admin",
+  "project_name": "运营后台权限与订单管理系统",
+  "files_total": 10,
+  "file_index": [
+    "src/router/guard.ts",
+    "src/stores/user.ts",
+    "src/stores/order.ts",
+    "src/services/auth.ts",
+    "src/services/order.ts",
+    "src/pages/order/list.vue",
+    "src/pages/order/detail.vue",
+    "src/components/TableFilter.vue",
+    "src/components/StatusTag.vue",
+    "src/utils/request.ts"
+  ],
+  "file_index_truncated": false,
+  "evidence_paths_index": [
+    "src/router/guard.ts",
+    "src/stores/user.ts",
+    "src/stores/order.ts",
+    "src/services/auth.ts",
+    "src/services/order.ts",
+    "src/pages/order/list.vue",
+    "src/pages/order/detail.vue",
+    "src/components/TableFilter.vue",
+    "src/components/StatusTag.vue",
+    "src/utils/request.ts"
+  ],
+  "lines_total_estimate": 1200,
+  "extensions": [[".ts", 6], [".vue", 4]],
+  "languages_by_lines": [["TypeScript", 760], ["Vue", 440]],
+  "top_directories": [["src", 10]],
+  "key_files": ["package.json", "vite.config.ts", "tsconfig.json"],
+  "manifests": {
+    "package.json": {
+      "name": "vue-admin-fixture",
+      "scripts": ["dev", "build", "test"],
+      "dependencies": ["@vitejs/plugin-vue", "pinia", "vue", "vue-router"],
+      "devDependencies": ["typescript", "vitest"]
+    }
+  },
+  "docs": [],
+  "framework_profiles": [
+    {"name": "Vue", "role": "frontend", "confidence": 0.95, "signals": ["dependency:vue", "dependency:pinia", "pattern:<script\\s+setup"]}
+  ],
+  "specialized_signals": {},
+  "resume_pitch_inputs": {
+    "description_candidates": ["面向运营和客服角色的后台管理项目。"],
+    "tech_keywords": ["Vue", "TypeScript", "Pinia", "Vue Router"],
+    "metric_candidates": [],
+    "sensitivity_signals": [],
+    "truth_questions": ["你在这个项目中的真实角色/负责边界是什么？"]
+  },
+  "patterns": {
+    "counts": {"frontend_pages": 2, "components": 2, "api_routes": 0, "services": 3, "state": 2, "tests": 0, "docs": 0, "ci_devops": 0, "auth_security": 3, "data_ai": 0, "agent_ai": 0},
+    "examples": {"frontend_pages": ["src/pages/order/list.vue", "src/pages/order/detail.vue"], "components": ["src/components/TableFilter.vue", "src/components/StatusTag.vue"], "services": ["src/services/auth.ts", "src/services/order.ts", "src/utils/request.ts"], "state": ["src/stores/user.ts", "src/stores/order.ts"], "auth_security": ["src/router/guard.ts", "src/services/auth.ts"]}
+  },
+  "code_graph": {
+    "scanned_code_files": 10,
+    "entrypoints": [],
+    "routes": [{"source": "src/pages/order/list.vue", "method": "file", "path": "/order/list"}],
+    "api_calls": [{"source": "src/services/order.ts", "client": "fetch", "target": "/api/orders"}],
+    "local_import_edges": [],
+    "ast_summaries": [],
+    "business_flow_candidates": [{"domain": "order", "score": 4, "groups": {"page_or_route": ["src/pages/order/list.vue"], "service_or_api": ["src/services/order.ts"]}}]
+  },
+  "git": {"is_git": false},
+  "highlight_seeds": []
+}

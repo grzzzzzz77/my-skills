@@ -22,7 +22,7 @@ SCRIPT_DIR = Path(__file__).resolve().parent
 if str(SCRIPT_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPT_DIR))
 
-from validate_analysis import format_findings, validate_analysis_payload
+from validate_analysis import format_findings, load_evidence_context, validate_analysis_payload
 
 
 RISK_LABELS = {
@@ -275,11 +275,30 @@ def build_evidence_appendix(evidence: dict) -> str:
     rows = []
     graph = evidence.get("code_graph") or {}
     profiles = evidence.get("framework_profiles") or []
+    specialized = evidence.get("specialized_signals") or {}
+    uni = specialized.get("uniapp") or {}
+    node = specialized.get("node_backend") or {}
+    agent = specialized.get("ai_agent") or {}
+    specialized_rows = []
+    if uni:
+        specialized_rows.append(
+            "UniApp: pages={pages}, subpackages={subpackages}, APIs={apis}".format(
+                pages=uni.get("page_count", 0),
+                subpackages=uni.get("subpackages", 0),
+                apis=", ".join(f"uni.{name}:{count}" for name, count in (uni.get("uni_api_calls") or [])[:8]) or "无",
+            )
+        )
+    if node:
+        specialized_rows.append("Node 后端依赖: " + ", ".join((node.get("dependencies") or [])[:12]))
+    if agent:
+        patterns = agent.get("pattern_counts") or {}
+        specialized_rows.append("AI Agent 信号: " + ", ".join(f"{key}={value}" for key, value in patterns.items()))
     for name, value in [
         ("关键文件", evidence.get("key_files")),
         ("主要目录", [f"{name}/: {count} files" for name, count in evidence.get("top_directories", [])[:12]]),
         ("文档来源", [doc.get("path") for doc in evidence.get("docs", [])[:12]]),
         ("框架识别", [f"{item.get('name')} ({item.get('role')}, confidence={item.get('confidence')})" for item in profiles[:12]]),
+        ("专项识别", specialized_rows),
         ("入口文件", graph.get("entrypoints")),
         ("路由候选", [f"{item.get('method')} {item.get('path')} ({item.get('source')})" for item in graph.get("routes", [])[:12]]),
         ("API 调用候选", [f"{item.get('source')} -> {item.get('target')}" for item in graph.get("api_calls", [])[:12]]),
@@ -396,7 +415,7 @@ def main() -> None:
     if args.strict:
         if not args.analysis:
             raise SystemExit("--strict requires --analysis")
-        findings = validate_analysis_payload(analysis)
+        findings = validate_analysis_payload(analysis, load_evidence_context(evidence_path))
         errors = [item for item in findings if item["level"] == "error"]
         warnings = [item for item in findings if item["level"] == "warning"]
         if findings:

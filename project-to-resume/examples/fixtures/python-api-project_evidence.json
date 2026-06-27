@@ -1,0 +1,57 @@
+{
+  "generated_at": "2026-06-27T00:00:00",
+  "repo": "/fixture/python-api",
+  "project_name": "发票解析与报销自动化服务",
+  "files_total": 6,
+  "file_index": [
+    "app/main.py",
+    "app/services/invoice_parser.py",
+    "app/services/reimbursement.py",
+    "app/models/invoice.py",
+    "app/core/validators.py",
+    "tests/test_invoice_parser.py"
+  ],
+  "file_index_truncated": false,
+  "evidence_paths_index": [
+    "app/main.py",
+    "app/services/invoice_parser.py",
+    "app/services/reimbursement.py",
+    "app/models/invoice.py",
+    "app/core/validators.py",
+    "tests/test_invoice_parser.py"
+  ],
+  "lines_total_estimate": 840,
+  "extensions": [[".py", 6]],
+  "languages_by_lines": [["Python", 840]],
+  "top_directories": [["app", 5], ["tests", 1]],
+  "key_files": ["requirements.txt"],
+  "manifests": {"requirements.txt": {"present": true, "dependencies": ["fastapi", "pydantic", "pytest"]}},
+  "docs": [],
+  "framework_profiles": [
+    {"name": "Python API", "role": "backend", "confidence": 0.95, "signals": ["dependency:fastapi", "dependency:pydantic", "pattern:FastAPI\\s*\\("]},
+    {"name": "Testing", "role": "quality", "confidence": 0.75, "signals": ["dependency:pytest", "pattern:def\\s+test_"]}
+  ],
+  "specialized_signals": {},
+  "resume_pitch_inputs": {
+    "description_candidates": ["面向企业报销场景的 Python 服务。"],
+    "tech_keywords": ["Python", "FastAPI", "Pydantic", "pytest"],
+    "metric_candidates": [],
+    "sensitivity_signals": [],
+    "truth_questions": ["你在这个项目中的真实角色/负责边界是什么？"]
+  },
+  "patterns": {
+    "counts": {"frontend_pages": 0, "components": 0, "api_routes": 1, "services": 2, "state": 0, "tests": 1, "docs": 0, "ci_devops": 0, "auth_security": 0, "data_ai": 1, "agent_ai": 0},
+    "examples": {"api_routes": ["app/main.py"], "services": ["app/services/invoice_parser.py", "app/services/reimbursement.py"], "tests": ["tests/test_invoice_parser.py"], "data_ai": ["app/models/invoice.py"]}
+  },
+  "code_graph": {
+    "scanned_code_files": 6,
+    "entrypoints": ["app/main.py"],
+    "routes": [{"source": "app/main.py", "method": "POST", "path": "/parse"}],
+    "api_calls": [],
+    "local_import_edges": [],
+    "ast_summaries": [{"source": "app/services/invoice_parser.py", "imports": ["re"], "functions": ["parse_invoice"], "classes": [], "decorators": [], "route_decorators": []}],
+    "business_flow_candidates": [{"domain": "invoice", "score": 4, "groups": {"service_or_api": ["app/services/invoice_parser.py"], "model_or_data": ["app/models/invoice.py"]}}]
+  },
+  "git": {"is_git": false},
+  "highlight_seeds": []
+}

@@ -1,17 +1,17 @@
 {
   "project_name": "运营后台权限与订单管理系统",
-  "summary": "面向运营和客服角色的后台管理项目，覆盖登录鉴权、菜单权限、订单列表、订单详情和异常处理等核心业务流。",
+  "summary": "面向运营和客服角色的后台管理项目，覆盖登录鉴权、菜单权限、订单列表、订单详情、表单配置和异常处理等核心业务流。",
   "target_role": "前端开发",
   "readiness": "可直接整理为前端项目经历，业务效率指标需要用户确认",
   "role_assumption": "未确认，默认使用“负责/参与模块开发”等保守表述。",
   "disclosure_assumption": "不写真实客户名、内部订单量、营收或生产环境细节。",
-  "keywords": ["Vue", "TypeScript", "Pinia", "Vue Router", "权限体系", "订单管理", "组件化"],
+  "keywords": ["Vue", "TypeScript", "Pinia", "Vue Router", "权限体系", "订单管理", "组件化", "后台工程化"],
   "facts": [
     {
       "label": "业务流",
       "value": [
         "登录/刷新登录态 -> 路由守卫 -> 动态菜单 -> 订单列表 -> 订单详情 -> 异常兜底",
-        "运营按角色访问不同页面入口，客服处理订单查询与状态跟进"
+        "运营按角色访问不同页面入口，客服处理订单查询、状态筛选和详情跟进"
       ]
     },
     {
@@ -20,8 +20,10 @@
         "src/router/guard.ts",
         "src/stores/user.ts",
         "src/pages/order/list.vue",
+        "src/pages/order/detail.vue",
         "src/services/order.ts",
-        "src/components/TableFilter.vue"
+        "src/components/TableFilter.vue",
+        "src/utils/request.ts"
       ]
     },
     {
@@ -30,7 +32,8 @@
         "角色数量",
         "后台页面数量",
         "订单查询接口数量",
-        "同类页面开发周期变化"
+        "同类页面开发周期变化",
+        "首屏或列表渲染耗时"
       ]
     }
   ],
@@ -41,11 +44,7 @@
       "score": 15,
       "risk": "safe",
       "readiness": "direct",
-      "evidence": [
-        "src/router/guard.ts",
-        "src/stores/user.ts",
-        "src/services/auth.ts"
-      ],
+      "evidence": ["src/router/guard.ts", "src/stores/user.ts", "src/services/auth.ts"],
       "safe_bullet": "负责后台权限与菜单访问控制模块开发，基于路由守卫、登录态校验和菜单配置封装页面访问链路，支撑多角色后台功能入口管理。",
       "enhanced_bullet": "负责后台权限与菜单访问控制模块开发，覆盖 X 类角色和 Y+ 页面入口，将新增角色配置时间缩短约 Z%。",
       "why": "能体现权限抽象、前端架构和业务后台复杂度，不只是页面开发。",
@@ -56,11 +55,7 @@
         "result": "代码层面支持多角色页面访问控制；角色数量和配置效率需用户确认。",
         "tradeoff": "前端权限提升体验和可维护性，但关键数据权限仍需后端校验。"
       },
-      "data_to_confirm": [
-        "角色数量",
-        "页面入口数量",
-        "新增角色配置耗时"
-      ],
+      "data_to_confirm": ["角色数量", "页面入口数量", "新增角色配置耗时"],
       "usage": "direct_paste"
     },
     {
@@ -69,11 +64,7 @@
       "score": 13,
       "risk": "safe",
       "readiness": "rewrite",
-      "evidence": [
-        "src/pages/order/list.vue",
-        "src/components/TableFilter.vue",
-        "src/services/order.ts"
-      ],
+      "evidence": ["src/pages/order/list.vue", "src/components/TableFilter.vue", "src/services/order.ts"],
       "safe_bullet": "参与订单管理核心页面开发，封装列表筛选、分页查询和接口请求逻辑，沉淀可复用表格筛选组件，提升同类后台页面迭代效率。",
       "enhanced_bullet": "参与订单管理核心页面开发，沉淀 X 个表格/筛选复用组件，支撑 Y+ 个后台页面复用，将同类页面开发周期缩短约 Z%。",
       "why": "能体现前端组件化和业务页面交付能力。",
@@ -84,23 +75,98 @@
         "result": "代码层面减少列表页重复实现；复用页面数量和效率提升需确认。",
         "tradeoff": "组件过度抽象会影响特殊页面灵活性，因此保留配置扩展点。"
       },
-      "data_to_confirm": [
-        "复用组件数量",
-        "复用页面数量",
-        "开发周期变化"
-      ],
+      "data_to_confirm": ["复用组件数量", "复用页面数量", "开发周期变化"],
       "usage": "rewrite_candidate"
+    },
+    {
+      "title": "统一请求封装与异常反馈",
+      "category": "工程质量",
+      "score": 12,
+      "risk": "safe",
+      "readiness": "direct",
+      "evidence": ["src/utils/request.ts", "src/services/order.ts", "src/services/auth.ts"],
+      "safe_bullet": "封装统一请求与异常反馈链路，将接口调用、登录态刷新、错误提示和 loading 状态收敛到公共层，提升后台页面联调和问题定位效率。",
+      "enhanced_bullet": "封装统一请求与异常反馈链路，覆盖 X 个业务接口和 Y 类异常场景，将接口联调问题定位时间缩短约 Z%。",
+      "why": "能展示工程抽象、可维护性和联调效率。",
+      "interview": {
+        "situation": "页面直接调用接口会导致错误处理、加载状态和登录态逻辑重复。",
+        "task": "建设统一请求层并约束业务页面调用方式。",
+        "action": "封装请求实例、响应拦截、错误提示、登录态刷新和业务服务模块。",
+        "result": "页面层更关注业务展示，接口异常处理更集中；具体覆盖接口数需确认。",
+        "tradeoff": "统一封装降低重复代码，但需要保留业务接口的局部扩展能力。"
+      },
+      "data_to_confirm": ["接口数量", "异常类型", "联调耗时变化"],
+      "usage": "direct_paste"
+    },
+    {
+      "title": "复杂表单配置与状态回显",
+      "category": "核心功能",
+      "score": 11,
+      "risk": "safe",
+      "readiness": "rewrite",
+      "evidence": ["src/pages/order/detail.vue", "src/components/StatusTag.vue", "src/stores/order.ts"],
+      "safe_bullet": "参与订单详情与状态回显功能开发，拆分状态标签、详情字段映射和本地状态管理逻辑，支撑订单跟进场景下的信息核对与操作反馈。",
+      "enhanced_bullet": "参与订单详情与状态回显功能开发，覆盖 X 类订单状态和 Y 个详情字段，减少客服人工核对成本约 Z%。",
+      "why": "能把页面能力和业务流程关联起来，避免只写 UI。",
+      "interview": {
+        "situation": "订单详情页承载客服核对、状态查看和后续跟进。",
+        "task": "负责详情数据展示、状态映射和交互反馈。",
+        "action": "拆分状态展示组件、字段配置和状态管理，处理空值、异常状态和接口返回差异。",
+        "result": "详情页能稳定承载订单信息核对；业务节省成本需确认。",
+        "tradeoff": "字段配置提升可维护性，但复杂字段仍需要在页面层保留定制渲染。"
+      },
+      "data_to_confirm": ["订单状态数量", "详情字段数量", "客服核对耗时变化"],
+      "usage": "rewrite_candidate"
+    },
+    {
+      "title": "列表性能与交互体验优化",
+      "category": "性能与体验",
+      "score": 10,
+      "risk": "needs_confirmation",
+      "readiness": "confirm",
+      "evidence": ["src/pages/order/list.vue", "src/components/TableFilter.vue", "src/utils/request.ts"],
+      "safe_bullet": "围绕订单列表的筛选、分页和加载状态进行体验优化，减少重复请求和无反馈等待，提升后台高频操作页面的可用性。",
+      "enhanced_bullet": "围绕订单列表体验优化，结合防抖筛选、分页缓存和 loading 状态管理，将列表查询等待体感降低约 X%，支撑 Y+ 条订单数据筛选。",
+      "why": "性能和体验指标有价值，但必须确认真实数据或可测量结果。",
+      "interview": {
+        "situation": "运营后台列表页是高频入口，筛选和分页交互影响使用效率。",
+        "task": "优化列表查询、加载反馈和重复请求控制。",
+        "action": "在筛选触发、请求状态和分页切换处增加约束，避免无意义请求和空白等待。",
+        "result": "代码层面改善了交互链路；等待时间和数据规模需要实测或确认。",
+        "tradeoff": "缓存和防抖能减少请求，但要避免让用户看到过期数据。"
+      },
+      "data_to_confirm": ["列表数据规模", "查询耗时", "优化前后等待体感"],
+      "usage": "confirm_before_use"
+    },
+    {
+      "title": "高风险：从 0 到 1 与大幅提升表述",
+      "category": "风险控制",
+      "score": 8,
+      "risk": "risky",
+      "readiness": "idea",
+      "evidence": ["src/router/guard.ts", "src/pages/order/list.vue", "src/services/order.ts"],
+      "safe_bullet": "不要直接写“主导从 0 到 1 搭建运营后台并将效率提升 80%”；除非能确认个人职责、上线范围和真实效率指标。",
+      "enhanced_bullet": "确认个人角色、上线范围和效率数据后，可改写为“负责/参与 X 模块建设，覆盖 Y 类业务场景，带来 Z% 效率改善”。",
+      "why": "该类表述吸引人，但没有证据时很容易在面试追问中失真。",
+      "interview": {
+        "situation": "简历常见问题是把团队成果写成个人全盘负责。",
+        "task": "控制项目描述的真实性风险。",
+        "action": "把高风险所有权和业务数字拆成待确认项，先使用模块级保守表达。",
+        "result": "避免在背景调查或面试追问中出现无法解释的夸大表述。",
+        "tradeoff": "保守表达冲击力略低，但可信度更高。"
+      },
+      "data_to_confirm": ["是否从零建设", "个人负责边界", "效率提升数据来源"],
+      "usage": "do_not_paste"
     }
   ],
   "safe_bullets": [
     "负责后台权限与菜单访问控制模块开发，基于路由守卫、登录态校验和菜单配置封装页面访问链路，支撑多角色后台功能入口管理。",
-    "参与订单管理核心页面开发，封装列表筛选、分页查询和接口请求逻辑，沉淀可复用表格筛选组件，提升同类后台页面迭代效率。"
+    "参与订单管理核心页面开发，封装列表筛选、分页查询和接口请求逻辑，沉淀可复用表格筛选组件，提升同类后台页面迭代效率。",
+    "封装统一请求与异常反馈链路，将接口调用、登录态刷新、错误提示和 loading 状态收敛到公共层，提升后台页面联调和问题定位效率。"
   ],
   "confirmation_items": [
-    {
-      "title": "权限模块指标",
-      "text": "确认角色数量、页面入口数量和新增角色配置耗时后，可写增强版 bullet。"
-    }
+    {"title": "权限模块指标", "text": "确认角色数量、页面入口数量和新增角色配置耗时后，可写增强版 bullet。"},
+    {"title": "列表体验指标", "text": "确认列表数据规模、查询耗时和优化前后对比后，再写性能提升。"}
   ],
   "interview_stories": [],
   "prompt_pack": ""

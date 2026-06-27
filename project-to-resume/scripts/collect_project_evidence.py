@@ -26,6 +26,9 @@ IGNORE_DIRS = {
 
 IGNORE_FILES = {".DS_Store", "Thumbs.db"}
 
+SIGNAL_EXCLUDE_PREFIXES = ("examples/", "references/", "assets/", "docs/", "doc/")
+SIGNAL_EXCLUDE_FILES = {"agents/openai.yaml"}
+
 TEXT_EXTS = {
     ".js", ".jsx", ".ts", ".tsx", ".vue", ".svelte", ".py", ".go", ".rs",
     ".java", ".kt", ".swift", ".php", ".rb", ".cs", ".c", ".cc", ".cpp",
@@ -82,19 +85,30 @@ TECH_KEYWORDS = {
     "pinia": "Pinia",
     "redux": "Redux",
     "zustand": "Zustand",
+    "uni-app": "UniApp",
+    "@dcloudio": "UniApp",
+    "uview": "uView",
+    "uni-ui": "uni-ui",
+    "mp-weixin": "微信小程序",
     "express": "Express",
     "koa": "Koa",
     "nestjs": "NestJS",
     "fastify": "Fastify",
+    "hono": "Hono",
     "flask": "Flask",
     "django": "Django",
     "fastapi": "FastAPI",
     "sqlalchemy": "SQLAlchemy",
     "prisma": "Prisma",
+    "typeorm": "TypeORM",
+    "sequelize": "Sequelize",
+    "mongoose": "Mongoose",
     "mysql": "MySQL",
     "postgres": "PostgreSQL",
     "mongodb": "MongoDB",
     "redis": "Redis",
+    "bullmq": "BullMQ",
+    "jwt": "JWT",
     "docker": "Docker",
     "kubernetes": "Kubernetes",
     "playwright": "Playwright",
@@ -103,7 +117,13 @@ TECH_KEYWORDS = {
     "eslint": "ESLint",
     "prettier": "Prettier",
     "openai": "OpenAI",
+    "anthropic": "Anthropic",
     "langchain": "LangChain",
+    "llamaindex": "LlamaIndex",
+    "mcp": "MCP",
+    "agent": "Agent",
+    "tool_call": "Tool Calling",
+    "rag": "RAG",
     "embedding": "Embedding",
 }
 
@@ -121,15 +141,22 @@ FRAMEWORK_DEFINITIONS = {
         "role": "frontend",
     },
     "UniApp": {
-        "manifest": ["@dcloudio", "uni-app"],
-        "files": ["manifest.json", "pages.json", "uni.scss"],
-        "patterns": [r"uni\.", r"pages\.json"],
+        "manifest": ["@dcloudio", "uni-app", "uview-ui", "uni-ui"],
+        "files": ["manifest.json", "pages.json", "uni.scss", "uni_modules"],
+        "patterns": [
+            r"uni\.(login|getUserProfile|requestPayment|chooseLocation|uploadFile|chooseImage|request)",
+            r"#ifdef\s+(MP-WEIXIN|APP-PLUS|H5)",
+            r"subPackages|subpackages|tabBar",
+        ],
         "role": "frontend",
     },
     "Node API": {
-        "manifest": ["express", "koa", "nestjs", "fastify", "hono"],
-        "files": ["server.js", "app.js", "main.ts", "nest-cli.json"],
-        "patterns": [r"app\.(get|post|put|delete)", r"@Controller\s*\("],
+        "manifest": [
+            "express", "koa", "nestjs", "@nestjs", "fastify", "hono", "prisma",
+            "typeorm", "sequelize", "mongoose", "bullmq", "redis", "jsonwebtoken",
+        ],
+        "files": ["server.js", "app.js", "main.ts", "nest-cli.json", "prisma/schema.prisma"],
+        "patterns": [r"app\.(get|post|put|delete)", r"router\.(get|post|put|delete)", r"@Controller\s*\(", r"createServer\s*\("],
         "role": "backend",
     },
     "Python API": {
@@ -145,10 +172,21 @@ FRAMEWORK_DEFINITIONS = {
         "role": "quality",
     },
     "AI/Data": {
-        "manifest": ["openai", "langchain", "llamaindex", "pandas", "numpy", "sklearn"],
+        "manifest": ["openai", "anthropic", "langchain", "llamaindex", "pandas", "numpy", "sklearn"],
         "files": [],
-        "patterns": [r"OpenAI\s*\(", r"embedding", r"prompt", r"pandas", r"numpy"],
+        "patterns": [r"OpenAI\s*\(", r"Anthropic\s*\(", r"embedding", r"prompt", r"pandas", r"numpy"],
         "role": "ai_data",
+    },
+    "AI Agent": {
+        "manifest": ["openai", "anthropic", "langchain", "llamaindex", "crewai", "autogen", "@modelcontextprotocol", "ai"],
+        "files": ["agents", "tools", "prompts", "workflows", "mcp.json"],
+        "patterns": [
+            r"tool_call|function_call|tools\s*[:=]",
+            r"createAgent|AgentExecutor|StateGraph|workflow",
+            r"retriever|vectorStore|embedding|RAG|memory",
+            r"system_prompt|PromptTemplate|messages\s*[:=]",
+        ],
+        "role": "ai_agent",
     },
 }
 
@@ -163,6 +201,7 @@ PATTERNS = {
     "ci_devops": [".github/workflows", "Dockerfile", "docker", "k8s", "helm"],
     "auth_security": ["auth", "permission", "rbac", "guard", "token", "login"],
     "data_ai": ["model", "prompt", "vector", "embedding", "analytics", "chart", "etl"],
+    "agent_ai": ["agent", "agents", "tool", "tools", "workflow", "workflows", "mcp", "rag", "retrieval"],
 }
 
 TEST_FILE_RE = re.compile(
@@ -175,7 +214,7 @@ TEST_FILE_RE = re.compile(
 
 CODE_GRAPH_EXTS = {
     ".js", ".jsx", ".ts", ".tsx", ".vue", ".svelte", ".py", ".go", ".java",
-    ".kt", ".swift", ".php", ".rb",
+    ".kt", ".swift", ".php", ".rb", ".mjs", ".cjs",
 }
 
 ENTRYPOINT_RE = re.compile(r"(^|/)(main|index|app|server|router|routes|client)\.(js|jsx|ts|tsx|mjs|cjs|py|go|java)$", re.I)
@@ -196,6 +235,29 @@ API_CALL_RE = re.compile(
     r"(axios|request)\s*\(\s*\{[^}]*\burl\s*:\s*[\"'`]([^\"'`]+)[\"'`]",
     re.I | re.S,
 )
+UNI_API_RE = re.compile(
+    r"\buni\.(login|getUserProfile|getUserInfo|requestPayment|chooseLocation|openLocation|"
+    r"uploadFile|downloadFile|chooseImage|request|navigateTo|switchTab|showToast)\b"
+)
+UNI_CONDITION_RE = re.compile(r"#(?:ifdef|ifndef)\s+([A-Z0-9_-]+)")
+NODE_BACKEND_DEPS = {
+    "express", "koa", "fastify", "hono", "nestjs", "@nestjs/core", "@nestjs/common",
+    "prisma", "@prisma/client", "typeorm", "sequelize", "mongoose", "mysql2", "pg",
+    "redis", "ioredis", "bull", "bullmq", "jsonwebtoken", "passport", "zod", "joi",
+}
+AI_AGENT_DEPS = {
+    "openai", "@ai-sdk/openai", "ai", "anthropic", "@anthropic-ai/sdk", "langchain",
+    "@langchain/core", "@langchain/openai", "llamaindex", "crewai", "autogen",
+    "@modelcontextprotocol/sdk", "chromadb", "pinecone-client", "@pinecone-database/pinecone",
+}
+AI_AGENT_PATTERNS = {
+    "tool_calling": re.compile(r"tool_call|function_call|tools\s*[:=]|Tool\s*\(", re.I),
+    "prompt_engineering": re.compile(r"system_prompt|PromptTemplate|messages\s*[:=]|role\s*:\s*[\"']system", re.I),
+    "rag_retrieval": re.compile(r"retriever|vectorStore|similaritySearch|RAG|context\s+window", re.I),
+    "memory_state": re.compile(r"memory|checkpoint|conversation_state|chat_history", re.I),
+    "workflow_orchestration": re.compile(r"StateGraph|createAgent|AgentExecutor|workflow|planner|executor", re.I),
+    "mcp_integration": re.compile(r"modelcontextprotocol|mcp\.|MCP", re.I),
+}
 
 COMMON_DOMAIN_WORDS = {
     "src", "app", "apps", "pages", "page", "views", "view", "components", "component",
@@ -216,6 +278,22 @@ def run(cmd: list[str], cwd: Path) -> str:
 
 def is_ignored(path: Path) -> bool:
     return any(part in IGNORE_DIRS for part in path.parts)
+
+
+def is_signal_excluded(rel: str) -> bool:
+    normalized = rel.replace("\\", "/").lstrip("./")
+    return normalized in SIGNAL_EXCLUDE_FILES or normalized.startswith(SIGNAL_EXCLUDE_PREFIXES)
+
+
+def is_signal_source_file(path: Path, rel: str) -> bool:
+    if is_signal_excluded(rel):
+        return False
+    if path.suffix.lower() in CODE_GRAPH_EXTS:
+        return True
+    return rel in {
+        "package.json", "pyproject.toml", "requirements.txt",
+        "pages.json", "manifest.json", "mcp.json",
+    }
 
 
 def iter_files(root: Path):
@@ -344,11 +422,15 @@ def manifest_names(manifests: dict) -> set[str]:
 
 def detect_framework_profiles(repo: Path, files: list[Path], manifests: dict) -> list[dict]:
     deps = manifest_names(manifests)
-    rels = [str(path.relative_to(repo)).replace("\\", "/") for path in files]
+    rels = [
+        str(path.relative_to(repo)).replace("\\", "/")
+        for path in files
+        if not is_signal_excluded(str(path.relative_to(repo)).replace("\\", "/"))
+    ]
     sample_text = ""
     for path in files[:300]:
         rel = str(path.relative_to(repo)).replace("\\", "/")
-        if rel.startswith(("examples/", "references/", "docs/", "doc/", "scripts/")):
+        if is_signal_excluded(rel) or rel.startswith("scripts/"):
             continue
         if path.suffix.lower() in CODE_GRAPH_EXTS or path.name in {"package.json", "pyproject.toml", "requirements.txt"}:
             sample_text += "\n" + read_text_sample(path, max_chars=2500)
@@ -380,6 +462,170 @@ def detect_framework_profiles(repo: Path, files: list[Path], manifests: dict) ->
             })
     profiles.sort(key=lambda item: item["confidence"], reverse=True)
     return profiles
+
+
+def package_dependency_names(manifests: dict) -> set[str]:
+    deps = set()
+    for manifest in manifests.values():
+        if not isinstance(manifest, dict):
+            continue
+        for field in ("dependencies", "devDependencies"):
+            for item in manifest.get(field) or []:
+                deps.add(str(item).lower())
+    return deps
+
+
+def rel_file_list(repo: Path, files: list[Path]) -> list[str]:
+    return [str(path.relative_to(repo)).replace("\\", "/") for path in files]
+
+
+def signal_files(repo: Path, files: list[Path]) -> list[Path]:
+    result = []
+    for path in files:
+        rel = str(path.relative_to(repo)).replace("\\", "/")
+        if is_signal_source_file(path, rel):
+            result.append(path)
+    return result
+
+
+def limited_source_text(repo: Path, files: list[Path], needles: tuple[str, ...], max_files: int = 400) -> str:
+    chunks = []
+    scanned = 0
+    for path in files:
+        rel = str(path.relative_to(repo)).replace("\\", "/")
+        lowered = rel.lower()
+        if not is_signal_source_file(path, rel):
+            continue
+        if not any(needle in lowered for needle in needles) and path.suffix.lower() not in CODE_GRAPH_EXTS:
+            continue
+        scanned += 1
+        if scanned > max_files:
+            break
+        chunks.append(read_text_sample(path, max_chars=12000))
+        if sum(len(chunk) for chunk in chunks) > 260000:
+            break
+    return "\n".join(chunks)
+
+
+def collect_uniapp_signals(repo: Path, files: list[Path], deps: set[str]) -> dict:
+    source_files = signal_files(repo, files)
+    rels = rel_file_list(repo, source_files)
+    pages_json = load_json(repo / "pages.json") if (repo / "pages.json").exists() else None
+    manifest_json = load_json(repo / "manifest.json") if (repo / "manifest.json").exists() else None
+    source_text = limited_source_text(repo, source_files, ("pages", "components", "uni", "store", "api", "service"))
+    api_counts = Counter(match.group(1) for match in UNI_API_RE.finditer(source_text))
+    condition_counts = Counter(match.group(1) for match in UNI_CONDITION_RE.finditer(source_text))
+    ui_libraries = sorted(
+        item for item in {"uview-ui", "uview-plus", "@dcloudio/uni-ui", "uni-ui"}
+        if item in deps or any(item in rel.lower() for rel in rels)
+    )
+    result: dict = {}
+    if isinstance(pages_json, dict):
+        pages = pages_json.get("pages") or []
+        subpackages = pages_json.get("subPackages") or pages_json.get("subpackages") or []
+        tabbar = (pages_json.get("tabBar") or {}).get("list") or []
+        result.update({
+            "pages_json": "pages.json",
+            "page_count": len(pages) if isinstance(pages, list) else 0,
+            "subpackages": len(subpackages) if isinstance(subpackages, list) else 0,
+            "tabbar_items": len(tabbar) if isinstance(tabbar, list) else 0,
+            "example_pages": [
+                item.get("path") for item in pages[:10]
+                if isinstance(item, dict) and item.get("path")
+            ],
+        })
+    if isinstance(manifest_json, dict):
+        platforms = [
+            key for key in ("mp-weixin", "mp-alipay", "mp-baidu", "h5", "app-plus")
+            if key in manifest_json
+        ]
+        if platforms:
+            result["manifest_platforms"] = platforms
+    if api_counts:
+        result["uni_api_calls"] = api_counts.most_common(20)
+    if condition_counts:
+        result["conditional_platforms"] = condition_counts.most_common(20)
+    if ui_libraries:
+        result["ui_libraries"] = ui_libraries
+    return result
+
+
+def collect_node_backend_signals(repo: Path, files: list[Path], deps: set[str]) -> dict:
+    source_files = signal_files(repo, files)
+    rels = rel_file_list(repo, source_files)
+    backend_deps = sorted(dep for dep in deps if dep in NODE_BACKEND_DEPS or dep.startswith("@nestjs/"))
+    buckets = {
+        "routes": ["route", "routes", "router"],
+        "controllers": ["controller", "controllers"],
+        "services": ["service", "services"],
+        "middleware": ["middleware", "middlewares", "guard", "guards"],
+        "models_or_schema": ["model", "models", "schema", "schemas", "entity", "entities", "prisma"],
+        "jobs_or_queues": ["job", "jobs", "queue", "queues", "worker", "workers"],
+        "auth": ["auth", "login", "jwt", "passport", "permission", "rbac"],
+    }
+    candidates = {}
+    for bucket, needles in buckets.items():
+        matches = [rel for rel in rels if any(needle in rel.lower() for needle in needles)]
+        if matches:
+            candidates[bucket] = matches[:12]
+    source_hit_count = sum(len(values) for values in candidates.values())
+    if not backend_deps and not source_hit_count:
+        return {}
+    return {
+        "dependencies": backend_deps[:30],
+        "confidence": min(1.0, round(0.25 + 0.25 * bool(backend_deps) + 0.08 * min(source_hit_count, 6), 2)),
+        "basis": "dependency+source" if backend_deps and source_hit_count else ("dependency_only" if backend_deps else "source_only"),
+        "layer_candidates": candidates,
+        "database_or_cache": sorted(dep for dep in backend_deps if dep in {"prisma", "@prisma/client", "typeorm", "sequelize", "mongoose", "mysql2", "pg", "redis", "ioredis"})[:20],
+        "auth_or_validation": sorted(dep for dep in backend_deps if dep in {"jsonwebtoken", "passport", "zod", "joi"})[:20],
+    }
+
+
+def collect_ai_agent_signals(repo: Path, files: list[Path], deps: set[str]) -> dict:
+    source_files = signal_files(repo, files)
+    rels = rel_file_list(repo, source_files)
+    agent_deps = sorted(dep for dep in deps if dep in AI_AGENT_DEPS or dep.startswith("@langchain/"))
+    buckets = {
+        "agents": ["agent", "agents"],
+        "tools": ["tool", "tools", "function"],
+        "prompts": ["prompt", "prompts", "system"],
+        "workflows": ["workflow", "workflows", "planner", "executor", "graph"],
+        "rag_retrieval": ["rag", "retrieval", "retriever", "vector", "embedding"],
+        "memory": ["memory", "history", "checkpoint"],
+        "mcp": ["mcp", "modelcontextprotocol"],
+    }
+    file_candidates = {}
+    for bucket, needles in buckets.items():
+        matches = [rel for rel in rels if any(needle in rel.lower() for needle in needles)]
+        if matches:
+            file_candidates[bucket] = matches[:12]
+    source_text = limited_source_text(repo, source_files, ("agent", "tool", "prompt", "workflow", "rag", "vector", "memory", "mcp", "llm", "ai"))
+    pattern_counts = {
+        name: len(pattern.findall(source_text))
+        for name, pattern in AI_AGENT_PATTERNS.items()
+    }
+    pattern_counts = {key: value for key, value in pattern_counts.items() if value}
+    source_candidate_count = sum(len(values) for values in file_candidates.values())
+    source_hit_count = source_candidate_count + sum(pattern_counts.values())
+    if not agent_deps and not source_candidate_count:
+        return {}
+    return {
+        "dependencies": agent_deps[:30],
+        "confidence": min(1.0, round(0.25 + 0.25 * bool(agent_deps) + 0.06 * min(source_hit_count, 8), 2)),
+        "basis": "dependency+source" if agent_deps and source_hit_count else ("dependency_only" if agent_deps else "source_only"),
+        "file_candidates": file_candidates,
+        "pattern_counts": pattern_counts,
+    }
+
+
+def collect_specialized_signals(repo: Path, files: list[Path], manifests: dict) -> dict:
+    deps = package_dependency_names(manifests)
+    signals = {
+        "uniapp": collect_uniapp_signals(repo, files, deps),
+        "node_backend": collect_node_backend_signals(repo, files, deps),
+        "ai_agent": collect_ai_agent_signals(repo, files, deps),
+    }
+    return {key: value for key, value in signals.items() if value}
 
 
 def sensitivity_signals(rel_files: list[str]) -> list[str]:
@@ -698,12 +944,14 @@ def highlight_seeds(evidence: dict) -> list[dict]:
     seeds = []
     counts = evidence["patterns"]["counts"]
     examples = evidence["patterns"]["examples"]
+    specialized = evidence.get("specialized_signals") or {}
     mapping = [
         ("工程化与质量", "检测到测试/CI/配置文件，可提炼工程质量、稳定性和协作效率亮点。", ["tests", "ci_devops"]),
         ("前端组件化", "检测到组件/页面结构，可提炼组件复用、页面交付和业务流实现亮点。", ["components", "frontend_pages"]),
         ("接口与服务层", "检测到 API/Service/Controller 结构，可提炼接口封装、业务服务拆分和联调能力。", ["api_routes", "services"]),
         ("权限与安全", "检测到登录、权限、token 或 guard 相关文件，可提炼鉴权和访问控制亮点。", ["auth_security"]),
         ("数据与智能化", "检测到数据分析、图表、模型、prompt 或向量相关文件，可提炼数据/AI/自动化亮点。", ["data_ai"]),
+        ("AI Agent 与工具调用", "检测到 Agent、工具调用、Prompt、RAG 或 MCP 相关文件，可提炼智能应用落地亮点。", ["agent_ai"]),
         ("状态管理", "检测到 store/state 相关文件，可提炼复杂状态流转和前端架构亮点。", ["state"]),
     ]
     for category, reason, keys in mapping:
@@ -718,12 +966,48 @@ def highlight_seeds(evidence: dict) -> list[dict]:
                 "evidence_count": score,
                 "example_paths": seed_examples[:12],
             })
+    if specialized.get("uniapp"):
+        uni = specialized["uniapp"]
+        paths = ["pages.json"] if uni.get("pages_json") else []
+        paths.extend(examples.get("frontend_pages", [])[:6])
+        seeds.append({
+            "category": "移动端/小程序多端交付",
+            "reason": "检测到 UniApp pages.json、manifest、多端条件编译或小程序 API，可提炼多端页面、登录授权、支付、地图、上传等移动端业务亮点。",
+            "evidence_count": int(uni.get("page_count") or 0) + len(uni.get("uni_api_calls") or []),
+            "example_paths": paths[:12],
+        })
+    if specialized.get("node_backend"):
+        node = specialized["node_backend"]
+        candidates = []
+        for values in (node.get("layer_candidates") or {}).values():
+            candidates.extend(values[:4])
+        seeds.append({
+            "category": "Node 后端服务设计",
+            "reason": "检测到 Node API 依赖、路由/控制器/服务/中间件/模型等分层，可提炼接口设计、鉴权、数据层和任务队列亮点。",
+            "evidence_count": len(candidates) + len(node.get("dependencies") or []),
+            "example_paths": candidates[:12],
+        })
+    if specialized.get("ai_agent"):
+        agent = specialized["ai_agent"]
+        candidates = []
+        for values in (agent.get("file_candidates") or {}).values():
+            candidates.extend(values[:4])
+        seeds.append({
+            "category": "AI Agent 应用落地",
+            "reason": "检测到模型调用、Prompt、工具调用、RAG、Memory、Workflow 或 MCP 信号，可提炼 AI 应用工程化落地亮点。",
+            "evidence_count": len(candidates) + sum((agent.get("pattern_counts") or {}).values()),
+            "example_paths": candidates[:12],
+        })
     return seeds
 
 
 def collect(repo: Path, author: str | None) -> dict:
     files = list(iter_files(repo))
     rel_files = [str(path.relative_to(repo)) for path in files]
+    signal_rel_files = [
+        str(path.relative_to(repo)).replace("\\", "/")
+        for path in signal_files(repo, files)
+    ]
     ext_counter = Counter(path.suffix.lower() or "[no_ext]" for path in files)
     lang_counter = Counter()
     total_lines = 0
@@ -753,6 +1037,13 @@ def collect(repo: Path, author: str | None) -> dict:
         "project_name": repo.name,
         "files_total": len(files),
         "file_index": rel_files[:5000],
+        "file_index_truncated": len(rel_files) > 5000,
+        "evidence_paths_index": rel_files,
+        "signal_policy": {
+            "exclude_from_signals_prefixes": list(SIGNAL_EXCLUDE_PREFIXES),
+            "exclude_from_signals_files": sorted(SIGNAL_EXCLUDE_FILES),
+            "signal_files_total": len(signal_rel_files),
+        },
         "lines_total_estimate": total_lines,
         "extensions": ext_counter.most_common(30),
         "languages_by_lines": lang_counter.most_common(20),
@@ -761,9 +1052,10 @@ def collect(repo: Path, author: str | None) -> dict:
         "manifests": manifests,
         "docs": docs,
         "framework_profiles": detect_framework_profiles(repo, files, manifests),
+        "specialized_signals": collect_specialized_signals(repo, files, manifests),
         "resume_pitch_inputs": {
             "description_candidates": doc_bits[:12],
-            "tech_keywords": detect_tech_keywords(doc_bits + rel_files, manifests, key_files),
+            "tech_keywords": detect_tech_keywords(doc_bits + signal_rel_files, manifests, key_files),
             "metric_candidates": extract_metric_candidates(repo, docs),
             "sensitivity_signals": sensitivity_signals(rel_files),
             "truth_questions": [
@@ -771,7 +1063,7 @@ def collect(repo: Path, author: str | None) -> dict:
                 "内部指标、客户名称、业务规模或公司细节是否可以写进简历？",
             ],
         },
-        "patterns": pattern_counts(rel_files),
+        "patterns": pattern_counts(signal_rel_files),
         "code_graph": collect_code_graph(repo, files),
         "git": git_summary(repo, author),
     }
@@ -786,6 +1078,8 @@ def write_markdown(evidence: dict, out: Path) -> None:
         f"- Repo: `{evidence['repo']}`",
         f"- Generated: {evidence['generated_at']}",
         f"- Files: {evidence['files_total']}",
+        f"- Evidence path index: {len(evidence.get('evidence_paths_index') or [])} paths",
+        f"- File index truncated: {evidence.get('file_index_truncated')}",
         f"- Estimated text lines: {evidence['lines_total_estimate']}",
         "",
         "## Languages",
@@ -819,12 +1113,47 @@ def write_markdown(evidence: dict, out: Path) -> None:
     for item in pitch.get("truth_questions", []):
         lines.append(f"  - {item}")
     profiles = evidence.get("framework_profiles") or []
+    signal_policy = evidence.get("signal_policy") or {}
+    if signal_policy:
+        lines.extend(["", "## Signal Policy"])
+        lines.append("- Excluded from framework/business signals: " + ", ".join(signal_policy.get("exclude_from_signals_prefixes", [])))
+        lines.append(f"- Signal files scanned: {signal_policy.get('signal_files_total', 0)}")
     if profiles:
         lines.extend(["", "## Framework Profiles"])
         for item in profiles[:10]:
             lines.append(f"- {item.get('name')} ({item.get('role')}, confidence={item.get('confidence')})")
             for signal in item.get("signals", [])[:6]:
                 lines.append(f"  - {signal}")
+    specialized = evidence.get("specialized_signals") or {}
+    if specialized:
+        lines.extend(["", "## Specialized Signals"])
+        uni = specialized.get("uniapp") or {}
+        if uni:
+            lines.append("- UniApp / 小程序:")
+            if uni.get("page_count") is not None:
+                lines.append(f"  - pages: {uni.get('page_count')}, subpackages: {uni.get('subpackages', 0)}, tabbar: {uni.get('tabbar_items', 0)}")
+            for name, count in uni.get("uni_api_calls", [])[:10]:
+                lines.append(f"  - uni.{name}: {count}")
+            for platform, count in uni.get("conditional_platforms", [])[:8]:
+                lines.append(f"  - conditional {platform}: {count}")
+            if uni.get("ui_libraries"):
+                lines.append("  - UI libraries: " + ", ".join(uni.get("ui_libraries", [])[:8]))
+        node = specialized.get("node_backend") or {}
+        if node:
+            lines.append("- Node Backend:")
+            if node.get("dependencies"):
+                lines.append("  - dependencies: " + ", ".join(node.get("dependencies", [])[:12]))
+            for bucket, values in (node.get("layer_candidates") or {}).items():
+                lines.append(f"  - {bucket}: " + ", ".join(f"`{value}`" for value in values[:6]))
+        agent = specialized.get("ai_agent") or {}
+        if agent:
+            lines.append("- AI Agent / AI 应用:")
+            if agent.get("dependencies"):
+                lines.append("  - dependencies: " + ", ".join(agent.get("dependencies", [])[:12]))
+            if agent.get("pattern_counts"):
+                lines.append("  - patterns: " + ", ".join(f"{key}={value}" for key, value in agent.get("pattern_counts", {}).items()))
+            for bucket, values in (agent.get("file_candidates") or {}).items():
+                lines.append(f"  - {bucket}: " + ", ".join(f"`{value}`" for value in values[:6]))
     graph = evidence.get("code_graph", {})
     lines.extend(["", "## Code Graph"])
     lines.append(f"- Scanned code files: {graph.get('scanned_code_files', 0)}")

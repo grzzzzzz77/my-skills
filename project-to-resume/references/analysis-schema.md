@@ -9,6 +9,7 @@ Validate before rendering:
 ```bash
 python3 <skill_dir>/scripts/validate_analysis.py \
   --analysis /path/to/project_resume_analysis.json \
+  --evidence /path/to/project_evidence.json \
   --strict
 ```
 
@@ -75,14 +76,23 @@ Use these as quality bars before writing a new analysis:
 
 - `examples/vue-admin-golden-analysis.json`: frontend/admin system example with permissions, route guards, table filtering, and reusable components.
 - `examples/python-api-golden-analysis.json`: backend/Python automation example with parsing, validation, reliability, and workflow automation.
+- `examples/node-agent-golden-analysis.json`: Node backend + AI Agent example with tool calling, RAG, model orchestration, and evaluation metrics.
 
-Both examples should pass:
+All examples should pass:
 
 ```bash
 python3 <skill_dir>/scripts/validate_analysis.py \
   --analysis <example-json> \
   --strict
 ```
+
+Each golden example also has a paired evidence fixture under `examples/fixtures/`. Use this end-to-end check before publishing changes:
+
+```bash
+python3 <skill_dir>/scripts/check_golden_fixtures.py
+```
+
+The fixture check runs `render_resume_report.py --strict`, so it exercises evidence-aware path validation and HTML/prompt rendering together.
 
 ## Field Rules
 
@@ -93,6 +103,7 @@ python3 <skill_dir>/scripts/validate_analysis.py \
 - `interview`: must include `situation`, `task`, `action`, `result`, and `tradeoff`.
 - `enhanced_bullet`: may include `X/Y/Z` placeholders or suggested metrics, but must remain under confirmation sections.
 - `facts`: include business flows, module map, API/page map, data flow, integration points, quality signals, and contribution boundary when known.
+- Evidence fixtures and generated evidence should include `evidence_paths_index` for complete strict path validation. `file_index` may be truncated for readability.
 
 ## Business Flow Notes
 

@@ -15,13 +15,30 @@ READINESS_VALUES = {"direct", "rewrite", "confirm", "idea"}
 STAR_KEYS = ("situation", "task", "action", "result", "tradeoff")
 
 SENSITIVE_RE = re.compile(
-    r"(?i)(password|passwd|secret|token|api[_-]?key|access[_-]?key|private[_-]?key|"
+    r"(?i)(password|passwd|secret|api[_-]?key|access[_-]?key|private[_-]?key|"
     r"credential|cookie|authorization|bearer|客户名称|客户名|内部客户|真实客户|"
     r"手机号|身份证|银行卡|邮箱[:：]|内网|生产库)"
+)
+TOKEN_SECRET_RE = re.compile(
+    r"(?i)("
+    r"(?:api|auth|access|refresh|id|private|secret)[_-]?token\s*[:=]\s*['\"][A-Za-z0-9._/+=-]{12,}['\"]|"
+    r"token\s*[:=]\s*['\"][A-Za-z0-9._/+=-]{16,}['\"]|"
+    r"bearer\s+[A-Za-z0-9._/+=-]{12,}|"
+    r"(?:hardcode|hard-coded|leak|泄露|明文|硬编码|凭证|密钥)[^。；;\\n]{0,30}token"
+    r")"
 )
 
 HIGH_OWNERSHIP_RE = re.compile(r"主导|全盘|独立负责|Owner|从\s*0\s*到\s*1|核心负责人", re.I)
 UNCONFIRMED_METRIC_RE = re.compile(r"提升\s*\d|降低\s*\d|减少\s*\d|缩短\s*\d|增长\s*\d|\d+\s*%")
+PATH_EXT_RE = re.compile(
+    r"\.(vue|svelte|jsx?|tsx?|mjs|cjs|py|go|rs|java|kt|swift|php|rb|cs|json|ya?ml|toml|md|mdx|html|css|scss|sql|sh)$",
+    re.I,
+)
+PATH_PREFIX_RE = re.compile(
+    r"^(src|app|apps|pages|views|components|widgets|routes|api|server|services|store|stores|lib|libs|"
+    r"models|schemas|tests?|__tests__|docs?|references|scripts|config|configs|uni_modules|packages|tools|agents)/",
+    re.I,
+)
 
 
 def load_json(path: Path) -> dict:
@@ -50,7 +67,81 @@ def add(findings: list[dict], level: str, path: str, message: str) -> None:
     findings.append({"level": level, "path": path, "message": message})
 
 
-def validate_highlight(item: Any, index: int, findings: list[dict]) -> None:
+def contains_sensitive_text(text: str) -> bool:
+    return bool(SENSITIVE_RE.search(text) or TOKEN_SECRET_RE.search(text))
+
+
+def load_evidence_context(path: Path | None) -> dict:
+    if path is None:
+        return {}
+    evidence = load_json(path)
+    path_source = evidence.get("evidence_paths_index") or evidence.get("file_index")
+    file_index = {str(item).replace("\\", "/").lstrip("./") for item in as_list(path_source)}
+    for item in as_list(evidence.get("key_files")):
+        if str(item).strip():
+            file_index.add(str(item).replace("\\", "/").lstrip("./"))
+    for doc in as_list(evidence.get("docs")):
+        if isinstance(doc, dict) and str(doc.get("path", "")).strip():
+            file_index.add(str(doc["path"]).replace("\\", "/").lstrip("./"))
+    return {"repo": evidence.get("repo") or "", "file_index": file_index}
+
+
+def normalize_evidence_path(value: Any, repo: str = "") -> str:
+    text = str(value or "").strip().strip("`").strip()
+    if not text:
+        return ""
+    text = text.replace("\\", "/")
+    text = re.sub(r"^file://", "", text)
+    text = re.sub(r"^['\"]|['\"]$", "", text)
+    text = re.sub(r":\d+(?::\d+)?$", "", text)
+    text = re.split(r"\s+(?:->|=>|\(|\[)", text, 1)[0].strip()
+    text = text.lstrip("./")
+    if repo:
+        repo_norm = repo.replace("\\", "/").rstrip("/") + "/"
+        if text.startswith(repo_norm):
+            text = text[len(repo_norm):]
+    return text.strip("/")
+
+
+def is_path_like_evidence(value: Any) -> bool:
+    text = normalize_evidence_path(value)
+    if not text or text.startswith(("http://", "https://")):
+        return False
+    if " " in text and "/" not in text:
+        return False
+    return "/" in text or bool(PATH_EXT_RE.search(text)) or bool(PATH_PREFIX_RE.search(text))
+
+
+def evidence_path_exists(value: Any, context: dict) -> bool:
+    file_index = context.get("file_index") or set()
+    repo = str(context.get("repo") or "")
+    candidate = normalize_evidence_path(value, repo)
+    if not candidate:
+        return False
+    if candidate in file_index:
+        return True
+    directory = candidate.rstrip("/") + "/"
+    if any(path.startswith(directory) for path in file_index):
+        return True
+    return False
+
+
+def validate_evidence_paths(evidence: list[Any], path: str, context: dict, findings: list[dict]) -> None:
+    if not context:
+        return
+    for item_index, item in enumerate(evidence):
+        if not is_path_like_evidence(item):
+            continue
+        if not evidence_path_exists(item, context):
+            add(
+                findings,
+                "error",
+                f"{path}.evidence[{item_index}]",
+                "evidence path is not present in project_evidence.json file_index/key_files/docs",
+            )
+
+
+def validate_highlight(item: Any, index: int, findings: list[dict], evidence_context: dict | None = None) -> None:
     path = f"highlights[{index}]"
     if not isinstance(item, dict):
         add(findings, "error", path, "highlight must be an object")
@@ -71,9 +162,11 @@ def validate_highlight(item: Any, index: int, findings: list[dict]) -> None:
     evidence = [x for x in as_list(item.get("evidence")) if str(x).strip()]
     if not evidence:
         add(findings, "error", f"{path}.evidence", "at least one evidence path/count/signal is required")
+    else:
+        validate_evidence_paths(evidence, path, evidence_context or {}, findings)
 
     bullet = str(item.get("safe_bullet") or "")
-    if SENSITIVE_RE.search(bullet):
+    if contains_sensitive_text(bullet):
         add(findings, "error", f"{path}.safe_bullet", "safe_bullet appears to contain sensitive data or secrets")
 
     if risk == "safe" and UNCONFIRMED_METRIC_RE.search(bullet):
@@ -106,11 +199,11 @@ def scan_sensitive_values(value: Any, findings: list[dict], path: str = "$") -> 
     elif isinstance(value, list):
         for index, child in enumerate(value):
             scan_sensitive_values(child, findings, f"{path}[{index}]")
-    elif isinstance(value, str) and SENSITIVE_RE.search(value):
+    elif isinstance(value, str) and contains_sensitive_text(value):
         add(findings, "warning", path, "text may contain secrets, credentials, or disclosure-sensitive details")
 
 
-def validate_analysis_payload(analysis: dict) -> list[dict]:
+def validate_analysis_payload(analysis: dict, evidence_context: dict | None = None) -> list[dict]:
     findings: list[dict] = []
 
     for key in ("project_name", "summary", "target_role", "readiness", "role_assumption", "disclosure_assumption"):
@@ -130,7 +223,7 @@ def validate_analysis_payload(analysis: dict) -> list[dict]:
         add(findings, "error", "highlights", "at least one highlight is required")
     else:
         for index, item in enumerate(highlights):
-            validate_highlight(item, index, findings)
+            validate_highlight(item, index, findings, evidence_context)
 
     safe_highlights = [
         item for item in highlights or []
@@ -156,11 +249,13 @@ def format_findings(findings: list[dict]) -> str:
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--analysis", required=True, help="project_resume_analysis.json")
+    parser.add_argument("--evidence", help="Optional project_evidence.json for strict evidence path checks")
     parser.add_argument("--strict", action="store_true", help="Exit non-zero on warnings as well as errors")
     args = parser.parse_args()
 
     analysis = load_json(Path(args.analysis).expanduser().resolve())
-    findings = validate_analysis_payload(analysis)
+    evidence_context = load_evidence_context(Path(args.evidence).expanduser().resolve()) if args.evidence else {}
+    findings = validate_analysis_payload(analysis, evidence_context)
     print(format_findings(findings))
     has_error = any(item["level"] == "error" for item in findings)
     has_warning = any(item["level"] == "warning" for item in findings)
