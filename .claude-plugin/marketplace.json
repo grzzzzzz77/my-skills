@@ -45,15 +45,6 @@
       "strict": false
     },
     {
-      "description": "Analyze a local Git repository's contribution history and generate evidence-backed project summaries, resume bullets, interview scripts, and claim-risk reports. Use when the user wants to understand what someone contributed to a codebase, package real project experience for a resume, prepare interview talking points, or audit whether contribution claims are safe under background checks.",
-      "name": "contrib-skill",
-      "skills": [
-        "./"
-      ],
-      "source": "./contrib-skill",
-      "strict": false
-    },
-    {
       "description": "Create Cursor rules for persistent AI guidance. Use when you want to create a rule, add coding standards, set up project conventions, configure file-specific patterns, create RULE.md files, or asks about .cursor/rules/ or AGENTS.md.",
       "name": "create-rule",
       "skills": [
