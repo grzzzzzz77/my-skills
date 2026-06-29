@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{REPORT_TITLE}}</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f7f8fa;
+      --panel: #ffffff;
+      --text: #17202a;
+      --muted: #64748b;
+      --line: #dbe3ea;
+      --green: #15803d;
+      --green-bg: #eaf7ee;
+      --amber: #b45309;
+      --amber-bg: #fff4df;
+      --red: #b91c1c;
+      --red-bg: #feecec;
+      --blue: #2563eb;
+      --blue-bg: #eaf1ff;
+      --shadow: 0 14px 34px rgba(15, 23, 42, .08);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font: 15px/1.65 -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    }
+    a { color: var(--blue); }
+    .shell { max-width: 1180px; margin: 0 auto; padding: 28px 18px 48px; }
+    .hero {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      padding: 26px;
+    }
+    .hero h1 { margin: 0 0 10px; font-size: 32px; line-height: 1.2; letter-spacing: 0; }
+    .summary { margin: 12px 0 0; color: #334155; max-width: 920px; }
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border: 1px solid var(--line);
+      background: #f8fafc;
+      border-radius: 999px;
+      padding: 5px 10px;
+      color: #475569;
+      font-size: 13px;
+    }
+    .section { margin-top: 20px; }
+    .section h2 { margin: 0 0 12px; font-size: 21px; letter-spacing: 0; }
+    .grid { display: grid; gap: 14px; }
+    .score-grid { grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); }
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 18px;
+      box-shadow: 0 6px 18px rgba(15, 23, 42, .05);
+    }
+    .score-card .top { display: flex; justify-content: space-between; gap: 12px; align-items: flex-start; }
+    .score-card h3 { margin: 0; font-size: 17px; }
+    .score {
+      font-size: 42px;
+      line-height: 1;
+      font-weight: 800;
+      letter-spacing: 0;
+    }
+    .band {
+      display: inline-flex;
+      border-radius: 999px;
+      padding: 4px 9px;
+      font-size: 13px;
+      font-weight: 700;
+      background: var(--green-bg);
+      color: var(--green);
+    }
+    .band.mid { background: var(--amber-bg); color: var(--amber); }
+    .band.low { background: var(--red-bg); color: var(--red); }
+    .muted { color: var(--muted); }
+    .bar { height: 9px; background: #e2e8f0; border-radius: 999px; overflow: hidden; }
+    .bar > span { display: block; height: 100%; border-radius: inherit; background: var(--blue); }
+    .dimension { margin-top: 14px; border-top: 1px solid var(--line); padding-top: 14px; }
+    .dimension:first-child { margin-top: 0; border-top: 0; padding-top: 0; }
+    .dim-head { display: flex; justify-content: space-between; gap: 12px; align-items: center; margin-bottom: 8px; }
+    .dim-head strong { font-size: 16px; }
+    .dim-score { white-space: nowrap; font-weight: 800; }
+    ul { margin: 8px 0 0; padding-left: 20px; }
+    li + li { margin-top: 3px; }
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 6px;
+      padding: 2px 7px;
+      font-size: 12px;
+      font-weight: 700;
+      background: #eef2f7;
+      color: #475569;
+      margin-right: 6px;
+    }
+    .tag.high { background: var(--red-bg); color: var(--red); }
+    .tag.medium { background: var(--amber-bg); color: var(--amber); }
+    .tag.low { background: var(--green-bg); color: var(--green); }
+    table { width: 100%; border-collapse: collapse; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+    th, td { text-align: left; vertical-align: top; border-bottom: 1px solid var(--line); padding: 10px 12px; }
+    th { background: #f8fafc; color: #334155; font-weight: 700; }
+    tr:last-child td { border-bottom: 0; }
+    .callout {
+      background: var(--blue-bg);
+      border: 1px solid #c7d8ff;
+      color: #1e3a8a;
+      border-radius: 8px;
+      padding: 14px 16px;
+    }
+    .empty { color: var(--muted); padding: 12px 0; }
+    details { border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; background: #fbfdff; }
+    details + details { margin-top: 8px; }
+    summary { cursor: pointer; font-weight: 700; }
+    .footer { color: var(--muted); font-size: 13px; margin-top: 28px; }
+    @media (max-width: 760px) {
+      .shell { padding: 16px 12px 36px; }
+      .hero { padding: 18px; }
+      .hero h1 { font-size: 25px; }
+      .two-col { grid-template-columns: 1fr; }
+      .score { font-size: 34px; }
+      th, td { padding: 8px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <section class="hero">
+      <h1>{{REPORT_TITLE}}</h1>
+      <p class="summary">{{OVERALL_SUMMARY}}</p>
+      <div class="chips">
+        {{META_CHIPS}}
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>评分总览</h2>
+      <div class="grid score-grid">{{SCORE_CARDS}}</div>
+    </section>
+
+    {{COMPARISON_SECTION}}
+
+    <section class="section">
+      <h2>维度拆分</h2>
+      <div class="grid">{{DIMENSION_SECTIONS}}</div>
+    </section>
+
+    <section class="section">
+      <h2>风险与 ATS 诊断</h2>
+      <div class="two-col">
+        <div class="card">
+          <h3>可信度 / 面试风险</h3>
+          {{RISK_ITEMS}}
+        </div>
+        <div class="card">
+          <h3>ATS / 可读性</h3>
+          {{ATS_ITEMS}}
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>提分杠杆</h2>
+      <div class="grid">{{LIFT_ITEMS}}</div>
+    </section>
+
+    <section class="section">
+      <h2>缺失信息与置信度</h2>
+      <div class="callout">{{MISSING_INFORMATION}}</div>
+    </section>
+
+    <section class="section">
+      <h2>评分方法</h2>
+      <div class="card">
+        <p>本报告是简历竞争力诊断，不代表真实录用概率。默认 100 分由 6 个维度组成：目标定位与岗位对齐、证据强度与量化结果、经历/项目深度、岗位能力与技能信号、结构/ATS/可读性、可信度与面试可防守性。</p>
+      </div>
+    </section>
+
+    <p class="footer">Generated by resume-scorecard. Sensitive contact details should be redacted from the report.</p>
+  </main>
+</body>
+</html>

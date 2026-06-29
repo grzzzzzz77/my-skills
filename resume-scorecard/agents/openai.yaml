@@ -1,0 +1,5 @@
+interface:
+  display_name: "简历评分卡"
+  short_description: "简历 100 分评分、无 JD 单评、跨行业对比和 HTML 报告"
+  brand_color: "#16A34A"
+  default_prompt: "Use $resume-scorecard to score this resume without requiring a JD, compare versions or cross-industry resumes if provided, and render a Chinese HTML scorecard report."
