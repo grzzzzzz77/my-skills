@@ -1,6 +1,6 @@
 ---
 name: resume-scorecard
-description: Score and compare resumes with a structured 100-point scorecard, standalone no-JD resume scoring, cross-industry resume comparison, JD-fit analysis, ATS/readability checks, credibility risks, and a Chinese HTML report. Use when the user asks for 简历打分, 单独评分, 无 JD 评分, 简历评分, 简历对比, 跨行业简历对比, A/B 简历比较, ATS 分数, JD 匹配分, 简历质量评估, 为什么这版简历更强, or wants an objective score report instead of resume rewriting or optimization.
+description: Score and compare resumes with a structured 100-point scorecard, standalone no-JD resume scoring, cross-industry resume comparison, JD-fit analysis, ATS/readability checks, credibility risks, experience-year benchmark averages, and a Chinese HTML report. Use when the user asks for 简历打分, 单独评分, 无 JD 评分, 简历评分, 简历对比, 跨行业简历对比, A/B 简历比较, ATS 分数, JD 匹配分, 简历质量评估, 年限平均分, 1-3 年/3-5 年对标, 为什么这版简历更强, or wants an objective score report instead of resume rewriting or optimization.
 ---
 
 # Resume Scorecard
@@ -16,8 +16,10 @@ Produce a defensible score that separates:
 - **JD fit**: whether this resume matches a specific job description or role.
 - **Version or cross-industry advantage**: which resume is stronger for a target, or which is stronger within its own target market when targets differ.
 - **Interview risk**: which claims may collapse under follow-up.
+- **Experience-year benchmark**: how the score compares with the expected average for the candidate's inferred experience band and the next higher band.
 
 Never treat the score as hiring probability. Say it is a diagnostic score for resume competitiveness and evidence quality.
+Experience-year averages are rubric-calibrated reference baselines, not live hiring-market statistics. Label them as internal benchmark averages unless the user provides an external dataset.
 
 ## Inputs
 
@@ -28,6 +30,7 @@ Ask only for missing essentials:
 - `per_resume_target`: optional target role/industry for each resume when comparing cross-industry resumes.
 - `jd`: optional job description. When present, run JD-fit mode.
 - `candidate_stage`: 校招、实习、社招、转岗、专科/高职、本科、硕士/博士, if relevant.
+- `candidate_experience_years`: optional. If omitted, infer from resume dates and stage. Use `unknown` when evidence is insufficient.
 - `output_dir`: where to save the HTML report. If omitted, save next to the resume file or in the current working directory.
 
 If a PDF/DOCX cannot be reliably parsed, ask for pasted text or a text/Markdown export. Do not score screenshots unless text is available.
@@ -54,6 +57,8 @@ Extract the resume into plain text. Preserve section boundaries:
 - Projects
 - Awards/certifications
 - Publications/portfolio links, if present
+
+Estimate candidate experience years from work/internship dates, graduation context, and role labels. If a resume shows internships only, treat them as internship/early-career evidence rather than full professional seniority unless the resume clearly states full-time years.
 
 Remove or redact private contact details from the report. Do not include phone numbers, email addresses, exact street addresses, ID numbers, or private links in final artifacts.
 
@@ -94,6 +99,28 @@ Use score bands:
 - `70-79`: B / usable, but obvious gaps remain.
 - `60-69`: C / needs significant rebuild before serious submission.
 - `<60`: D / not ready for target use.
+
+### 3.5 Add Experience-Year Benchmark
+
+After scoring each resume, add `experience_benchmark` when experience can be inferred or the user provides it.
+
+Use `references/scoring-rubric.md` for benchmark bands and include:
+
+- inferred or provided experience years
+- current experience band
+- next higher band
+- the current band's average score
+- the next higher band's average score
+- candidate delta versus each benchmark
+- the expectation gap that explains what the next band would require
+
+Example: if a candidate has about 2 years of experience, show both `1-3 年` and `3-5 年`. If the candidate has about 4 years, show `3-5 年` and `5-8 年`.
+
+Do not present these averages as real-time market statistics. Use language such as:
+
+```text
+该均分是本 skill 基于 100 分评分尺标设定的经验段参考基准，用于横向对标，不代表招聘市场真实统计均值。
+```
 
 ### 4. Risk Rules
 
@@ -138,6 +165,7 @@ python3 <skill_dir>/scripts/render_scorecard_report.py \
 The HTML report must include:
 
 - Overall score cards for each resume version.
+- Experience-year benchmark comparison when experience is known or inferred.
 - Dimension breakdown with bars and deductions.
 - Version comparison and winner when multiple versions exist.
 - Cross-industry comparison notes when resumes target different industries, including "best for" scenarios instead of a simplistic winner.
@@ -152,6 +180,7 @@ The HTML report must include:
 For chat summaries, keep the answer concise:
 
 - Total score and band.
+- Experience-year benchmark: current band average and next-band average.
 - Biggest 3 deductions.
 - Strongest 3 advantages.
 - Best version if comparing.

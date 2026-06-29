@@ -85,6 +85,34 @@ A 简历一定比 B 简历好。
 | 60-69 | C | Significant rebuild needed; likely underperforms against comparable candidates. |
 | <60 | D | Not ready for this target; foundational content or positioning is missing. |
 
+## Experience-Year Benchmark Averages
+
+Use this section to give the user a same-seniority and one-level-up reference. These are **rubric-calibrated benchmark averages**, not live market statistics. They answer: "For this resume-quality scoring system, what score is typical for a candidate at this experience level?"
+
+Always show the candidate's current band and the next higher band when experience can be estimated. For example:
+
+- About 2 years of experience -> show `1-3 年` and `3-5 年`.
+- About 4 years of experience -> show `3-5 年` and `5-8 年`.
+- Fresh graduate or internship-only resume -> show `应届/0-1 年` and `1-3 年`.
+
+| Experience band | Benchmark average | Competitive line | Excellent line | What this band usually needs |
+|---|---:|---:|---:|---|
+| 应届/0-1 年 | 64 | 74 | 84 | Clear target, strong projects/internships, skills backed by evidence, no obvious template gaps. |
+| 1-3 年 | 72 | 80 | 88 | Real work or production-like projects, concrete ownership, several quantified outcomes, clean one-page/two-page structure. |
+| 3-5 年 | 78 | 85 | 90 | Independent module ownership, business impact, cross-team collaboration, measurable delivery quality, deeper technical tradeoffs. |
+| 5-8 年 | 82 | 88 | 92 | System-level ownership, architecture decisions, mentoring or project leadership, stable business impact, strong risk control. |
+| 8 年以上 | 84 | 90 | 94 | Domain leadership, strategy/architecture scope, team influence, complex stakeholder management, durable measurable outcomes. |
+
+### Benchmark Rules
+
+- `estimated_years` should be based on resume evidence or user-provided facts. If unclear, mark `unknown` and skip numeric deltas.
+- `candidate_delta` = `candidate total_score - benchmark average`.
+- If the candidate beats the current-band average but falls below the next-band average, say they are strong for current seniority but not yet packaged like the next band.
+- If the candidate beats both averages, still check the next-band expectation gap before claiming next-band readiness.
+- If the candidate is below the current-band average, explain the biggest 2-3 gaps by evidence, not by seniority alone.
+- For cross-industry comparisons, compute benchmarks per resume using each resume's own target role and inferred years.
+- If the user provides real cohort data, prefer it over this built-in table and state the source.
+
 ## 90+ Gate
 
 A resume should not exceed 90 unless most of these are true:

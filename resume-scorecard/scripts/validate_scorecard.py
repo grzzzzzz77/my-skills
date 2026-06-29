@@ -92,6 +92,45 @@ def validate_dimension(item: Any, path: str, findings: list[dict]) -> tuple[floa
     return score, max_score
 
 
+def validate_experience_benchmark(item: Any, path: str, findings: list[dict], total_score: float | None) -> None:
+    if item in (None, ""):
+        return
+    if not isinstance(item, dict):
+        add(findings, "error", path, "experience_benchmark must be an object")
+        return
+    if not is_text(item.get("current_band")):
+        add(findings, "warning", f"{path}.current_band", "current experience band should be included")
+    if not is_text(item.get("next_band")):
+        add(findings, "warning", f"{path}.next_band", "next higher experience band should be included")
+    bands = item.get("bands")
+    if not isinstance(bands, list) or not bands:
+        add(findings, "warning", f"{path}.bands", "experience benchmark should include current and next-band rows")
+        return
+    if len(bands) < 2:
+        add(findings, "warning", f"{path}.bands", "include at least current band and next higher band")
+    for band_index, band in enumerate(bands):
+        band_path = f"{path}.bands[{band_index}]"
+        if not isinstance(band, dict):
+            add(findings, "error", band_path, "benchmark band must be an object")
+            continue
+        if not is_text(band.get("band")):
+            add(findings, "error", f"{band_path}.band", "band label is required")
+        average = numeric_score(band.get("average_score"))
+        if average is None:
+            add(findings, "error", f"{band_path}.average_score", "average_score must be numeric")
+        elif average < 0 or average > 100:
+            add(findings, "error", f"{band_path}.average_score", "average_score must be 0-100")
+        for optional_key in ("competitive_score", "excellent_score", "candidate_delta"):
+            value = band.get(optional_key)
+            if value not in (None, "") and numeric_score(value) is None:
+                add(findings, "error", f"{band_path}.{optional_key}", f"{optional_key} must be numeric when present")
+        delta = numeric_score(band.get("candidate_delta"))
+        if total_score is not None and average is not None and delta is not None:
+            expected_delta = total_score - average
+            if abs(delta - expected_delta) > 1.0:
+                add(findings, "warning", f"{band_path}.candidate_delta", f"candidate_delta differs from total_score - average_score ({expected_delta:g})")
+
+
 def validate_resume(item: Any, index: int, findings: list[dict], score_mode: str = "") -> None:
     path = f"resumes[{index}]"
     if not isinstance(item, dict):
@@ -126,6 +165,7 @@ def validate_resume(item: Any, index: int, findings: list[dict], score_mode: str
             severity = flag.get("severity")
             if severity not in SEVERITY_VALUES:
                 add(findings, "error", f"{path}.red_flags[{flag_index}].severity", "severity must be high, medium, or low")
+    validate_experience_benchmark(item.get("experience_benchmark"), f"{path}.experience_benchmark", findings, total)
 
 
 def validate_analysis_payload(analysis: dict) -> list[dict]:

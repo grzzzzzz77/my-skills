@@ -42,6 +42,34 @@ python3 <skill_dir>/scripts/render_scorecard_report.py \
       "total_score": 82,
       "band": "A",
       "score_summary": "整体可投，但还不是 90+，主要扣分来自项目结果量化不足和技能证据分散。",
+      "experience_benchmark": {
+        "estimated_years": 2,
+        "current_band": "1-3 年",
+        "next_band": "3-5 年",
+        "benchmark_note": "该均分是本 skill 基于 100 分评分尺标设定的经验段参考基准，用于横向对标，不代表招聘市场真实统计均值。",
+        "basis": [
+          "简历显示约 2 年前端相关实习/工作经历"
+        ],
+        "bands": [
+          {
+            "band": "1-3 年",
+            "average_score": 72,
+            "competitive_score": 80,
+            "excellent_score": 88,
+            "candidate_delta": 10,
+            "expectations": "需要真实项目、明确个人边界、若干量化结果和清晰岗位主线。"
+          },
+          {
+            "band": "3-5 年",
+            "average_score": 78,
+            "competitive_score": 85,
+            "excellent_score": 90,
+            "candidate_delta": 4,
+            "expectations": "需要独立模块 ownership、业务影响、跨团队协作、技术取舍和稳定交付证据。"
+          }
+        ],
+        "interpretation": "这份简历高于 1-3 年参考均分，也略高于 3-5 年参考均分；若要按 3-5 年强竞争力包装，还需要补足独立负责范围和业务结果口径。"
+      },
       "dimensions": [
         {
           "name": "目标定位与岗位对齐",
@@ -118,6 +146,11 @@ python3 <skill_dir>/scripts/render_scorecard_report.py \
 - `resumes[].scoring_context`: explain whether the resume was scored against a JD, role-market expectation, or universal baseline.
 - `total_score`: 0-100. Keep it consistent with dimension scores.
 - `band`: may be omitted; renderer can infer it.
+- `experience_benchmark`: optional but recommended whenever years can be inferred or provided. Include the current experience band and the next higher band. If experience is unknown, omit it or set `estimated_years` to `"unknown"` and explain in `missing_information`.
+- `experience_benchmark.estimated_years`: numeric years or `"unknown"`. Do not over-precision; `2`, `2.5`, or `"unknown"` is enough.
+- `experience_benchmark.bands[]`: include at least two rows when known: current band and next higher band.
+- `experience_benchmark.bands[].average_score`: internal benchmark average for that experience band.
+- `experience_benchmark.bands[].candidate_delta`: `total_score - average_score`. May be omitted if experience or total score is unknown.
 - `dimensions`: required for each resume. The sum of `max_score` should be 100 in strict reports.
 - `red_flags.severity`: use `high`, `medium`, or `low`.
 - `score_lifts.estimated_gain`: write ranges like `+2-4`, not guaranteed outcomes.

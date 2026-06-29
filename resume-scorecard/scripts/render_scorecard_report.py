@@ -50,6 +50,17 @@ def score_number(value: Any, fallback: float = 0.0) -> float:
     return float(match.group(0)) if match else fallback
 
 
+def optional_number(value: Any) -> float | None:
+    if value in (None, "") or isinstance(value, bool):
+        return None
+    if isinstance(value, (int, float)):
+        return float(value)
+    try:
+        return float(str(value))
+    except Exception:
+        return None
+
+
 def infer_band(score: float) -> str:
     if score >= 90:
         return "A+"
@@ -144,6 +155,72 @@ def comparison_from_scores(resumes: list[dict]) -> dict:
         "delta_summary": [f"{top.get('name') or top.get('id')}：{top.get('total_score')}；{second.get('name') or second.get('id')}：{second.get('total_score')}。"],
         "best_for": [],
     }
+
+
+def format_delta(value: Any) -> str:
+    number = optional_number(value)
+    if number is None:
+        return "未估"
+    sign = "+" if number > 0 else ""
+    shown = int(number) if float(number).is_integer() else round(number, 1)
+    return f"{sign}{shown}"
+
+
+def render_experience_benchmarks(resumes: list[dict]) -> str:
+    blocks = []
+    for resume in resumes:
+        benchmark = resume.get("experience_benchmark")
+        if not isinstance(benchmark, dict):
+            continue
+        rows = []
+        total = optional_number(resume.get("total_score"))
+        for item in as_list(benchmark.get("bands")):
+            if not isinstance(item, dict):
+                continue
+            average = optional_number(item.get("average_score"))
+            delta = item.get("candidate_delta")
+            if delta in (None, "") and total is not None and average is not None:
+                delta = total - average
+            rows.append(
+                "<tr>"
+                f"<td>{h(item.get('band') or '')}</td>"
+                f"<td>{h(item.get('average_score') if item.get('average_score') not in (None, '') else '未估')}</td>"
+                f"<td>{h(item.get('competitive_score') if item.get('competitive_score') not in (None, '') else '未估')}</td>"
+                f"<td>{h(item.get('excellent_score') if item.get('excellent_score') not in (None, '') else '未估')}</td>"
+                f"<td>{h(format_delta(delta))}</td>"
+                f"<td>{h(item.get('expectations') or '')}</td>"
+                "</tr>"
+            )
+        table = ""
+        if rows:
+            table = (
+                "<table><thead><tr>"
+                "<th>年限段</th><th>参考均分</th><th>竞争线</th><th>优秀线</th><th>本简历差值</th><th>该段通常要求</th>"
+                "</tr></thead><tbody>"
+                + "".join(rows)
+                + "</tbody></table>"
+            )
+        years = benchmark.get("estimated_years", "未知")
+        current_band = benchmark.get("current_band") or "未估"
+        next_band = benchmark.get("next_band") or "未估"
+        blocks.append(f"""
+        <article class="card">
+          <h3>{h(resume.get("name") or resume.get("id") or "简历")}</h3>
+          <p class="muted">估算年限：<strong>{h(years)}</strong> · 当前分段：<strong>{h(current_band)}</strong> · 高一档分段：<strong>{h(next_band)}</strong></p>
+          {table or '<div class="empty">暂无年限基准明细。</div>'}
+          <p>{h(benchmark.get("interpretation") or "")}</p>
+          {ul(benchmark.get("basis"), "暂无年限估算依据")}
+          <p class="muted">{h(benchmark.get("benchmark_note") or "该均分是本 skill 基于 100 分评分尺标设定的经验段参考基准，不代表招聘市场真实统计均值。")}</p>
+        </article>
+        """)
+    if not blocks:
+        return ""
+    return f"""
+    <section class="section">
+      <h2>经验年限基准</h2>
+      <div class="grid">{''.join(blocks)}</div>
+    </section>
+    """
 
 
 def render_comparison(analysis: dict, resumes: list[dict]) -> str:
@@ -285,6 +362,7 @@ def render_report(analysis: dict, template: str) -> str:
         "OVERALL_SUMMARY": h(analysis.get("overall_summary") or "暂无总体结论。"),
         "META_CHIPS": render_meta(analysis),
         "SCORE_CARDS": render_score_cards(resumes),
+        "EXPERIENCE_BENCHMARK_SECTION": render_experience_benchmarks(resumes),
         "COMPARISON_SECTION": render_comparison(analysis, resumes),
         "DIMENSION_SECTIONS": render_dimension_sections(resumes),
         "RISK_ITEMS": render_risks(resumes),

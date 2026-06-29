@@ -20,11 +20,18 @@ The report is a standalone Chinese HTML file rendered from `resume_scorecard_ana
    - Total score, band, short summary
    - JD-fit score when available
 
-4. Version Comparison
+4. Experience-Year Benchmark
+   - Show when a resume includes `experience_benchmark`
+   - Estimate or display the candidate's years of experience
+   - Compare the candidate score against the current experience band average
+   - Also compare against the next higher band average
+   - Clearly state that built-in averages are rubric-calibrated reference baselines, not live market statistics
+
+5. Version Comparison
    - Show only when there are multiple resume versions or `comparison` exists
    - Winner, reason, score deltas, best-use scenario
 
-5. Dimension Breakdown
+6. Dimension Breakdown
    - For each resume version:
      - Dimension score and max score
      - Progress bar
@@ -33,20 +40,21 @@ The report is a standalone Chinese HTML file rendered from `resume_scorecard_ana
      - Deductions
      - Lift actions
 
-6. Risk And ATS Notes
+7. Risk And ATS Notes
    - Red flags grouped by severity
    - ATS/readability notes
    - Interview risks
 
-7. Score Lift Levers
+8. Score Lift Levers
    - Action
    - Estimated score gain
    - Effort
    - Why it matters
 
-8. Methodology
+9. Methodology
    - Explain that the score is diagnostic, not hiring probability
    - Mention the six default score dimensions
+   - Mention that experience-year averages are internal benchmark references unless an external dataset is provided
 
 ## UX Requirements
 
