@@ -11,6 +11,8 @@ Use this skill to turn a real local code project into credible resume material. 
 
 Do not merely beautify wording. First build an evidence trail from the repository, then write resume bullets that can survive interview follow-up and background checks.
 
+Metric integrity is part of the deliverable. If real business metrics are missing, do not fabricate them as facts. Instead produce clearly labeled metric candidates: what can be verified, what is code-derived, what is a reasonable estimate direction, and what the user must confirm before it can enter a resume.
+
 Optimize for three use cases:
 
 1. **Quick resume bullets**: 3-8 evidence-backed bullets in chat when the user only asks for a few project descriptions.
@@ -26,6 +28,8 @@ Each final highlight must include:
 - Risk label: `safe`, `needs_confirmation`, or `risky`.
 - Interview talking points: problem, action, result, tradeoff.
 - Whether the bullet is suitable for direct paste, downstream rewrite, or only as an idea that needs confirmation.
+- Metric tier and source when a number appears.
+- Optional project-level score impact when the user is comparing projects or asking why a project did not reach a higher score.
 
 ## Inputs
 
@@ -160,6 +164,33 @@ Generate at least 8 candidate highlights when evidence allows, grouped into cate
 - Security/auth/compliance
 - Collaboration and ownership
 
+### 4.5 Score Project Value and Metric Strategy
+
+When the user asks for comparison, "含金量", "打分", "为什么没上 90", or when strict report mode would benefit from it, add a project-level 100-point evaluation before writing final bullets.
+
+Use two score modes:
+
+- `evidence_safe_score`: only verified/code-derived evidence counts. This is the score you can defend in an interview today.
+- `potential_score`: may consider clearly labeled assumptions and estimated metric directions. This is not a factual resume claim; it is a packaging ceiling after the user confirms data.
+
+Use the 100-point rubric in `references/highlight-rubric.md`. A project should not receive an evidence-safe score above 89 unless at least one of these is true:
+
+- Production/business impact is verified by repo docs, logs, issues, analytics, or user-provided facts.
+- Personal ownership is confirmed and supported by Git or user facts.
+- The code provides unusually strong, role-relevant depth with testable scope metrics and multiple high-difficulty highlights.
+
+If the score is below 90, explicitly name the missing evidence, for example: 缺真实用户/营收/效率指标、缺个人负责边界、缺上线证明、缺测试/工程质量证据、业务闭环不完整、AI/架构深度不足.
+
+If the user asks whether you can "合理推测" or "虚构" metrics, do not write false claims. Instead create `metric_strategy.estimated_metric_suggestions` with:
+
+- `claim_direction`: the impact direction, such as efficiency, conversion, latency, adoption, maintainability, cost, or reliability.
+- `basis`: code evidence that makes the direction plausible.
+- `placeholder`: an editable resume phrase using `X/Y/Z` or a conservative range that remains visibly unconfirmed.
+- `confidence`: low, medium, or high.
+- `confirmation_needed`: the exact fact the user must provide.
+
+These estimates may appear in enhanced bullets, confirmation sections, and the downstream prompt pack. They must not appear as facts in `safe_bullets`.
+
 ### 5. Write Structured Analysis JSON
 
 Read `references/analysis-schema.md`, then create:
@@ -174,6 +205,8 @@ This JSON is the handoff between deep project understanding and deterministic re
 - Business flow map, module map, API/page/data-flow notes in `facts`.
 - Keywords suitable for the skills section.
 - Categorized highlights with `risk`, `readiness`, evidence paths, safe bullet, enhanced bullet, STAR notes, and data to confirm.
+- Optional `project_score` for 100-point evidence-safe and potential scoring when the user asks for evaluation or comparison.
+- Optional `metric_strategy` containing verified, code-derived, estimated, and not-to-claim metrics.
 - Optional custom `prompt_pack` only when the generated default prompt would not be enough.
 
 Do not manually replace placeholders in `assets/report-template.html` for final delivery. Use the render script in step 9.
@@ -191,19 +224,21 @@ Fix any validation errors or warnings. Final delivery should pass strict validat
 
 ### 6. Quantification Rules
 
-Use three metric tiers:
+Use four metric tiers:
 
 1. `verified`: Directly observed in repo, logs, tests, docs, issue text, or user-provided facts.
 2. `code_derived`: Counted or inferred from code, such as `12 pages`, `28 components`, `16 API endpoints`, `4 roles`, `3 platforms`, `70+ commits`, `20+ tests`.
 3. `needs_confirmation`: Reasonable business metric suggestions, such as conversion, latency, retention, adoption, cost, efficiency, or manual time saved. These must be labeled as needing user confirmation.
+4. `estimated_hypothesis`: A clearly labeled impact hypothesis produced from code evidence when the user lacks metrics. It may use placeholders or conservative ranges, but it is not a fact and must remain outside safe bullets.
 
-Never present `needs_confirmation` metrics as facts. In the HTML report, separate:
+Never present `needs_confirmation` or `estimated_hypothesis` metrics as facts. In the HTML report, separate:
 
 - **可直接写入简历**: safe wording.
 - **增强版，需要你确认数据**: stronger wording with suggested metrics.
+- **估算指标方向，不可直接当事实**: plausible metric candidates with basis and confirmation needs.
 - **不要直接写**: risky wording to avoid.
 
-When the user explicitly wants more quantified bullets, add metric placeholders or conservative ranges, but keep the risk label visible.
+When the user explicitly wants more quantified bullets, add metric placeholders or conservative ranges, keep the risk label visible, and explain exactly what real data would upgrade the bullet into a safe claim.
 
 ### 7. Write Resume Bullets
 
@@ -260,6 +295,7 @@ Use `references/pitch-prompt-pack.md` for the exact structure. The prompt pack m
 - Technical highlights grouped by category.
 - Safe bullets and enhanced bullets that require confirmation.
 - Verified/code-derived metrics with sources.
+- Estimated metric directions labeled as placeholders, never as facts.
 - Keywords suitable for the skills section.
 - Unknowns the user should confirm before sending the resume.
 

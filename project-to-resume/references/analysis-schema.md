@@ -37,6 +37,39 @@ If `--analysis` is omitted, the renderer creates an evidence-only draft report. 
   "role_assumption": "用户角色边界。未知时写：未确认，默认使用保守表述。",
   "disclosure_assumption": "公开边界。未知时写：未确认，不暴露内部指标、客户名和敏感细节。",
   "keywords": ["TypeScript", "Vue", "权限体系"],
+  "project_score": {
+    "evidence_safe_score": 89,
+    "potential_score": 93,
+    "score_mode": "evidence_safe_and_potential",
+    "score_breakdown_100": {
+      "technical_depth": 23,
+      "ai_or_rarity_signal": 19,
+      "business_completeness": 13,
+      "evidence_and_quality": 13,
+      "resume_readability": 14,
+      "interview_expansion": 7
+    },
+    "score_rationale": "代码证据显示技术深度和简历可读性强，但业务指标与个人 Owner 边界仍需确认。",
+    "score_ceiling_reason": "缺少已确认业务指标或上线规模，evidence-safe score 不宜超过 89。"
+  },
+  "metric_strategy": {
+    "verified_metrics": [
+      {"metric": "12 个页面", "source": "pages.json", "usable_in_safe_bullet": true}
+    ],
+    "code_derived_metrics": [
+      {"metric": "20+ 组件", "source": "src/components", "usable_in_safe_bullet": true}
+    ],
+    "estimated_metric_suggestions": [
+      {
+        "claim_direction": "效率提升",
+        "basis": "多页面复用字段映射表单和统一请求层。",
+        "placeholder": "将同类页面开发周期从 X 天缩短至 Y 天",
+        "confidence": "medium",
+        "confirmation_needed": "确认历史开发周期和复用前后差异"
+      }
+    ],
+    "metrics_not_to_claim": ["用户量", "营收", "转化率", "线上延迟降低百分比"]
+  },
   "facts": [
     {"label": "业务流程", "value": ["用户登录", "订单管理", "审批流"]},
     {"label": "核心模块", "value": ["src/pages/order", "src/services/order.ts"]}
@@ -111,6 +144,15 @@ The fixture check runs `render_resume_report.py --strict`, so it exercises evide
 - `score`: required for serious report highlights; use the rubric score after any AI application bonus.
 - `score_breakdown`: optional but recommended for strict reports; include the six base dimensions and `ai_application_bonus` when relevant.
 - `score_rationale`: optional but recommended; one concise Chinese sentence explaining why this highlight ranks high or low.
+- `project_score`: optional, but required when the user asks for comparison, "含金量", "打分", or "为什么没上 90".
+- `project_score.evidence_safe_score`: 0-100 score using only verified and code-derived evidence.
+- `project_score.potential_score`: 0-100 score after clearly labeled assumptions or estimated metric directions are confirmed.
+- `project_score.score_breakdown_100`: use `technical_depth`, `ai_or_rarity_signal`, `business_completeness`, `evidence_and_quality`, `resume_readability`, and `interview_expansion`.
+- `project_score.score_ceiling_reason`: required when evidence-safe score is below 90 but potential score is 90+.
+- `metric_strategy`: optional, but recommended for strict reports and any quantified bullet request.
+- `metric_strategy.verified_metrics` and `metric_strategy.code_derived_metrics`: may be used in safe bullets when sources are listed.
+- `metric_strategy.estimated_metric_suggestions`: must stay under enhanced/confirmation sections and use placeholders or ranges, not factual claims.
+- `metric_strategy.metrics_not_to_claim`: list metrics that would overstate the project unless the user provides proof.
 - `evidence`: required for every highlight.
 - `safe_bullet`: must be conservative and evidence-backed.
 - `interview`: must include `situation`, `task`, `action`, `result`, and `tradeoff`.

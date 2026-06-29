@@ -38,12 +38,15 @@ For final delivery, render with `--strict` so invalid `project_resume_analysis.j
    - Role/disclosure assumptions.
    - Tech stack and keywords.
    - Verified and code-derived metrics with sources.
+   - Optional 100-point project value score when `project_score` exists.
+   - Optional metric strategy when `metric_strategy` exists: verified, code-derived, estimated placeholders, and metrics not to claim.
 
 5. Resume-Ready Bullets
    - A copy-friendly list of safe bullets.
 
 6. Enhanced Bullets Requiring Confirmation
    - Include suggested metrics and what the user must verify.
+   - Include estimated metric directions under a visibly non-factual label when available.
 
 7. Downstream Resume Prompt
    - Copy-friendly prompt for another agent to merge the project into the user's original resume.
@@ -63,6 +66,7 @@ For final delivery, render with `--strict` so invalid `project_resume_analysis.j
 - Do not add a separate highlight filter block unless the user explicitly asks for filtering.
 - Major sections must have stable anchors: overview, safe bullets, confirmation items, highlight explorer, downstream prompt, interview stories, and evidence appendix.
 - Keep the report scannable: show the safest resume material early, keep dense evidence and STAR notes behind expandable detail areas when practical.
+- When scoring is present, show both evidence-safe score and potential score. If the safe score is below 90, explain the score ceiling reason instead of leaving the number unexplained.
 - The highlight explorer must show the total highlight count.
 - Highlight titles should expose professional technical essence first, preferably in Chinese, such as `异步请求竞态治理`, `流式 Markdown 渲染`, `请求网关`, or `前端可观测性链路`.
 - Keep English in titles only for established technical names, protocols, frameworks, abbreviations, or code identifiers such as `WebSocket`, `SSE`, `SDK`, `CLI`, `MCP`, `API`, `Markdown`, `SQLite FTS`, `Tauri`, `Rust`, `rAF`, or `stream-json`; avoid bilingual title stacking for style.

@@ -185,6 +185,82 @@ def draft_highlights_from_evidence(evidence: dict) -> list[dict]:
     return highlights
 
 
+def compact_metric_entry(item: Any) -> str:
+    if isinstance(item, dict):
+        labels = {
+            "metric": "指标",
+            "source": "来源",
+            "usable_in_safe_bullet": "可用于安全 bullet",
+            "claim_direction": "指标方向",
+            "basis": "推测依据",
+            "placeholder": "占位写法",
+            "confidence": "置信度",
+            "confirmation_needed": "需确认",
+        }
+        preferred = [
+            "metric",
+            "source",
+            "usable_in_safe_bullet",
+            "claim_direction",
+            "basis",
+            "placeholder",
+            "confidence",
+            "confirmation_needed",
+        ]
+        parts = []
+        for key in preferred:
+            if key in item and str(item.get(key, "")).strip():
+                parts.append(f"{labels[key]}：{item.get(key)}")
+        if not parts:
+            parts = [f"{key}：{value}" for key, value in item.items() if str(value).strip()]
+        return "；".join(parts)
+    return str(item)
+
+
+def build_project_score_lines(score: Any) -> list[str]:
+    if not isinstance(score, dict):
+        return []
+    lines = []
+    safe_score = score.get("evidence_safe_score")
+    potential_score = score.get("potential_score")
+    if safe_score not in (None, "") or potential_score not in (None, ""):
+        lines.append(f"证据安全分：{safe_score if safe_score not in (None, '') else '未评'}/100；潜力分：{potential_score if potential_score not in (None, '') else '未评'}/100")
+    if score.get("score_rationale"):
+        lines.append(f"评分依据：{score.get('score_rationale')}")
+    if score.get("score_ceiling_reason"):
+        lines.append(f"上限原因：{score.get('score_ceiling_reason')}")
+    breakdown = score.get("score_breakdown_100")
+    if isinstance(breakdown, dict) and breakdown:
+        label_map = {
+            "technical_depth": "技术深度",
+            "ai_or_rarity_signal": "AI/稀缺度",
+            "business_completeness": "业务完整度",
+            "evidence_and_quality": "证据与质量",
+            "resume_readability": "简历可读性",
+            "interview_expansion": "面试展开度",
+        }
+        parts = [f"{label_map.get(key, key)} {value}" for key, value in breakdown.items()]
+        lines.append("拆分：" + "，".join(parts))
+    return lines
+
+
+def build_metric_strategy_lines(strategy: Any) -> list[dict]:
+    if not isinstance(strategy, dict):
+        return []
+    sections = []
+    mapping = [
+        ("verified_metrics", "已验证指标"),
+        ("code_derived_metrics", "代码推导指标"),
+        ("estimated_metric_suggestions", "估算指标方向（不可直接当事实）"),
+        ("metrics_not_to_claim", "不要直接写的指标"),
+    ]
+    for key, label in mapping:
+        values = [compact_metric_entry(item) for item in as_list(strategy.get(key)) if str(item).strip()]
+        if values:
+            sections.append({"label": label, "value": values})
+    return sections
+
+
 def build_metric_cards(evidence: dict, analysis: dict) -> str:
     git = evidence.get("git") or {}
     languages = evidence.get("languages_by_lines") or []
@@ -194,6 +270,12 @@ def build_metric_cards(evidence: dict, analysis: dict) -> str:
         ("主要语言", len(languages), "按行数统计的语言/文件类型"),
         ("Git 提交", git.get("total_commits", 0) if git.get("is_git") else "无 Git", "仓库历史信号"),
     ]
+    project_score = analysis.get("project_score")
+    if isinstance(project_score, dict):
+        if project_score.get("evidence_safe_score") not in (None, ""):
+            cards.append(("证据安全分", f"{project_score.get('evidence_safe_score')}/100", "只计可验证与代码推导证据"))
+        if project_score.get("potential_score") not in (None, ""):
+            cards.append(("潜力分", f"{project_score.get('potential_score')}/100", "需确认估算指标后再使用"))
     for item in as_list(analysis.get("metric_cards")):
         if isinstance(item, dict):
             cards.append((item.get("label", ""), item.get("value", ""), item.get("note", "")))
@@ -233,6 +315,10 @@ def build_project_facts(evidence: dict, analysis: dict) -> str:
             f"当前分支：{git.get('branch') or '未知'}",
             f"选择作者：{git.get('selected_author') or '未指定'}",
         ]})
+    score_lines = build_project_score_lines(analysis.get("project_score"))
+    if score_lines:
+        defaults.append({"label": "项目含金量评分", "value": score_lines})
+    defaults.extend(build_metric_strategy_lines(analysis.get("metric_strategy")))
     fact_items = defaults + [item for item in fact_items if isinstance(item, dict)]
     return "\n".join(
         f'<div class="fact"><strong>{h(item.get("label", ""))}</strong><div>{render_value(item.get("value", ""))}</div></div>'
@@ -287,6 +373,20 @@ def build_confirmation_items(highlights: list[dict], analysis: dict) -> str:
                 f'<div class="enhanced-item"><strong>{h(item["title"])}</strong><br>{h(item["enhanced_bullet"])}'
                 f'<br><span class="needs_confirmation">需确认：{h(confirm or "真实数据/负责边界")}</span></div>'
             )
+    strategy = analysis.get("metric_strategy")
+    if isinstance(strategy, dict):
+        for item in as_list(strategy.get("estimated_metric_suggestions")):
+            text = compact_metric_entry(item)
+            confirm = item.get("confirmation_needed") if isinstance(item, dict) else "真实数据"
+            rows.append(
+                f'<div class="enhanced-item"><strong>估算指标方向，不可直接当事实</strong><br>{h(text)}'
+                f'<br><span class="needs_confirmation">需确认：{h(confirm or "真实数据")}</span></div>'
+            )
+        for item in as_list(strategy.get("metrics_not_to_claim")):
+            if str(item).strip():
+                rows.append(
+                    f'<div class="enhanced-item"><strong>不要直接写</strong><br>{h(item)}</div>'
+                )
     return "\n".join(rows) or '<div class="enhanced-item">暂无增强版 bullet。</div>'
 
 
@@ -453,6 +553,23 @@ def build_prompt_pack(evidence: dict, analysis: dict, highlights: list[dict]) ->
         for item in highlights
         if item["risk"] == "risky" and item.get("safe_bullet", "").strip()
     ]
+    strategy = analysis.get("metric_strategy") if isinstance(analysis.get("metric_strategy"), dict) else {}
+    safe_metrics = [
+        compact_metric_entry(item)
+        for key in ("verified_metrics", "code_derived_metrics")
+        for item in as_list(strategy.get(key))
+        if str(item).strip()
+    ]
+    estimated_metrics = [
+        compact_metric_entry(item)
+        for item in as_list(strategy.get("estimated_metric_suggestions"))
+        if str(item).strip()
+    ]
+    risky.extend(str(item) for item in as_list(strategy.get("metrics_not_to_claim")) if str(item).strip())
+    confirmation_questions = [str(item) for item in as_list(pitch.get("truth_questions")) if str(item).strip()]
+    for item in as_list(strategy.get("estimated_metric_suggestions")):
+        if isinstance(item, dict) and str(item.get("confirmation_needed", "")).strip():
+            confirmation_questions.append(str(item["confirmation_needed"]))
     keywords = analysis.get("keywords") or pitch.get("tech_keywords") or []
     facts = [
         f"【项目名称】{project_name}",
@@ -467,12 +584,14 @@ def build_prompt_pack(evidence: dict, analysis: dict, highlights: list[dict]) ->
         return f"{title}\n{body}"
     return "\n\n".join([
         "我想把一个项目写进简历。请你结合我下面附上的原始简历，把这个项目用合适的措辞和详略融入进去，并输出一版完整的新简历。",
-        "写作要求：\n1. 风格、语言、人称、bullet 详略与我的原始简历保持一致。\n2. 用“动作 + 技术/方法 + 业务对象 + 规模/指标 + 结果”组织，不要写成功能清单。\n3. 只能使用下方提供的事实和数字，不要编造用户量、收益、性能提升、团队规模等信息。\n4. 对“需要确认”的指标或角色表述，不要直接写成事实。",
+        "写作要求：\n1. 风格、语言、人称、bullet 详略与我的原始简历保持一致。\n2. 用“动作 + 技术/方法 + 业务对象 + 规模/指标 + 结果”组织，不要写成功能清单。\n3. 只能使用下方提供的事实和数字，不要编造用户量、收益、性能提升、团队规模等信息。\n4. 对“需要确认”的指标或角色表述，不要直接写成事实。\n5. 对“估算指标方向”只能保留为待确认建议，不要改写成已发生结果。",
         "\n".join(facts),
+        bullet_section("【可安全使用的指标】", safe_metrics, "暂无已验证或代码推导指标。"),
         bullet_section("【可直接写入简历的 bullet】", safe_bullets, "暂无，请先补充可证实的项目贡献。"),
         bullet_section("【增强版 bullet，需要我确认数据后再用】", enhanced, "暂无。"),
+        bullet_section("【估算指标方向，不可直接当事实】", estimated_metrics, "暂无。"),
         bullet_section("【不要直接写的高风险表述】", risky, "暂无。"),
-        bullet_section("【待我确认的问题】", pitch.get("truth_questions") or [], "个人负责边界、是否可公开内部指标。"),
+        bullet_section("【待我确认的问题】", confirmation_questions, "个人负责边界、是否可公开内部指标。"),
         "请基于以上项目信息与我的原始简历，输出新版完整简历。",
     ])
 

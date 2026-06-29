@@ -10,8 +10,10 @@ The prompt pack is not a final resume. It is a structured handoff to another age
 
 - Use only facts from repository evidence, user input, or clearly labeled code-derived counts.
 - Do not invent users, revenue, GMV, traffic, performance gains, team size, or ownership.
+- Estimated metric directions are allowed only as placeholders under a separate section. They are prompts for the user to confirm, not facts.
 - Mark role assumptions and disclosure assumptions.
 - Keep safe bullets separate from enhanced bullets that need confirmation.
+- Keep verified/code-derived metrics separate from estimated metric suggestions.
 - Preserve enough project facts for the downstream agent to match the user's original resume style.
 
 ## Template
@@ -26,6 +28,7 @@ The prompt pack is not a final resume. It is a structured handoff to another age
 4. 项目经历建议控制在 3-5 条 bullet，可保留一句项目概述。
 5. 与原简历已有经历、技能或项目重复时，帮我合并去重，并指出改动点。
 6. 对“需要确认”的指标或角色表述，不要直接写成事实；可用占位符或在修改建议中提醒我补充。
+7. 对“估算指标方向”只能保留为待确认建议，不要把它改写成已发生的业务结果。
 
 项目信息：
 【项目名称】
@@ -55,6 +58,12 @@ The prompt pack is not a final resume. It is a structured handoff to another age
 【增强版 bullet，需要我确认数据后再用】
 - ...
 
+【估算指标方向，不可直接当事实】
+- 指标方向：
+- 推测依据：
+- 可替换占位句：
+- 需要我确认：
+
 【不要直接写的高风险表述】
 - ...
 
@@ -81,6 +90,12 @@ Prefer this:
 
 【增强版 bullet，需要我确认数据后再用】
 - 负责后台权限配置模块开发，沉淀角色、菜单和接口权限复用能力，将新角色配置时间从 X 小时缩短至 Y 分钟。
+
+【估算指标方向，不可直接当事实】
+- 指标方向：配置效率提升
+- 推测依据：代码中存在角色、菜单、接口权限配置复用链路。
+- 可替换占位句：将新角色配置时间从 X 小时缩短至 Y 分钟。
+- 需要我确认：实际配置前后耗时、角色数量、是否由本人负责。
 ```
 
 Avoid this:

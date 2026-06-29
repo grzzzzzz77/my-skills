@@ -54,6 +54,53 @@ Examples:
 
 Never put unconfirmed numbers in the safe bullet.
 
+### 4. Estimated Hypothesis
+
+Use when the user has no exact metric but asks for stronger quantified packaging. This is a metric direction inferred from code evidence, not a resume fact.
+
+Required shape:
+
+- `claim_direction`: efficiency, conversion, latency, adoption, maintainability, cost, reliability, or quality.
+- `basis`: code evidence that makes the direction plausible, such as reusable components, route/API count, batching, cache, request guard, upload pipeline, or automation workflow.
+- `placeholder`: wording with `X/Y/Z` or an explicitly unconfirmed range.
+- `confidence`: low, medium, or high.
+- `confirmation_needed`: what the user must verify.
+
+Examples:
+
+- `claim_direction`: efficiency
+- `basis`: code shows reusable schema-driven forms across resume/profile pages.
+- `placeholder`: "将同类资料采集页面开发周期从 X 天缩短至 Y 天"
+- `confirmation_needed`: historical delivery time before/after reuse.
+
+Do not turn an estimated hypothesis into a safe bullet. Put it under "估算指标方向，不可直接当事实" or "增强版，需要确认".
+
+## Reasonable Estimation Workflow
+
+When metrics are unknown, use this sequence:
+
+1. Find a code-derived denominator: pages, components, APIs, roles, flows, tests, commits, subpackages, providers, tools, prompt templates, or jobs.
+2. Identify the likely business/engineering effect: less duplicate code, faster delivery, fewer stale states, clearer permission boundaries, lower manual work, better debugging, more stable AI output, or broader platform coverage.
+3. Write a placeholder or range only as a candidate, for example `X%`, `X-Y 分钟`, `N+ 页面`, `从 A 到 B`, or `约 X 个流程`.
+4. State the exact confirmation needed.
+5. Keep the safe bullet on verified/code-derived scope; move the estimate to enhanced wording.
+
+Safe plus estimate pair:
+
+```text
+安全版：围绕简历编辑、资料补全和 AI 读岗等流程，抽象字段映射驱动表单，覆盖多页面资料采集和回填状态，降低重复表单维护成本。
+
+估算版，需要确认：围绕简历编辑、资料补全和 AI 读岗等流程，抽象字段映射驱动表单，覆盖 X+ 页面，将同类表单开发周期从 X 天缩短至 Y 天。
+```
+
+Forbidden:
+
+```text
+抽象字段映射驱动表单，使开发效率提升 80%。
+```
+
+Unless the user or project evidence proves the 80% figure.
+
 ## Risk Labels
 
 ### safe

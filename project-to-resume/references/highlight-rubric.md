@@ -32,6 +32,60 @@ In strict reports, add a short `score_breakdown` or `score_rationale` when usefu
 "score_rationale": "Agent 记忆与上下文注入属于 AI 应用核心能力，证据包含实现、测试和生命周期接入。"
 ```
 
+## Project Resume Value Score (100 Points)
+
+Use this score when the user asks for project comparison, "含金量", "打分", or "为什么没上 90". Score the whole project, not a single highlight.
+
+| Dimension | Points | What To Look For |
+|---|---:|---|
+| Technical depth | 25 | Architecture, state complexity, performance/reliability, cross-system integration, hard edge cases, tests or quality mechanisms. |
+| AI/rarity signal | 20 | Agent/RAG/tool calling/model orchestration/evaluation, or otherwise uncommon role-relevant technical depth. Non-AI projects can score here through rare domain complexity. |
+| Business completeness | 15 | Real user flow, monetization/operation loop, permission/payment/order/content/data lifecycle, production-like scope. |
+| Evidence and quality | 15 | Strong repo evidence, docs, tests, Git contribution, CI/config, repeatable validation, clear ownership or module boundaries. |
+| Resume readability | 15 | Can become 3-5 strong bullets with mechanism, scope, impact, and interview stories. |
+| Interview expansion | 10 | Can support STAR follow-up, tradeoff discussion, failure modes, debugging, and alternative designs. |
+
+Output two scores when metrics or ownership are uncertain:
+
+- `evidence_safe_score`: facts only. Count verified and code-derived metrics; ignore unconfirmed business results.
+- `potential_score`: includes clearly labeled assumptions, estimated metric directions, and improvements the user could confirm later.
+
+### 90+ Gate
+
+An evidence-safe score above 90 requires at least one of:
+
+- Verified production/business impact, such as user scale, revenue/GMV, conversion, latency, automation time saved, support cost reduced, or adoption.
+- Confirmed personal ownership over a hard module, supported by Git/user facts.
+- Exceptionally strong code evidence: multiple high-difficulty highlights, clear architecture depth, tests/quality controls, and code-derived scope metrics that are hard to fake in interviews.
+
+If none of these are present, cap `evidence_safe_score` at 89 even when the project is impressive. The report should explain the cap as a data/ownership/evidence gap, not as a dismissal of project quality.
+
+Common reasons a project stops at 85-89:
+
+- Business impact exists but has no verified number.
+- Role boundary is unknown, so wording must stay conservative.
+- Code shows features, but less evidence for production operation, tests, monitoring, or failure handling.
+- AI/architecture claims are plausible but not fully supported by code.
+- The project has many pages/modules but lacks a single standout hard problem.
+
+Use `potential_score` to show what the project could reach after confirmation. Example:
+
+```json
+"project_score": {
+  "evidence_safe_score": 89,
+  "potential_score": 93,
+  "score_ceiling_reason": "缺少已确认业务指标和个人 Owner 边界，安全分不宜超过 89；若确认上线规模、效率提升和负责范围，可按 90+ 项目包装。",
+  "score_breakdown_100": {
+    "technical_depth": 23,
+    "ai_or_rarity_signal": 19,
+    "business_completeness": 13,
+    "evidence_and_quality": 13,
+    "resume_readability": 14,
+    "interview_expansion": 7
+  }
+}
+```
+
 ## AI Application Weighting
 
 When the project is an AI application, AI Agent platform, model-powered workflow, coding assistant, RAG/search assistant, local AI desktop client, or tool-calling system, adjust scoring and ordering:
