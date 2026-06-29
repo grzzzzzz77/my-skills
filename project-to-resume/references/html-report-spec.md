@@ -64,7 +64,8 @@ For final delivery, render with `--strict` so invalid `project_resume_analysis.j
 - Major sections must have stable anchors: overview, safe bullets, confirmation items, highlight explorer, downstream prompt, interview stories, and evidence appendix.
 - Keep the report scannable: show the safest resume material early, keep dense evidence and STAR notes behind expandable detail areas when practical.
 - The highlight explorer must show the total highlight count.
-- Highlight titles should expose professional technical essence first, such as `Stale Response 防护`, `Incremental Markdown Renderer`, `Request Gateway`, or `Frontend Observability`.
+- Highlight titles should expose professional technical essence first, preferably in Chinese, such as `异步请求竞态治理`, `流式 Markdown 渲染`, `请求网关`, or `前端可观测性链路`.
+- Keep English in titles only for established technical names, protocols, frameworks, abbreviations, or code identifiers such as `WebSocket`, `SSE`, `SDK`, `CLI`, `MCP`, `API`, `Markdown`, `SQLite FTS`, `Tauri`, `Rust`, `rAF`, or `stream-json`; avoid bilingual title stacking for style.
 
 ## Card Fields
 

@@ -17,6 +17,37 @@ Rate each candidate from 0-3.
 
 Prioritize candidates scoring 12+ total. Keep 9-11 as backup. Discard or label risky below 9 unless the user asks for exhaustive notes.
 
+In strict reports, add a short `score_breakdown` or `score_rationale` when useful so the reader understands why a highlight is ranked high. Keep it concise:
+
+```json
+"score_breakdown": {
+  "business_relevance": 3,
+  "technical_difficulty": 3,
+  "evidence_strength": 3,
+  "resume_readability": 3,
+  "differentiation": 3,
+  "handoff_readiness": 2,
+  "ai_application_bonus": 2
+},
+"score_rationale": "Agent 记忆与上下文注入属于 AI 应用核心能力，证据包含实现、测试和生命周期接入。"
+```
+
+## AI Application Weighting
+
+When the project is an AI application, AI Agent platform, model-powered workflow, coding assistant, RAG/search assistant, local AI desktop client, or tool-calling system, adjust scoring and ordering:
+
+- Add `+2` to highlights that cover **Agent orchestration, memory, prompt/context injection, tool calling, MCP, RAG/retrieval, evaluation/guardrails, workflow automation, model routing, or long-session AI state**.
+- Add `+1` to highlights that support AI experience indirectly, such as streaming rendering, long conversation UI, Markdown rendering, message protocol adaptation, or AI result state management.
+- Keep ordinary page delivery, generic forms, CRUD, or marketing/business modules below the AI core unless their technical difficulty is clearly higher.
+- In the report order, place AI core highlights before general frontend/backend delivery when their evidence is strong. For example: `记忆/上下文注入`、`Agent 协同/工具调用`、`RAG/检索`、`模型路由/Provider 编排` should usually appear before `普通页面状态`、`支付`、`上传`、`埋点`.
+- Do not inflate unsupported AI claims. The bonus only applies when the repository contains code evidence such as prompt/context builders, memory stores, tool registration, MCP config, agent protocol handlers, model routing, stream processors, or tests.
+
+Recommended AI-app priority tiers:
+
+1. **Tier A**: Agent orchestration, memory/context, tool/MCP/RAG, model routing, safety/evaluation guardrails.
+2. **Tier B**: AI streaming protocol, long-session state machine, incremental Markdown rendering, conversation UI reliability.
+3. **Tier C**: AI product workflows such as result pages, form flows, upload, payment, analytics, and general business modules.
+
 ## Highlight Categories
 
 ### Business/Product Delivery
@@ -129,17 +160,19 @@ That pattern can appear in a project overview, but it is usually too flat for a 
 
 When the user explicitly asks for a stronger packaged story, the enhanced bullet may include a plausible product-result direction, but it must stay under confirmation unless the metric or ownership is verified.
 
-## Technical Term Priority
+## Chinese-First Technical Mechanism Priority
 
-In strict reports, phrase each accepted highlight as a technical capability first, not a business module first.
+In strict reports, phrase each accepted highlight as a technical capability first, not a business module first. Prefer Chinese technical mechanisms. Keep English only for established terms, protocols, frameworks, abbreviations, or code identifiers that are normally written in English.
 
 Good title patterns:
 
-- `Stale Response 防护与列表状态一致性`
+- `异步请求竞态治理与 stale response 防护`
 - `WebSocket 消息协议适配与长会话渲染`
-- `Incremental Markdown Renderer`
-- `Schema-driven Form Flow`
-- `Request Gateway 与 API Telemetry`
+- `流式 Markdown 渲染与打字队列`
+- `字段映射驱动的表单流转`
+- `请求网关与 API 可观测性`
+- `Tauri IPC 子进程管线`
+- `MCP 会话级配置隔离`
 
 Weak title patterns:
 
@@ -147,5 +180,7 @@ Weak title patterns:
 - `AI 小北聊天`
 - `简历上传流程`
 - `会员付费功能`
+- `Streaming State Controller / rAF Buffer / Orphan Queue`
+- `Provider Model Pass-through / Spawn Config Hash`
 
-The body can mention the product scenario, but the title and first clause should expose the professional technical essence.
+The body can mention the product scenario, but the title and first clause should expose the professional technical essence. Avoid making every title bilingual; a report should read like a Chinese technical resume, not a glossary. English is valuable when it names the actual technology (`WebSocket`, `CLI`, `SSE`, `MCP`, `SQLite FTS`, `Tauri`, `Rust`, `stream-json`), not when it is only a decorative translation.

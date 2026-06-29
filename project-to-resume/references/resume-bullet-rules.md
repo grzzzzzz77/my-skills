@@ -126,27 +126,38 @@ Before writing a safe bullet, check whether it names at least two of:
 
 If it does not, keep it as a project fact rather than a resume highlight.
 
-## Technical-First Wording
+## Chinese-First Technical Wording
 
-Default strict-report highlights should lead with the technical concept, then explain the project context.
+Default strict-report highlights should lead with the technical concept, then explain the project context. Use Chinese as the default expression for the concept. English should be kept only when it is a real professional term, framework/protocol name, abbreviation, or code-level identifier that Chinese technical resumes commonly keep as English.
 
 Preferred shape:
 
 ```text
-技术术语 / 中文本质：基于机制 A、机制 B 和机制 C，解决场景 X 下的问题 Y。
+中文工程机制：基于机制 A、机制 B 和机制 C，解决场景 X 下的问题 Y。
 ```
 
 Examples:
 
-- `异步请求竞态治理 / Stale Response 防护`
-- `WebSocket 消息协议适配 / 长会话渲染管线`
-- `Incremental Markdown Renderer / 流式富文本渲染`
-- `Schema-driven Form / 字段映射驱动采集`
-- `Upload Pipeline / 多媒体上传管线抽象`
-- `Request Gateway / 小程序请求网关`
-- `Frontend Observability / 前端可观测性链路`
-- `Payment State Reconciliation / 支付后权益同步`
-- `Subpackage Routing Governance / uni-app 分包治理`
+- `异步请求竞态治理与 stale response 防护`
+- `WebSocket 长会话消息协议适配`
+- `流式 Markdown 渲染与打字队列`
+- `字段映射驱动的资料采集表单`
+- `多媒体上传管线抽象`
+- `小程序统一请求网关`
+- `前端可观测性链路`
+- `支付后权益同步治理`
+- `uni-app 分包路由治理`
+
+Keep English when it is the clearer technical noun:
+
+- `WebSocket`, `SSE`, `SDK`, `CLI`, `MCP`, `API`, `JSON`, `Markdown`, `SQLite FTS`, `Tauri`, `Rust`, `rAF`, `stream-json`, `requestId`.
+
+Avoid English that is only decorative and can be cleanly written in Chinese:
+
+- Prefer `流式状态控制器` over `Streaming State Controller`.
+- Prefer `模型直通映射` over `Provider Model Pass-through` when no specific API name requires English.
+- Prefer `提示词上下文注入` over `Prompt Context Injection`.
+- Prefer `请求网关` over `Request Gateway` unless the project or code uses `Gateway` as a formal module name.
 
 Avoid titles that are only business descriptions:
 
@@ -155,7 +166,7 @@ Avoid titles that are only business descriptions:
 - `会员付费功能`
 - `AI 工具页开发`
 
-The business scenario may appear after the technical term, but the first impression should be professional frontend engineering capability.
+The business scenario may appear after the technical mechanism, but the first impression should be professional engineering capability. Avoid stacking two languages in every title; one title can contain English, but the report as a whole should read naturally in Chinese.
 
 ## Interview STAR Notes
 

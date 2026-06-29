@@ -141,9 +141,11 @@ Do not stop at feature inventory. A final highlight should expose the actual con
 - What specific pages/services/components prove the story?
 - What result can be safely claimed from code, and what stronger result needs user confirmation?
 
-In strict reports, make the wording technical-first:
+In strict reports, make the wording technical-first, but **do not overuse English for style**:
 
-- Use a professional term in the title or first clause, such as `Stale Response 防护`, `WebSocket 消息协议适配`, `Incremental Markdown Renderer`, `Schema-driven Form`, `Upload Pipeline`, `Request Gateway`, `Frontend Observability`, or `Payment State Reconciliation`.
+- Prefer a Chinese engineering mechanism in the title or first clause, such as `异步请求竞态治理`, `长会话消息协议适配`, `流式 Markdown 渲染`, `字段映射驱动表单`, `多媒体上传管线`, `统一请求网关`, `前端可观测性链路`, or `支付后权益同步`.
+- Keep English only when it is a real professional term, protocol, framework, abbreviation, or code concept that Chinese resumes commonly keep as English, such as `WebSocket`, `SSE`, `SDK`, `CLI`, `MCP`, `API`, `JSON`, `Markdown`, `SQLite FTS`, `Tauri`, `Rust`, `rAF`, `stream-json`, or `requestId`.
+- Avoid bilingual title piling like `English Phrase / 中文解释` unless the English phrase is an established term that would be weaker or ambiguous in Chinese. Most titles should be Chinese-first, with at most one necessary English term.
 - Put the business scenario after the technical essence, not before it.
 - Avoid titles like "职位模块开发" or "简历流程优化" unless paired with a concrete engineering mechanism.
 

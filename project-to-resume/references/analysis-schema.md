@@ -46,6 +46,16 @@ If `--analysis` is omitted, the renderer creates an evidence-only draft report. 
       "title": "后台权限体系建设",
       "category": "权限与安全",
       "score": 13,
+      "score_breakdown": {
+        "business_relevance": 3,
+        "technical_difficulty": 2,
+        "evidence_strength": 3,
+        "resume_readability": 2,
+        "differentiation": 1,
+        "handoff_readiness": 2,
+        "ai_application_bonus": 0
+      },
+      "score_rationale": "权限链路有明确代码证据和简历表达价值，但不属于 AI 应用核心能力。",
       "risk": "safe",
       "readiness": "direct",
       "evidence": ["src/router/guard.ts", "src/stores/user.ts"],
@@ -98,12 +108,19 @@ The fixture check runs `render_resume_report.py --strict`, so it exercises evide
 
 - `risk`: use `safe`, `needs_confirmation`, or `risky`.
 - `readiness`: use `direct`, `rewrite`, `confirm`, or `idea`.
+- `score`: required for serious report highlights; use the rubric score after any AI application bonus.
+- `score_breakdown`: optional but recommended for strict reports; include the six base dimensions and `ai_application_bonus` when relevant.
+- `score_rationale`: optional but recommended; one concise Chinese sentence explaining why this highlight ranks high or low.
 - `evidence`: required for every highlight.
 - `safe_bullet`: must be conservative and evidence-backed.
 - `interview`: must include `situation`, `task`, `action`, `result`, and `tradeoff`.
 - `enhanced_bullet`: may include `X/Y/Z` placeholders or suggested metrics, but must remain under confirmation sections.
 - `facts`: include business flows, module map, API/page map, data flow, integration points, quality signals, and contribution boundary when known.
 - Evidence fixtures and generated evidence should include `evidence_paths_index` for complete strict path validation. `file_index` may be truncated for readability.
+
+## Highlight Ordering
+
+The renderer sorts highlights by risk, score, AI-priority, readiness, and original order. For AI application projects, Agent orchestration, memory/context, tool/MCP/RAG, model routing, evaluation/guardrail, and long-session AI state highlights should receive higher `score` and appear before ordinary page/business modules when evidence is strong.
 
 ## Business Flow Notes
 

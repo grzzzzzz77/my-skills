@@ -88,7 +88,80 @@ def normalize_highlight(item: dict, index: int) -> dict:
         "interview": item.get("interview") or item.get("star") or {},
         "data_to_confirm": as_list(item.get("data_to_confirm")),
         "usage": item.get("usage") or item.get("downstream_usage") or "",
+        "score_breakdown": item.get("score_breakdown") if isinstance(item.get("score_breakdown"), dict) else {},
+        "score_rationale": item.get("score_rationale") or "",
+        "_source_index": index,
     }
+
+
+def score_value(item: dict) -> int:
+    raw = item.get("score")
+    if isinstance(raw, (int, float)):
+        return int(raw)
+    match = re.search(r"\d+", str(raw or ""))
+    return int(match.group(0)) if match else 0
+
+
+def project_is_ai_application(evidence: dict, analysis: dict) -> bool:
+    specialized = evidence.get("specialized_signals") or {}
+    if specialized.get("ai_agent"):
+        return True
+    profiles = evidence.get("framework_profiles") or []
+    if any("ai" in str(item.get("name", "")).lower() or "agent" in str(item.get("name", "")).lower() for item in profiles):
+        return True
+    text = " ".join(
+        [
+            str(analysis.get("project_name", "")),
+            str(analysis.get("summary", "")),
+            " ".join(str(x) for x in as_list(analysis.get("keywords"))),
+        ]
+    ).lower()
+    return any(term in text for term in ["ai", "agent", "llm", "mcp", "rag", "memory", "模型", "智能体", "记忆"])
+
+
+AI_TIER_A_TERMS = [
+    "agent", "智能体", "记忆", "memory", "上下文", "context", "prompt", "提示词",
+    "tool", "工具调用", "mcp", "rag", "检索", "模型路由", "provider", "guardrail", "评测",
+]
+AI_TIER_B_TERMS = [
+    "stream", "流式", "长会话", "消息协议", "markdown", "渲染", "conversation", "会话",
+    "websocket", "sse", "stdin", "stdout", "stream-json",
+]
+AI_TIER_C_TERMS = [
+    "结果页", "表单", "上传", "支付", "埋点", "可观测", "业务", "workflow", "流程",
+]
+
+
+def ai_priority(item: dict, enabled: bool) -> int:
+    if not enabled:
+        return 0
+    text = " ".join(
+        str(item.get(key, ""))
+        for key in ("title", "category", "safe_bullet", "enhanced_bullet", "why")
+    ).lower()
+    if any(term.lower() in text for term in AI_TIER_A_TERMS):
+        return 3
+    if any(term.lower() in text for term in AI_TIER_B_TERMS):
+        return 2
+    if any(term.lower() in text for term in AI_TIER_C_TERMS):
+        return 1
+    return 0
+
+
+def sort_highlights(highlights: list[dict], evidence: dict, analysis: dict) -> list[dict]:
+    is_ai = project_is_ai_application(evidence, analysis)
+    risk_order = {"safe": 0, "needs_confirmation": 1, "risky": 2}
+    readiness_order = {"direct": 0, "rewrite": 1, "confirm": 2, "idea": 3}
+    return sorted(
+        highlights,
+        key=lambda item: (
+            risk_order.get(item.get("risk"), 1),
+            -score_value(item),
+            -ai_priority(item, is_ai),
+            readiness_order.get(item.get("readiness"), 2),
+            item.get("_source_index", 0),
+        ),
+    )
 
 
 def draft_highlights_from_evidence(evidence: dict) -> list[dict]:
@@ -240,6 +313,28 @@ def build_highlight_cards(highlights: list[dict]) -> str:
         data_to_confirm = as_list(item.get("data_to_confirm"))
         evidence_html = "<ul>" + "".join(f"<li><code>{h(path)}</code></li>" for path in evidence[:8]) + "</ul>" if evidence else "<div class=\"interview-notes\">未提供</div>"
         confirm_html = "；".join(str(x) for x in data_to_confirm if str(x).strip()) or "无"
+        score_breakdown = item.get("score_breakdown") or {}
+        score_parts = []
+        if isinstance(score_breakdown, dict):
+            score_labels = {
+                "business_relevance": "业务相关",
+                "technical_difficulty": "技术难度",
+                "evidence_strength": "证据强度",
+                "resume_readability": "简历可读",
+                "differentiation": "差异化",
+                "handoff_readiness": "交付可用",
+                "ai_application_bonus": "AI 加权",
+            }
+            for key, label in score_labels.items():
+                if key in score_breakdown:
+                    score_parts.append(f"{label}:{score_breakdown[key]}")
+        score_detail_html = ""
+        if item.get("score_rationale") or score_parts:
+            score_detail_html = (
+                f'<div class="aside-box"><strong>评分依据</strong>'
+                f'{h(item.get("score_rationale") or "；".join(score_parts))}'
+                f'</div>'
+            )
         rows.append(f"""
           <article class="highlight-card" data-category="{h(item['category'])}" data-risk="{h(item['risk'])}" data-readiness="{h(item['readiness'])}">
             <div class="card-main">
@@ -260,8 +355,10 @@ def build_highlight_cards(highlights: list[dict]) -> str:
                 </div>
               </div>
               <aside class="card-aside">
+                <div class="aside-box"><strong>亮点评分</strong>{h(item.get('score') or '未评')}</div>
                 <div class="aside-box"><strong>待确认</strong>{h(confirm_html)}</div>
                 <div class="aside-box"><strong>下游用途</strong>{h(item.get('usage') or '按风险标签决定')}</div>
+                {score_detail_html}
               </aside>
             </div>
             <div class="card-details">
@@ -384,6 +481,7 @@ def render_report(evidence: dict, analysis: dict, template: str) -> tuple[str, s
     highlights = [normalize_highlight(item, i) for i, item in enumerate(as_list(analysis.get("highlights")) if analysis.get("highlights") else []) if isinstance(item, dict)]
     if not highlights:
         highlights = draft_highlights_from_evidence(evidence)
+    highlights = sort_highlights(highlights, evidence, analysis)
     prompt_pack = build_prompt_pack(evidence, analysis, highlights)
     safe_bullets_html, safe_count = build_safe_bullets(highlights, analysis)
     replacements = {
