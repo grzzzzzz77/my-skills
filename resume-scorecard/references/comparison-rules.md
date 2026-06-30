@@ -11,6 +11,32 @@ Use these rules when comparing two or more resume versions.
 
 For cross-industry comparisons, "equal terms" means equal scoring method, not the same JD. Score each resume against its own declared target or against a universal no-JD baseline.
 
+## Cross-Industry Normalization Method
+
+For `cross_industry_comparison`, do not compare JD keywords directly. Use a reproducible normalized axis table:
+
+| Normalized Axis | Compare By | Suggested Winner Basis |
+|---|---|---|
+| Own-target strength | Each resume's `total_score` against its own declared target or universal baseline. | Higher own-target score, with confidence noted. |
+| Evidence density | Ratio of concrete bullets, quantified outcomes, artifacts, scope, and proof. | More claims backed by evidence. |
+| Market clarity | Whether the target direction is clear in the top third and repeated through section order. | Less reader inference needed. |
+| Transferability | Portable skills, domain breadth, communication/story value, and cross-role proof. | Easier to reuse across target scenarios. |
+| Risk level | Unsupported claims, vague ownership, timeline issues, and interview fragility. | Lower risk wins. |
+| Upgrade path | Work needed to reach 85/90+ in its own lane. | Less rewrite/repackaging effort wins. |
+
+In JSON, represent this as `comparison.normalized_axes[]`:
+
+```json
+{
+  "axis": "Evidence density",
+  "winner": "A",
+  "scores": {"A": "high", "B": "medium"},
+  "reason": "A has more quantified outcomes and clearer ownership evidence."
+}
+```
+
+Use this table even when you still provide a scenario-specific `comparison.best_for` list.
+
 ## Comparison Axes
 
 Report the winner for each relevant axis:

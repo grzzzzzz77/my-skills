@@ -8,7 +8,8 @@ Optimize resumes by making true evidence legible for a target job. Do not fabric
 2. Read `experience-assets.md` and `strengths.md`.
 3. Map each important JD requirement to user evidence.
 4. Identify missing proof before rewriting.
-5. Suggest bullets using real action, method, result, and job keyword.
+5. Read `resume-optimization-craft.md` before writing final suggestions.
+6. Suggest bullets using real action, method, result, and job keyword.
 
 ## Bullet Pattern
 
@@ -23,6 +24,8 @@ Short resume version:
 ```text
 使用 <工具/方法> 完成 <动作/产出>，使 <结果/指标/证据>，支撑 <岗位关键词>。
 ```
+
+For full-resume polishing, version notes, and external prompt merging rules, use `resume-optimization-craft.md`.
 
 ## Labels
 

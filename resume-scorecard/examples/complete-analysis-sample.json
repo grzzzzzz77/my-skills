@@ -1,0 +1,210 @@
+{
+  "report_title": "样例简历评分卡报告",
+  "score_mode": "standalone",
+  "candidate_label": "样例候选人",
+  "target_role": "前端开发",
+  "jd_summary": "未提供 JD，本次只评估简历本体质量与通用投递竞争力。",
+  "overall_summary": "这份简历内容可投，但证据量化和版式层级仍有提升空间。",
+  "confidence": "medium",
+  "generated_at": "2026-06-30 12:00",
+  "resumes": [
+    {
+      "id": "A",
+      "name": "样例简历",
+      "source": "sample-resume.pdf",
+      "target_role": "前端开发",
+      "target_industry": "互联网 / 软件开发",
+      "scoring_context": "无 JD，按前端开发通用岗位预期评分",
+      "total_score": 82,
+      "band": "A",
+      "score_summary": "整体具备投递基础，但还缺少更强的量化成果和首屏证据。",
+      "experience_benchmark": {
+        "estimated_years": 2,
+        "current_band": "1-3 年",
+        "next_band": "3-5 年",
+        "benchmark_note": "该均分是本 skill 基于 100 分评分尺标设定的经验段参考基准，用于横向对标，不代表招聘市场真实统计均值。",
+        "basis": [
+          "简历显示约 2 年前端相关经历"
+        ],
+        "bands": [
+          {
+            "band": "1-3 年",
+            "average_score": 72,
+            "competitive_score": 80,
+            "excellent_score": 88,
+            "candidate_delta": 10,
+            "expectations": "需要真实项目、明确个人边界、若干量化结果和清晰岗位主线。"
+          },
+          {
+            "band": "3-5 年",
+            "average_score": 78,
+            "competitive_score": 85,
+            "excellent_score": 90,
+            "candidate_delta": 4,
+            "expectations": "需要独立模块 ownership、业务影响、跨团队协作、技术取舍和稳定交付证据。"
+          }
+        ],
+        "interpretation": "高于当前年限参考均分，但距离高一档强竞争力仍需补业务影响和独立负责边界。"
+      },
+      "presentation_review": {
+        "score": 78,
+        "band": "B",
+        "confidence": "medium",
+        "layout_evidence": "extracted_text",
+        "summary": "整体结构清楚，但信息密度偏高，模块层级不够利于 10 秒扫描。",
+        "criteria": [
+          {
+            "name": "信息层级与首屏抓取",
+            "score": 18,
+            "max_score": 25,
+            "rationale": "首屏能看出目标岗位，但核心成果没有足够突出。",
+            "evidence": ["顶部有目标岗位", "项目标题明确"],
+            "deductions": ["摘要偏长，最强成果未前置"]
+          },
+          {
+            "name": "版面密度与留白",
+            "score": 15,
+            "max_score": 20,
+            "rationale": "内容可读，但 bullet 密度偏高。",
+            "evidence": ["模块边界清楚"],
+            "deductions": ["部分项目描述连续堆叠"]
+          },
+          {
+            "name": "字体、字号、对齐与一致性",
+            "score": 12,
+            "max_score": 15,
+            "rationale": "标题和日期基本一致。",
+            "evidence": ["多数模块标题样式一致"],
+            "deductions": ["技术栈格式可进一步统一"]
+          },
+          {
+            "name": "模块组织与视觉引导",
+            "score": 12,
+            "max_score": 15,
+            "rationale": "模块顺序基本合理。",
+            "evidence": ["教育、技能、项目模块完整"],
+            "deductions": ["强项目可以更靠前"]
+          },
+          {
+            "name": "ATS/机器解析友好度",
+            "score": 13,
+            "max_score": 15,
+            "rationale": "文本结构大体标准。",
+            "evidence": ["使用常规模块名称"],
+            "deductions": ["仍需确认 PDF 文本可复制"]
+          },
+          {
+            "name": "专业感与岗位气质",
+            "score": 8,
+            "max_score": 10,
+            "rationale": "整体偏专业，符合技术岗风格。",
+            "evidence": ["没有过度装饰"],
+            "deductions": ["首屏冲击力有限"]
+          }
+        ],
+        "strengths": [
+          "模块边界清楚，阅读顺序基本稳定"
+        ],
+        "issues": [
+          "首屏没有把最强项目和量化成果做视觉突出"
+        ],
+        "lift_actions": [
+          "把最强项目压缩为 3 行结果型摘要",
+          "统一日期、项目标题和技术栈格式"
+        ],
+        "ats_layout_notes": [
+          "确认导出 PDF 后文本可复制；避免把联系方式放在不可解析文本框中"
+        ]
+      },
+      "dimensions": [
+        {
+          "name": "目标定位与岗位对齐",
+          "score": 12,
+          "max_score": 15,
+          "rationale": "目标岗位基本清晰。",
+          "evidence": ["求职意向写明前端开发"],
+          "deductions": ["顶部摘要未突出最强项目"],
+          "lift_actions": ["把目标岗位和核心技术关键词放到首屏"]
+        },
+        {
+          "name": "证据强度与量化结果",
+          "score": 15,
+          "max_score": 20,
+          "rationale": "部分项目有结果，但量化不足。",
+          "evidence": ["项目描述包含交付结果"],
+          "deductions": ["缺少规模和前后对比"],
+          "lift_actions": ["补充用户量、性能或业务指标"]
+        },
+        {
+          "name": "经历/项目深度",
+          "score": 16,
+          "max_score": 20,
+          "rationale": "项目复杂度较好。",
+          "evidence": ["包含多端项目"],
+          "deductions": ["技术取舍说明不足"],
+          "lift_actions": ["补充关键难点和方案权衡"]
+        },
+        {
+          "name": "岗位能力与技能信号",
+          "score": 13,
+          "max_score": 15,
+          "rationale": "技术栈匹配前端。",
+          "evidence": ["Vue 和 TypeScript 出现在项目中"],
+          "deductions": ["部分技能只在技能栏出现"],
+          "lift_actions": ["把核心技能绑定到项目证据"]
+        },
+        {
+          "name": "结构、ATS 与可读性",
+          "score": 13,
+          "max_score": 15,
+          "rationale": "结构较清晰。",
+          "evidence": ["章节名称标准"],
+          "deductions": ["密度偏高"],
+          "lift_actions": ["压缩弱相关内容"]
+        },
+        {
+          "name": "可信度与面试可防守性",
+          "score": 13,
+          "max_score": 15,
+          "rationale": "主要表述可信。",
+          "evidence": ["项目边界相对清楚"],
+          "deductions": ["指标来源未说明"],
+          "lift_actions": ["补充指标计算口径"]
+        }
+      ],
+      "strengths": [
+        "项目与目标岗位相关",
+        "技术栈匹配度较高"
+      ],
+      "weaknesses": [
+        "量化结果不足",
+        "首屏证据不够突出"
+      ],
+      "red_flags": [
+        {
+          "severity": "medium",
+          "title": "指标口径不清",
+          "detail": "部分结果未说明统计口径。",
+          "evidence": ["项目结果描述缺少前后对比"]
+        }
+      ],
+      "ats_notes": [
+        "建议使用标准章节名并确认 PDF 文本可复制"
+      ],
+      "interview_risks": [
+        "如果被追问性能优化效果，当前简历缺少测量方法和前后对比"
+      ],
+      "score_lifts": [
+        {
+          "action": "为核心项目补充规模、结果或可验证产出",
+          "estimated_gain": "+4-6",
+          "effort": "medium",
+          "why": "能提高证据强度和面试可防守性"
+        }
+      ]
+    }
+  ],
+  "missing_information": [
+    "未提供目标 JD，因此关键词覆盖只能按通用岗位判断"
+  ]
+}

@@ -46,6 +46,40 @@ Suggested standalone language:
 本次为无 JD 单独评分，分数代表简历本体质量与通用投递竞争力，不代表某个具体岗位的匹配概率。
 ```
 
+## Presentation / Layout Score
+
+Use this as a **separate 100-point score** named `presentation_review`. It evaluates whether the resume's appearance helps the reader quickly understand the candidate. Do not merge this score into the main `total_score`; the main score remains resume competitiveness and evidence quality.
+
+Score from rendered PDF/DOCX layout when possible. If only extracted text is available, infer from section order, density, line breaks, heading consistency, and ATS extraction quality, then set `presentation_review.confidence` to `medium` or `low`. Use `presentation_review.layout_evidence` to make the evidence level explicit.
+
+| Presentation Dimension | Points | What It Measures |
+|---|---:|---|
+| 信息层级与首屏抓取 | 25 | Whether the top third immediately shows target role, seniority/stage, strongest evidence, and contact/header hierarchy without forcing the reader to hunt. |
+| 版面密度与留白 | 20 | Whether page density, margins, line spacing, bullet length, and section spacing support 6-10 second scanning. |
+| 字体、字号、对齐与一致性 | 15 | Whether typography, date alignment, punctuation, headings, separators, and repeated patterns are consistent and professional. |
+| 模块组织与视觉引导 | 15 | Whether education, skills, experience, projects, awards, and links are ordered and grouped for the target role, with clear visual flow. |
+| ATS/机器解析友好度 | 15 | Whether the layout avoids fragile tables, image-only text, excessive text boxes, unreadable columns, icons as labels, or reading-order problems. |
+| 专业感与岗位气质 | 10 | Whether the visual tone fits the candidate stage and target role without decorative elements that reduce credibility or parsing. |
+
+Presentation score bands:
+
+| Score | Band | Meaning |
+|---:|---|---|
+| 90-100 | A+ | Polished, submit-ready, visually easy to scan, and ATS-safe. |
+| 80-89 | A | Clean and professional with minor density or hierarchy issues. |
+| 70-79 | B | Usable, but visible layout weaknesses reduce scan efficiency. |
+| 60-69 | C | Needs a layout rebuild before serious submission. |
+| <60 | D | Visually confusing, hard to scan, or likely ATS-hostile. |
+
+### Presentation Rules
+
+- Do not reward decoration that harms ATS parsing, copyability, or recruiter scanning.
+- Penalize image-only resumes, contact details in non-copyable text boxes, unstable two-column reading order, inconsistent date alignment, and dense bullets that fill the page edge to edge.
+- For early-career candidates, one polished page usually scores higher than a cramped two-page document unless evidence genuinely requires two pages.
+- For 3-5+ year candidates, two pages may be acceptable if each section has clear hierarchy and role-relevant ordering.
+- If visual evidence is unavailable, explain the uncertainty and keep claims focused on structure/readability signals from the extracted text.
+- Without rendered layout evidence, do not assign an A+ presentation score. Use the caps in `references/input-parsing.md`: `extracted_text` up to 82, `pasted_text` up to 75, and `ocr_only` up to 65 unless the user provides stronger evidence.
+
 ## Cross-Industry Comparison
 
 Use this when comparing resumes for different roles, industries, or career directions, such as "前端简历 vs 产品简历" or "技术岗简历 vs 运营岗简历".
@@ -62,6 +96,8 @@ Then compare normalized dimensions:
 - Transferability: which resume has stronger reusable skills across industries?
 - Risk level: which resume is more likely to fail under interview follow-up?
 - Upgrade path: which resume can reach 85/90+ with less work?
+
+For report mode, put these judgments in `comparison.normalized_axes` so the comparison is reproducible rather than a prose-only conclusion.
 
 Winner language must be scenario-specific:
 

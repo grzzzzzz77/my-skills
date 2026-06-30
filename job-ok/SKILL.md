@@ -54,7 +54,7 @@ job-search-cases/<yyyy-mm-dd-user-slug>/
 4. **生成岗位假设。** 输出 3-5 个目标岗位簇到 `target-roles.csv`。参考 `references/job-matching-rubric.md`，写清匹配证据、差距、30 天补强动作和适合公司类型。
 5. **整理真实 JD。** 只接受用户提供的岗位链接、截图、复制 JD、CSV 导出、Markdown 表格或浏览器可见页面。用 `scripts/normalize_jobs.py` 生成 `jobs.jsonl`。使用平台资料前先读 `references/platform-boundaries.md`。
 6. **评分和短名单。** 用 `scripts/score_job_matches.py` 做确定性初筛。分数只用于 triage，不代表真实录取概率。低分岗位进入观察池，不进入投递列表。
-7. **优化简历。** 参考 `references/resume-rubric.md`。每条建议必须能回到真实经历。输出 `resume-review.md`，并在 `resume-versions/` 记录不同岗位版本。
+7. **优化简历。** 参考 `references/resume-rubric.md` 和 `references/resume-optimization-craft.md`。如用户提供额外的简历优化提示词，先按 craft 文件做真实性与边界审查，再抽取可复用规则。每条建议必须能回到真实经历。输出 `resume-review.md`，并在 `resume-versions/` 记录不同岗位版本。
 8. **训练面试表达。** 参考 `references/interview-training.md`。一次只问一个问题，等待用户回答，再追问和复盘。首版只处理文本或语音转写稿。
 9. **跟踪和复盘。** 每次投递、回复、面试、拒信或新增 JD 后，更新 `application-tracker.csv` 和 `review-log.md`。
 
@@ -81,6 +81,6 @@ python3 .agents/skills/job-ok/scripts/score_job_matches.py \
 
 - 优势挖掘：写明证据、可信度、岗位信号和缺失证据。
 - 岗位建议：同时写为什么投、为什么不投、简历重点和下一步用户动作。
-- 简历修改：输出建议，不输出不可验证的最终表述；缺证据内容标记为 `needs_proof`。
+- 简历修改：先给诊断和改写建议，再生成可防守的岗位版本；不可验证的表述不得写成事实，缺证据内容标记为 `needs_proof`。
 - 面试训练：检查结构、具体性、证据、岗位相关性、风险表达和可追问性。
 - 外部动作：结尾使用“用户手动确认后再执行”，除非用户报告完成，否则不要写“已投递”。

@@ -16,7 +16,7 @@ SCRIPT_DIR = Path(__file__).resolve().parent
 if str(SCRIPT_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPT_DIR))
 
-from validate_scorecard import format_findings, validate_analysis_payload
+from validate_scorecard import format_findings, redact_payload, validate_analysis_payload
 
 
 def h(value: Any) -> str:
@@ -88,11 +88,15 @@ def ul(items: Any, empty: str = "暂无") -> str:
     return "<ul>" + "".join(f"<li>{h(item)}</li>" for item in values) + "</ul>"
 
 
+def table_scroll(table_html: str) -> str:
+    return f'<div class="table-scroll">{table_html}</div>'
+
+
 def render_meta(analysis: dict) -> str:
     generated = analysis.get("generated_at") or datetime.now().strftime("%Y-%m-%d %H:%M")
     chips = [
         ("目标岗位", analysis.get("target_role") or "未指定"),
-        ("评分模式", analysis.get("score_mode") or "single"),
+        ("评分模式", analysis.get("score_mode") or "standalone"),
         ("置信度", analysis.get("confidence") or "medium"),
         ("生成时间", generated),
     ]
@@ -193,7 +197,7 @@ def render_experience_benchmarks(resumes: list[dict]) -> str:
             )
         table = ""
         if rows:
-            table = (
+            table = table_scroll(
                 "<table><thead><tr>"
                 "<th>年限段</th><th>参考均分</th><th>竞争线</th><th>优秀线</th><th>本简历差值</th><th>该段通常要求</th>"
                 "</tr></thead><tbody>"
@@ -218,6 +222,84 @@ def render_experience_benchmarks(resumes: list[dict]) -> str:
     return f"""
     <section class="section">
       <h2>经验年限基准</h2>
+      <div class="callout">以下年限均分是本 skill 基于 100 分评分尺标设定的内部参考基准，用于横向对标；除非另有外部数据来源，不代表招聘市场真实统计均值。</div>
+      <div class="grid">{''.join(blocks)}</div>
+    </section>
+    """
+
+
+def render_presentation_reviews(resumes: list[dict]) -> str:
+    blocks = []
+    for resume in resumes:
+        review = resume.get("presentation_review")
+        if not isinstance(review, dict):
+            continue
+        score = score_number(review.get("score"))
+        band = review.get("band") or infer_band(score)
+        score_label = int(score) if score.is_integer() else round(score, 1)
+        criteria_rows = []
+        for item in as_list(review.get("criteria")):
+            if not isinstance(item, dict):
+                continue
+            criteria_rows.append(
+                "<tr>"
+                f"<td>{h(item.get('name') or '')}</td>"
+                f"<td>{h(item.get('score') if item.get('score') not in (None, '') else '未估')}/{h(item.get('max_score') if item.get('max_score') not in (None, '') else '未估')}</td>"
+                f"<td>{h(item.get('rationale') or '')}</td>"
+                f"<td>{ul(item.get('evidence'), '暂无证据')}</td>"
+                f"<td>{ul(item.get('deductions'), '无明显扣分')}</td>"
+                "</tr>"
+            )
+        criteria_table = ""
+        if criteria_rows:
+            criteria_table = table_scroll(
+                "<table><thead><tr>"
+                "<th>排版维度</th><th>得分</th><th>说明</th><th>证据</th><th>扣分点</th>"
+                "</tr></thead><tbody>"
+                + "".join(criteria_rows)
+                + "</tbody></table>"
+            )
+        else:
+            criteria_table = '<div class="empty">暂无排版分项明细。</div>'
+        blocks.append(f"""
+        <article class="card score-card">
+          <div class="top">
+            <div>
+              <h3>{h(resume.get("name") or resume.get("id") or "简历")}</h3>
+              <p class="muted">独立排版/外观评分 · 置信度：{h(review.get("confidence") or "medium")} · 证据等级：{h(review.get("layout_evidence") or "未标注")}</p>
+            </div>
+            <span class="band{band_class(score)}">{h(band)}</span>
+          </div>
+          <div class="score">{h(score_label)}</div>
+          <div class="bar"><span style="width:{max(0, min(100, score)):.1f}%"></span></div>
+          <p>{h(review.get("summary") or "暂无排版摘要。")}</p>
+          <details open><summary>排版分项</summary>{criteria_table}</details>
+          <div class="two-col">
+            <div>
+              <h4>外观优势</h4>
+              {ul(review.get("strengths"), "暂无明显外观优势")}
+            </div>
+            <div>
+              <h4>主要问题</h4>
+              {ul(review.get("issues"), "暂无明显排版问题")}
+            </div>
+            <div>
+              <h4>版式提分动作</h4>
+              {ul(review.get("lift_actions"), "暂无版式提分动作")}
+            </div>
+            <div>
+              <h4>ATS 版式备注</h4>
+              {ul(review.get("ats_layout_notes"), "暂无 ATS 版式备注")}
+            </div>
+          </div>
+        </article>
+        """)
+    if not blocks:
+        return ""
+    return f"""
+    <section class="section">
+      <h2>排版与外观评分</h2>
+      <p class="muted">该分数独立于主 100 分，用来判断视觉层级、版面密度、一致性和 ATS 版式风险。</p>
       <div class="grid">{''.join(blocks)}</div>
     </section>
     """
@@ -239,10 +321,32 @@ def render_comparison(analysis: dict, resumes: list[dict]) -> str:
             best_for_rows.append(f"<tr><td colspan=\"3\">{h(item)}</td></tr>")
     table = ""
     if best_for_rows:
-        table = (
+        table = table_scroll(
             "<table><thead><tr><th>场景</th><th>推荐版本</th><th>原因</th></tr></thead><tbody>"
             + "".join(best_for_rows)
             + "</tbody></table>"
+        )
+    axis_rows = []
+    for item in as_list(comp.get("normalized_axes")):
+        if not isinstance(item, dict):
+            continue
+        scores = item.get("scores")
+        if isinstance(scores, dict):
+            score_text = "；".join(f"{key}: {value}" for key, value in scores.items())
+        else:
+            score_text = str(scores or "")
+        axis_rows.append(
+            f"<tr><td>{h(item.get('axis') or item.get('name') or '')}</td><td>{h(item.get('winner') or '')}</td><td>{h(score_text)}</td><td>{h(item.get('reason') or item.get('rationale') or '')}</td></tr>"
+        )
+    axes_table = ""
+    if axis_rows:
+        axes_table = (
+            "<h3>归一化比较轴</h3>"
+            + table_scroll(
+                "<table><thead><tr><th>比较轴</th><th>领先/推荐</th><th>分档</th><th>原因</th></tr></thead><tbody>"
+                + "".join(axis_rows)
+                + "</tbody></table>"
+            )
         )
     return f"""
     <section class="section">
@@ -253,6 +357,7 @@ def render_comparison(analysis: dict, resumes: list[dict]) -> str:
         <p>{h(comp.get("reason") or "")}</p>
         {ul(comp.get("delta_summary"), "暂无分差说明")}
         {table}
+        {axes_table}
       </div>
     </section>
     """
@@ -363,6 +468,7 @@ def render_report(analysis: dict, template: str) -> str:
         "META_CHIPS": render_meta(analysis),
         "SCORE_CARDS": render_score_cards(resumes),
         "EXPERIENCE_BENCHMARK_SECTION": render_experience_benchmarks(resumes),
+        "PRESENTATION_REVIEW_SECTION": render_presentation_reviews(resumes),
         "COMPARISON_SECTION": render_comparison(analysis, resumes),
         "DIMENSION_SECTIONS": render_dimension_sections(resumes),
         "RISK_ITEMS": render_risks(resumes),
@@ -385,10 +491,13 @@ def main() -> None:
     parser.add_argument("--output", required=True, help="Output HTML path")
     parser.add_argument("--template", help="Optional template path")
     parser.add_argument("--strict", action="store_true", help="Validate and fail on warnings/errors")
+    parser.add_argument("--auto-redact", action="store_true", help="Redact private contact details, private links, and token-like secrets before validation and rendering")
     args = parser.parse_args()
 
     analysis_path = Path(args.analysis).expanduser().resolve()
     analysis = load_json(analysis_path)
+    if args.auto_redact:
+        analysis = redact_payload(analysis)
     if args.strict:
         findings = validate_analysis_payload(analysis)
         errors = [item for item in findings if item["level"] == "error"]
