@@ -13,6 +13,17 @@ from typing import Any
 RISK_VALUES = {"safe", "needs_confirmation", "risky"}
 READINESS_VALUES = {"direct", "rewrite", "confirm", "idea"}
 STAR_KEYS = ("situation", "task", "action", "result", "tradeoff")
+LOGIC_CHAIN_TEXT_KEYS = (
+    "plain_summary",
+    "beginner_context",
+    "problem",
+    "trigger",
+    "closure",
+    "difficulty",
+    "resume_connection",
+    "limits",
+)
+DETAIL_ANCHOR_RE = re.compile(r"^[a-z0-9][a-z0-9_-]{1,80}$")
 
 SENSITIVE_RE = re.compile(
     r"(?i)(password|passwd|secret|api[_-]?key|access[_-]?key|private[_-]?key|"
@@ -141,6 +152,42 @@ def validate_evidence_paths(evidence: list[Any], path: str, context: dict, findi
             )
 
 
+def validate_logic_chain(chain: Any, path: str, context: dict, findings: list[dict]) -> None:
+    if not isinstance(chain, dict):
+        add(findings, "warning", f"{path}.logic_chain", "logic_chain is recommended for quick output and required for standard/strict reports")
+        return
+
+    missing = [key for key in LOGIC_CHAIN_TEXT_KEYS if not is_nonempty_text(chain.get(key))]
+    if missing:
+        add(findings, "warning", f"{path}.logic_chain", "missing logic-chain fields: " + ", ".join(missing))
+
+    steps = [step for step in as_list(chain.get("flow_steps")) if step]
+    if len(steps) < 3:
+        add(findings, "warning", f"{path}.logic_chain.flow_steps", "use at least 3 flow steps to show trigger, processing, and closure")
+
+    for step_index, step in enumerate(steps):
+        step_path = f"{path}.logic_chain.flow_steps[{step_index}]"
+        if isinstance(step, dict):
+            if not is_nonempty_text(step.get("step")):
+                add(findings, "warning", f"{step_path}.step", "flow step should name the stage")
+            if not is_nonempty_text(step.get("explanation")):
+                add(findings, "warning", f"{step_path}.explanation", "flow step should explain what happens")
+            step_evidence = [x for x in as_list(step.get("evidence") or step.get("evidence_paths")) if str(x).strip()]
+            if not step_evidence:
+                add(findings, "warning", f"{step_path}.evidence", "flow step should include evidence when possible")
+            else:
+                validate_evidence_paths(step_evidence, f"{step_path}", context, findings)
+        elif not is_nonempty_text(step):
+            add(findings, "warning", step_path, "flow step should be text or an object")
+
+    evidence_map = chain.get("evidence_map")
+    if evidence_map is not None:
+        for item_index, item in enumerate(as_list(evidence_map)):
+            if isinstance(item, dict):
+                mapped = [x for x in as_list(item.get("evidence") or item.get("evidence_paths")) if str(x).strip()]
+                validate_evidence_paths(mapped, f"{path}.logic_chain.evidence_map[{item_index}]", context, findings)
+
+
 def validate_highlight(item: Any, index: int, findings: list[dict], evidence_context: dict | None = None) -> None:
     path = f"highlights[{index}]"
     if not isinstance(item, dict):
@@ -164,6 +211,14 @@ def validate_highlight(item: Any, index: int, findings: list[dict], evidence_con
         add(findings, "error", f"{path}.evidence", "at least one evidence path/count/signal is required")
     else:
         validate_evidence_paths(evidence, path, evidence_context or {}, findings)
+
+    anchor = item.get("detail_anchor")
+    if not is_nonempty_text(anchor):
+        add(findings, "warning", f"{path}.detail_anchor", "detail_anchor is required for anchor-linked highlight details")
+    elif not DETAIL_ANCHOR_RE.match(str(anchor).strip()):
+        add(findings, "warning", f"{path}.detail_anchor", "detail_anchor should be lowercase URL-safe text, e.g. permission-access-control")
+
+    validate_logic_chain(item.get("logic_chain"), path, evidence_context or {}, findings)
 
     bullet = str(item.get("safe_bullet") or "")
     if contains_sensitive_text(bullet):
@@ -222,8 +277,15 @@ def validate_analysis_payload(analysis: dict, evidence_context: dict | None = No
     if not isinstance(highlights, list) or not highlights:
         add(findings, "error", "highlights", "at least one highlight is required")
     else:
+        anchors: dict[str, int] = {}
         for index, item in enumerate(highlights):
             validate_highlight(item, index, findings, evidence_context)
+            if isinstance(item, dict) and is_nonempty_text(item.get("detail_anchor")):
+                anchor = str(item["detail_anchor"]).strip()
+                if anchor in anchors:
+                    add(findings, "warning", f"highlights[{index}].detail_anchor", f"duplicate detail_anchor also used by highlights[{anchors[anchor]}]")
+                else:
+                    anchors[anchor] = index
 
     safe_highlights = [
         item for item in highlights or []

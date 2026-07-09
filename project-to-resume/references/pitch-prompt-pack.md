@@ -14,6 +14,7 @@ The prompt pack is not a final resume. It is a structured handoff to another age
 - Mark role assumptions and disclosure assumptions.
 - Keep safe bullets separate from enhanced bullets that need confirmation.
 - Keep verified/code-derived metrics separate from estimated metric suggestions.
+- Include highlight logic-chain details when available so the downstream agent can preserve the user's ability to explain the project in interviews.
 - Preserve enough project facts for the downstream agent to match the user's original resume style.
 
 ## Template
@@ -54,6 +55,13 @@ The prompt pack is not a final resume. It is a structured handoff to another age
 
 【可直接写入简历的 bullet】
 - ...
+
+【亮点链路详情，用于理解和面试复述】
+- 亮点：
+- 一句话解释：
+- 闭环链路：
+- 证据：
+- 简历边界：
 
 【增强版 bullet，需要我确认数据后再用】
 - ...

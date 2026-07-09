@@ -31,6 +31,8 @@ For final delivery, render with `--strict` so invalid `project_resume_analysis.j
 3. Highlight Explorer
    - Show all highlight cards by default.
    - Show technical-first highlight titles, category, risk label, resume readiness, visible count, safe bullet, enhanced bullet, evidence paths, and STAR notes.
+   - Every card must expose a stable anchor target for its detail view, using `detail_anchor` when present.
+   - Every serious highlight must include a beginner-readable closed-loop logic chain: problem, trigger, flow steps, closure, difficulty, resume boundary, and limits.
    - Use expandable details for dense evidence/interview content.
 
 4. Project Fact Pack
@@ -43,6 +45,7 @@ For final delivery, render with `--strict` so invalid `project_resume_analysis.j
 
 5. Resume-Ready Bullets
    - A copy-friendly list of safe bullets.
+   - Each safe bullet should include a "查看链路详情" jump link to the matching highlight detail anchor when the source highlight is known.
 
 6. Enhanced Bullets Requiring Confirmation
    - Include suggested metrics and what the user must verify.
@@ -65,6 +68,7 @@ For final delivery, render with `--strict` so invalid `project_resume_analysis.j
 - Sidebar links must jump to major report sections and update active-section highlighting while scrolling.
 - Do not add a separate highlight filter block unless the user explicitly asks for filtering.
 - Major sections must have stable anchors: overview, safe bullets, confirmation items, highlight explorer, downstream prompt, interview stories, and evidence appendix.
+- Individual highlight details must have stable anchors derived from `detail_anchor`, so a summary bullet can jump directly to the full chain.
 - Keep the report scannable: show the safest resume material early, keep dense evidence and STAR notes behind expandable detail areas when practical.
 - When scoring is present, show both evidence-safe score and potential score. If the safe score is below 90, explain the score ceiling reason instead of leaving the number unexplained.
 - The highlight explorer must show the total highlight count.
@@ -80,6 +84,8 @@ Each highlight card must include:
 - Readiness score
 - Risk label
 - Evidence paths or counts
+- Detail anchor
+- Closed-loop logic chain
 - Safe resume bullet
 - Enhanced bullet
 - Why it is valuable
@@ -97,4 +103,5 @@ Each highlight card must include:
 - Copy controls for safe bullets and the downstream prompt when practical.
 - Left sidebar reading nav and right-side content must be interactive and aligned through anchors/active states.
 - Dense card details should be progressively disclosed with expandable evidence/interview sections instead of forcing everything into one visual block.
+- Logic-chain details should open when a user jumps from a safe bullet anchor link.
 - Text must not overflow on mobile.

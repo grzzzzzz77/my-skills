@@ -5,7 +5,18 @@
   "readiness": "可直接整理为 AI 应用落地项目经历，模型效果、成本和线上规模需要确认",
   "role_assumption": "未确认，默认使用“负责/参与核心模块开发”等保守表述。",
   "disclosure_assumption": "不写真实公司、客户名称、内部知识库内容、工单详情或生产环境细节。",
-  "keywords": ["Node.js", "TypeScript", "AI Agent", "OpenAI", "RAG", "Tool Calling", "Express", "Redis", "PostgreSQL", "工程化落地"],
+  "keywords": [
+    "Node.js",
+    "TypeScript",
+    "AI Agent",
+    "OpenAI",
+    "RAG",
+    "Tool Calling",
+    "Express",
+    "Redis",
+    "PostgreSQL",
+    "工程化落地"
+  ],
   "facts": [
     {
       "label": "业务流",
@@ -44,7 +55,11 @@
       "score": 16,
       "risk": "safe",
       "readiness": "direct",
-      "evidence": ["src/agents/customerAgent.ts", "src/services/sessionStore.ts", "src/routes/chat.ts"],
+      "evidence": [
+        "src/agents/customerAgent.ts",
+        "src/services/sessionStore.ts",
+        "src/routes/chat.ts"
+      ],
       "safe_bullet": "参与智能客服 Agent 编排服务开发，封装会话上下文、模型调用和回复生成链路，使用户问题能够进入可追踪的多步骤处理流程。",
       "enhanced_bullet": "参与智能客服 Agent 编排服务开发，支撑 X 类客服问题和 Y 轮上下文记忆，将人工接管前的信息整理时间缩短约 Z%。",
       "why": "能体现 AI 应用从模型调用到业务流程落地的工程能力。",
@@ -55,8 +70,48 @@
         "result": "形成可追踪、可扩展的多步骤对话处理链路；真实业务效果需确认。",
         "tradeoff": "上下文越多效果可能越好，但响应耗时和成本也会增加。"
       },
-      "data_to_confirm": ["问题类型数量", "上下文轮数", "人工接管前整理耗时"],
-      "usage": "direct_paste"
+      "data_to_confirm": [
+        "问题类型数量",
+        "上下文轮数",
+        "人工接管前整理耗时"
+      ],
+      "usage": "direct_paste",
+      "detail_anchor": "node-agent-highlight-01",
+      "logic_chain": {
+        "plain_summary": "参与智能客服 Agent 编排服务开发，封装会话上下文、模型调用和回复生成链路，使用户问题能够进入可追踪的多步骤处理流程。",
+        "beginner_context": "客服问答不是一次简单模型调用，需要结合上下文、知识和业务动作。",
+        "problem": "客服问答不是一次简单模型调用，需要结合上下文、知识和业务动作。",
+        "trigger": "负责对话链路中的上下文整理、模型请求和回复生成模块。",
+        "flow_steps": [
+          {
+            "step": "入口触发",
+            "explanation": "负责对话链路中的上下文整理、模型请求和回复生成模块。",
+            "evidence": [
+              "src/agents/customerAgent.ts"
+            ]
+          },
+          {
+            "step": "核心处理",
+            "explanation": "拆分会话存储、模型客户端和 Agent 编排逻辑，并让接口层只处理请求响应。",
+            "evidence": [
+              "src/agents/customerAgent.ts",
+              "src/services/sessionStore.ts",
+              "src/routes/chat.ts"
+            ]
+          },
+          {
+            "step": "结果反馈",
+            "explanation": "形成可追踪、可扩展的多步骤对话处理链路；真实业务效果需确认。",
+            "evidence": [
+              "src/routes/chat.ts"
+            ]
+          }
+        ],
+        "closure": "形成可追踪、可扩展的多步骤对话处理链路；真实业务效果需确认。；问题类型数量、上下文轮数、人工接管前整理耗时需确认后才能写成更强业务结果。",
+        "difficulty": "能体现 AI 应用从模型调用到业务流程落地的工程能力。；上下文越多效果可能越好，但响应耗时和成本也会增加。",
+        "resume_connection": "安全版可写：参与智能客服 Agent 编排服务开发，封装会话上下文、模型调用和回复生成链路，使用户问题能够进入可追踪的多步骤处理流程。 增强版需确认：参与智能客服 Agent 编排服务开发，支撑 X 类客服问题和 Y 轮上下文记忆，将人工接管前的信息整理时间缩短约 Z%。",
+        "limits": "不要直接声称未验证的所有权、上线规模或效果指标；待确认项：问题类型数量、上下文轮数、人工接管前整理耗时。"
+      }
     },
     {
       "title": "工具调用与工单草稿生成",
@@ -64,7 +119,11 @@
       "score": 15,
       "risk": "safe",
       "readiness": "rewrite",
-      "evidence": ["src/tools/ticketTool.ts", "src/agents/customerAgent.ts", "tests/customerAgent.test.ts"],
+      "evidence": [
+        "src/tools/ticketTool.ts",
+        "src/agents/customerAgent.ts",
+        "tests/customerAgent.test.ts"
+      ],
       "safe_bullet": "封装 Agent 工具调用模块，将工单草稿生成、参数校验和结果回传拆为独立工具，降低模型输出直接进入业务动作的风险。",
       "enhanced_bullet": "封装 Agent 工具调用模块，覆盖 X 类工单字段和 Y 类校验规则，将工单草稿人工整理时间缩短约 Z%。",
       "why": "能体现 AI Agent 中工具调用、边界控制和业务系统接入能力。",
@@ -75,8 +134,48 @@
         "result": "工具调用链路更可控，便于人工复核和后续接入更多业务工具。",
         "tradeoff": "严格工具参数会限制模型自由度，但能降低错误业务动作风险。"
       },
-      "data_to_confirm": ["工单字段数量", "校验规则数量", "人工整理耗时变化"],
-      "usage": "rewrite_candidate"
+      "data_to_confirm": [
+        "工单字段数量",
+        "校验规则数量",
+        "人工整理耗时变化"
+      ],
+      "usage": "rewrite_candidate",
+      "detail_anchor": "node-agent-highlight-02",
+      "logic_chain": {
+        "plain_summary": "封装 Agent 工具调用模块，将工单草稿生成、参数校验和结果回传拆为独立工具，降低模型输出直接进入业务动作的风险。",
+        "beginner_context": "模型生成内容不能无校验地直接写入业务系统。",
+        "problem": "模型生成内容不能无校验地直接写入业务系统。",
+        "trigger": "建设工具调用层，让 Agent 只在明确参数和业务规则下生成工单草稿。",
+        "flow_steps": [
+          {
+            "step": "入口触发",
+            "explanation": "建设工具调用层，让 Agent 只在明确参数和业务规则下生成工单草稿。",
+            "evidence": [
+              "src/tools/ticketTool.ts"
+            ]
+          },
+          {
+            "step": "核心处理",
+            "explanation": "把工单字段、参数校验、调用结果和错误反馈拆成独立工具，并用测试覆盖典型输入。",
+            "evidence": [
+              "src/tools/ticketTool.ts",
+              "src/agents/customerAgent.ts",
+              "tests/customerAgent.test.ts"
+            ]
+          },
+          {
+            "step": "结果反馈",
+            "explanation": "工具调用链路更可控，便于人工复核和后续接入更多业务工具。",
+            "evidence": [
+              "tests/customerAgent.test.ts"
+            ]
+          }
+        ],
+        "closure": "工具调用链路更可控，便于人工复核和后续接入更多业务工具。；工单字段数量、校验规则数量、人工整理耗时变化需确认后才能写成更强业务结果。",
+        "difficulty": "能体现 AI Agent 中工具调用、边界控制和业务系统接入能力。；严格工具参数会限制模型自由度，但能降低错误业务动作风险。",
+        "resume_connection": "安全版可写：封装 Agent 工具调用模块，将工单草稿生成、参数校验和结果回传拆为独立工具，降低模型输出直接进入业务动作的风险。 增强版需确认：封装 Agent 工具调用模块，覆盖 X 类工单字段和 Y 类校验规则，将工单草稿人工整理时间缩短约 Z%。",
+        "limits": "不要直接声称未验证的所有权、上线规模或效果指标；待确认项：工单字段数量、校验规则数量、人工整理耗时变化。"
+      }
     },
     {
       "title": "知识检索与 RAG 上下文组装",
@@ -84,7 +183,11 @@
       "score": 14,
       "risk": "safe",
       "readiness": "direct",
-      "evidence": ["src/retrieval/knowledgeBase.ts", "src/services/llmClient.ts", "src/agents/customerAgent.ts"],
+      "evidence": [
+        "src/retrieval/knowledgeBase.ts",
+        "src/services/llmClient.ts",
+        "src/agents/customerAgent.ts"
+      ],
       "safe_bullet": "参与知识检索与 RAG 上下文组装模块开发，将用户问题、检索片段和模型提示词分层处理，提升客服回答的可解释性和可维护性。",
       "enhanced_bullet": "参与知识检索与 RAG 上下文组装模块开发，接入 X 类知识源，在 Y 条测试问题上知识命中率达到 Z%。",
       "why": "能把 AI 项目从“调用模型”提升到“检索增强与业务知识接入”。",
@@ -95,8 +198,48 @@
         "result": "回答链路具备知识来源和提示词结构；命中率和效果指标需确认。",
         "tradeoff": "检索片段过多会增加成本和噪音，因此需要控制上下文长度。"
       },
-      "data_to_confirm": ["知识源数量", "测试问题数量", "知识命中率"],
-      "usage": "direct_paste"
+      "data_to_confirm": [
+        "知识源数量",
+        "测试问题数量",
+        "知识命中率"
+      ],
+      "usage": "direct_paste",
+      "detail_anchor": "node-agent-highlight-03",
+      "logic_chain": {
+        "plain_summary": "参与知识检索与 RAG 上下文组装模块开发，将用户问题、检索片段和模型提示词分层处理，提升客服回答的可解释性和可维护性。",
+        "beginner_context": "客服回答需要依据业务知识，不应只依赖模型通用知识。",
+        "problem": "客服回答需要依据业务知识，不应只依赖模型通用知识。",
+        "trigger": "建设检索上下文进入模型前的组装链路。",
+        "flow_steps": [
+          {
+            "step": "入口触发",
+            "explanation": "建设检索上下文进入模型前的组装链路。",
+            "evidence": [
+              "src/retrieval/knowledgeBase.ts"
+            ]
+          },
+          {
+            "step": "核心处理",
+            "explanation": "拆分知识检索、片段筛选、提示词组装和模型请求参数，让回复可以追溯来源。",
+            "evidence": [
+              "src/retrieval/knowledgeBase.ts",
+              "src/services/llmClient.ts",
+              "src/agents/customerAgent.ts"
+            ]
+          },
+          {
+            "step": "结果反馈",
+            "explanation": "回答链路具备知识来源和提示词结构；命中率和效果指标需确认。",
+            "evidence": [
+              "src/agents/customerAgent.ts"
+            ]
+          }
+        ],
+        "closure": "回答链路具备知识来源和提示词结构；命中率和效果指标需确认。；知识源数量、测试问题数量、知识命中率需确认后才能写成更强业务结果。",
+        "difficulty": "能把 AI 项目从“调用模型”提升到“检索增强与业务知识接入”。；检索片段过多会增加成本和噪音，因此需要控制上下文长度。",
+        "resume_connection": "安全版可写：参与知识检索与 RAG 上下文组装模块开发，将用户问题、检索片段和模型提示词分层处理，提升客服回答的可解释性和可维护性。 增强版需确认：参与知识检索与 RAG 上下文组装模块开发，接入 X 类知识源，在 Y 条测试问题上知识命中率达到 Z%。",
+        "limits": "不要直接声称未验证的所有权、上线规模或效果指标；待确认项：知识源数量、测试问题数量、知识命中率。"
+      }
     },
     {
       "title": "Node 后端接口分层与服务治理",
@@ -104,7 +247,11 @@
       "score": 13,
       "risk": "safe",
       "readiness": "rewrite",
-      "evidence": ["src/routes/chat.ts", "src/services/llmClient.ts", "src/services/sessionStore.ts"],
+      "evidence": [
+        "src/routes/chat.ts",
+        "src/services/llmClient.ts",
+        "src/services/sessionStore.ts"
+      ],
       "safe_bullet": "基于 Node.js 封装智能对话接口分层，将路由、模型客户端、会话存储和业务工具拆分为独立模块，提升 AI 服务后续扩展和问题定位效率。",
       "enhanced_bullet": "基于 Node.js 封装智能对话接口分层，支撑 X 个 AI 服务接口和 Y 个业务工具接入，降低新增工具接入成本约 Z%。",
       "why": "能体现后端工程能力，不把 AI 项目写成单纯 prompt 调用。",
@@ -115,8 +262,48 @@
         "result": "AI 服务结构更清晰，后续接入新工具或新模型更容易扩展。",
         "tradeoff": "模块拆分增加文件数量，但能减少单文件逻辑堆积。"
       },
-      "data_to_confirm": ["接口数量", "工具数量", "新增工具接入耗时"],
-      "usage": "rewrite_candidate"
+      "data_to_confirm": [
+        "接口数量",
+        "工具数量",
+        "新增工具接入耗时"
+      ],
+      "usage": "rewrite_candidate",
+      "detail_anchor": "node-agent-highlight-04",
+      "logic_chain": {
+        "plain_summary": "基于 Node.js 封装智能对话接口分层，将路由、模型客户端、会话存储和业务工具拆分为独立模块，提升 AI 服务后续扩展和问题定位效率。",
+        "beginner_context": "AI 应用一旦接入真实业务，就需要接口、状态、工具和异常处理的稳定边界。",
+        "problem": "AI 应用一旦接入真实业务，就需要接口、状态、工具和异常处理的稳定边界。",
+        "trigger": "负责后端接口和服务层拆分。",
+        "flow_steps": [
+          {
+            "step": "入口触发",
+            "explanation": "负责后端接口和服务层拆分。",
+            "evidence": [
+              "src/routes/chat.ts"
+            ]
+          },
+          {
+            "step": "核心处理",
+            "explanation": "按路由、模型客户端、会话存储和工具调用拆分模块，并统一错误返回。",
+            "evidence": [
+              "src/routes/chat.ts",
+              "src/services/llmClient.ts",
+              "src/services/sessionStore.ts"
+            ]
+          },
+          {
+            "step": "结果反馈",
+            "explanation": "AI 服务结构更清晰，后续接入新工具或新模型更容易扩展。",
+            "evidence": [
+              "src/services/sessionStore.ts"
+            ]
+          }
+        ],
+        "closure": "AI 服务结构更清晰，后续接入新工具或新模型更容易扩展。；接口数量、工具数量、新增工具接入耗时需确认后才能写成更强业务结果。",
+        "difficulty": "能体现后端工程能力，不把 AI 项目写成单纯 prompt 调用。；模块拆分增加文件数量，但能减少单文件逻辑堆积。",
+        "resume_connection": "安全版可写：基于 Node.js 封装智能对话接口分层，将路由、模型客户端、会话存储和业务工具拆分为独立模块，提升 AI 服务后续扩展和问题定位效率。 增强版需确认：基于 Node.js 封装智能对话接口分层，支撑 X 个 AI 服务接口和 Y 个业务工具接入，降低新增工具接入成本约 Z%。",
+        "limits": "不要直接声称未验证的所有权、上线规模或效果指标；待确认项：接口数量、工具数量、新增工具接入耗时。"
+      }
     },
     {
       "title": "响应成本与效果评估",
@@ -124,7 +311,10 @@
       "score": 10,
       "risk": "needs_confirmation",
       "readiness": "confirm",
-      "evidence": ["src/services/llmClient.ts", "tests/customerAgent.test.ts"],
+      "evidence": [
+        "src/services/llmClient.ts",
+        "tests/customerAgent.test.ts"
+      ],
       "safe_bullet": "围绕模型调用链路整理可观测指标，为后续评估响应耗时、调用成本、知识命中率和人工接管率提供基础。",
       "enhanced_bullet": "围绕模型调用链路做效果评估，在 X 条客服问题样例上知识命中率达到 Y%，平均响应耗时控制在 Z 秒内。",
       "why": "AI 应用最需要效果评估，但数字必须来自测试集、日志或用户确认。",
@@ -135,8 +325,48 @@
         "result": "可以把项目从功能实现提升到效果评估；具体数字需确认。",
         "tradeoff": "离线样例评估不能完全代表线上表现，需要和真实反馈结合。"
       },
-      "data_to_confirm": ["测试问题数量", "知识命中率", "平均响应耗时", "调用成本"],
-      "usage": "confirm_before_use"
+      "data_to_confirm": [
+        "测试问题数量",
+        "知识命中率",
+        "平均响应耗时",
+        "调用成本"
+      ],
+      "usage": "confirm_before_use",
+      "detail_anchor": "node-agent-highlight-05",
+      "logic_chain": {
+        "plain_summary": "围绕模型调用链路整理可观测指标，为后续评估响应耗时、调用成本、知识命中率和人工接管率提供基础。",
+        "beginner_context": "AI 应用不能只证明“能回答”，还要证明成本、速度和业务效果可接受。",
+        "problem": "AI 应用不能只证明“能回答”，还要证明成本、速度和业务效果可接受。",
+        "trigger": "整理模型调用链路的可衡量指标。",
+        "flow_steps": [
+          {
+            "step": "入口触发",
+            "explanation": "整理模型调用链路的可衡量指标。",
+            "evidence": [
+              "src/services/llmClient.ts"
+            ]
+          },
+          {
+            "step": "核心处理",
+            "explanation": "从响应耗时、调用成本、知识命中和人工接管四个角度设计评估项。",
+            "evidence": [
+              "src/services/llmClient.ts",
+              "tests/customerAgent.test.ts"
+            ]
+          },
+          {
+            "step": "结果反馈",
+            "explanation": "可以把项目从功能实现提升到效果评估；具体数字需确认。",
+            "evidence": [
+              "tests/customerAgent.test.ts"
+            ]
+          }
+        ],
+        "closure": "可以把项目从功能实现提升到效果评估；具体数字需确认。；测试问题数量、知识命中率、平均响应耗时、调用成本需确认后才能写成更强业务结果。",
+        "difficulty": "AI 应用最需要效果评估，但数字必须来自测试集、日志或用户确认。；离线样例评估不能完全代表线上表现，需要和真实反馈结合。",
+        "resume_connection": "安全版可写：围绕模型调用链路整理可观测指标，为后续评估响应耗时、调用成本、知识命中率和人工接管率提供基础。 增强版需确认：围绕模型调用链路做效果评估，在 X 条客服问题样例上知识命中率达到 Y%，平均响应耗时控制在 Z 秒内。",
+        "limits": "不要直接声称未验证的所有权、上线规模或效果指标；待确认项：测试问题数量、知识命中率、平均响应耗时、调用成本。"
+      }
     },
     {
       "title": "高风险：替代人工客服表述",
@@ -144,7 +374,11 @@
       "score": 8,
       "risk": "risky",
       "readiness": "idea",
-      "evidence": ["src/agents/customerAgent.ts", "src/retrieval/knowledgeBase.ts", "src/tools/ticketTool.ts"],
+      "evidence": [
+        "src/agents/customerAgent.ts",
+        "src/retrieval/knowledgeBase.ts",
+        "src/tools/ticketTool.ts"
+      ],
       "safe_bullet": "不要直接写“主导 AI 客服替代人工并显著降低成本”；除非能确认个人职责、上线范围、人工接管率和真实成本数据。",
       "enhanced_bullet": "确认真实数据后，可改写为“参与智能客服 Agent 建设，覆盖 X 类高频问题，辅助生成 Y% 工单草稿并降低 Z% 人工整理成本”。",
       "why": "AI 应用容易被写成夸张业务结果，必须把自动化边界和效果数据说清楚。",
@@ -155,8 +389,49 @@
         "result": "简历表达保留 AI 应用亮点，同时避免把辅助能力写成完全替代。",
         "tradeoff": "谨慎表述不会显得夸张，但更经得起追问。"
       },
-      "data_to_confirm": ["上线范围", "人工接管率", "工单草稿采纳率", "成本变化"],
-      "usage": "do_not_paste"
+      "data_to_confirm": [
+        "上线范围",
+        "人工接管率",
+        "工单草稿采纳率",
+        "成本变化"
+      ],
+      "usage": "do_not_paste",
+      "detail_anchor": "node-agent-highlight-06",
+      "logic_chain": {
+        "plain_summary": "不要直接写“主导 AI 客服替代人工并显著降低成本”；除非能确认个人职责、上线范围、人工接管率和真实成本数据。",
+        "beginner_context": "AI 客服项目常被追问真实效果和失败边界。",
+        "problem": "AI 客服项目常被追问真实效果和失败边界。",
+        "trigger": "控制替代人工、降本增效等高风险表达。",
+        "flow_steps": [
+          {
+            "step": "入口触发",
+            "explanation": "控制替代人工、降本增效等高风险表达。",
+            "evidence": [
+              "src/agents/customerAgent.ts"
+            ]
+          },
+          {
+            "step": "核心处理",
+            "explanation": "将结果拆成可确认指标，包括命中率、接管率、草稿采纳率和人工耗时变化。",
+            "evidence": [
+              "src/agents/customerAgent.ts",
+              "src/retrieval/knowledgeBase.ts",
+              "src/tools/ticketTool.ts"
+            ]
+          },
+          {
+            "step": "结果反馈",
+            "explanation": "简历表达保留 AI 应用亮点，同时避免把辅助能力写成完全替代。",
+            "evidence": [
+              "src/tools/ticketTool.ts"
+            ]
+          }
+        ],
+        "closure": "简历表达保留 AI 应用亮点，同时避免把辅助能力写成完全替代。；上线范围、人工接管率、工单草稿采纳率、成本变化需确认后才能写成更强业务结果。",
+        "difficulty": "AI 应用容易被写成夸张业务结果，必须把自动化边界和效果数据说清楚。；谨慎表述不会显得夸张，但更经得起追问。",
+        "resume_connection": "安全版可写：不要直接写“主导 AI 客服替代人工并显著降低成本”；除非能确认个人职责、上线范围、人工接管率和真实成本数据。 增强版需确认：确认真实数据后，可改写为“参与智能客服 Agent 建设，覆盖 X 类高频问题，辅助生成 Y% 工单草稿并降低 Z% 人工整理成本”。",
+        "limits": "不要直接声称未验证的所有权、上线规模或效果指标；待确认项：上线范围、人工接管率、工单草稿采纳率、成本变化。"
+      }
     }
   ],
   "safe_bullets": [
@@ -165,8 +440,14 @@
     "参与知识检索与 RAG 上下文组装模块开发，将用户问题、检索片段和模型提示词分层处理，提升客服回答的可解释性和可维护性。"
   ],
   "confirmation_items": [
-    {"title": "AI 效果指标", "text": "确认知识命中率、人工接管率、响应耗时和调用成本后，再写增强版 bullet。"},
-    {"title": "业务落地指标", "text": "确认覆盖问题类型、工单草稿采纳率和上线范围后，再写业务收益。"}
+    {
+      "title": "AI 效果指标",
+      "text": "确认知识命中率、人工接管率、响应耗时和调用成本后，再写增强版 bullet。"
+    },
+    {
+      "title": "业务落地指标",
+      "text": "确认覆盖问题类型、工单草稿采纳率和上线范围后，再写业务收益。"
+    }
   ],
   "interview_stories": [],
   "prompt_pack": ""

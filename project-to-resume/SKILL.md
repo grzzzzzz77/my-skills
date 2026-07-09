@@ -1,6 +1,6 @@
 ---
 name: project-to-resume
-description: Turn local code evidence into evidence-backed resume bullets, project highlights, STAR interview stories, optional HTML reports, and downstream resume-rewrite prompt packs. Requires a local repository, project path, or explicit code files/snippets as evidence; not for resume polishing without code evidence. Use for codebase-to-resume, 代码项目转简历, 项目亮点, 简历项目描述, project bullets, contribution packaging, project value scoring, and portfolio/interview story extraction across frontend/uni-app, Node/backend, AI/Agent, data automation, and full-stack projects.
+description: Turn local code evidence into evidence-backed resume bullets, project highlights, anchor-linked highlight logic-chain details, STAR interview stories, optional HTML reports, and downstream resume-rewrite prompt packs. Requires a local repository, project path, or explicit code files/snippets as evidence; not for resume polishing without code evidence. Use for codebase-to-resume, 代码项目转简历, 项目亮点, 简历项目描述, project bullets, contribution packaging, 项目链路闭环, 亮点详情跳转, project value scoring, and portfolio/interview story extraction across frontend/uni-app, Node/backend, AI/Agent, data automation, and full-stack projects.
 ---
 
 # Project To Resume
@@ -47,8 +47,8 @@ Use the lightest mode that satisfies the request:
 
 - `micro`: Use when the user provides only 1-2 files, a diff, a snippet, or asks for one small section. Do not run full repository collection. Inspect only supplied evidence and output localized bullets/caveats in chat.
 - `quick`: Use for "写几条/5 条/bullet/项目描述" against a local repo. Run the collector, inspect only strongest evidence files, and answer in chat. Do not create JSON, HTML, or prompt pack unless asked.
-- `standard`: Use for reusable project analysis, categorized highlights, STAR stories, project score, or handoff prompt. Run collector, inspect targeted files, write `project_resume_analysis.json`, and validate it.
-- `strict_report`: Use for HTML reports, deliverables, uploadable/package-quality output, or stable repeatable results. Run collector, structured JSON, evidence-aware strict validation, renderer, and prompt pack.
+- `standard`: Use for reusable project analysis, categorized highlights, STAR stories, highlight logic-chain details, project score, or handoff prompt. Run collector, inspect targeted files, write `project_resume_analysis.json`, and validate it.
+- `strict_report`: Use for HTML reports, deliverables, uploadable/package-quality output, or stable repeatable results. Run collector, structured JSON with anchor-linked highlight logic chains, evidence-aware strict validation, renderer, and prompt pack.
 
 If wording is ambiguous:
 
@@ -70,6 +70,10 @@ python3 <skill_dir>/scripts/collect_project_evidence.py \
 
 Read `project_evidence.json` and `project_evidence.md`, then inspect targeted source files. Use the evidence output to choose relevant docs, entrypoints, routes, services, stores, tests, configs, and framework-specific files. Do not read every file blindly.
 
+For monorepos or multi-app workspaces, inspect `manifests.workspace_projects`, top-level `signal_files_total`, `signal_lines_estimate`, and `signal_policy` before choosing highlights. Prefer the actual product/service source directories over bundled examples, vendored packages, generated resources, screenshots, or built-in skill packs. If the root evidence is noisy, run the collector again on the strongest subprojects and compare root vs subproject evidence before writing final highlights.
+
+When evidence includes tests, treat implementation files as the main runtime chain and tests as closure/quality proof. Do not let test files, reproduction scripts, generated resources, or a misleading parent directory name become the primary reason for a highlight.
+
 For `micro`, do not run the collector unless the user also provides a repo and asks for repo-level confidence. Treat claims as local-evidence-only and label missing repo context.
 
 Author handling:
@@ -82,6 +86,7 @@ Author handling:
 Load references only when needed:
 
 - Before selecting/scoring highlights: `references/highlight-rubric.md`.
+- Before writing anchor-linked highlight details or explaining a highlight's full path to a beginner: `references/highlight-logic-chain.md`.
 - Before writing bullets, metric strategy, STAR notes, ownership wording, or disclosure-sensitive content: `references/resume-bullet-rules.md`.
 - Before creating `project_resume_analysis.json`: `references/analysis-schema.md`.
 - Before generating a prompt pack: `references/pitch-prompt-pack.md`.
@@ -95,13 +100,14 @@ Return:
 
 1. evidence scope used
 2. 3-8 safe bullets, or fewer if evidence is limited
-3. optional enhanced bullets requiring confirmation
-4. risk/unknowns, including role, metrics, and disclosure gaps
-5. interview talking points when useful
+3. optional anchor-linked detail notes when the user needs to understand the highlight chain
+4. optional enhanced bullets requiring confirmation
+5. risk/unknowns, including role, metrics, and disclosure gaps
+6. interview talking points when useful
 
 ### Standard Output
 
-Create and validate `project_resume_analysis.json` using `references/analysis-schema.md`.
+Create and validate `project_resume_analysis.json` using `references/analysis-schema.md`. For every final highlight, include a stable `detail_anchor` and `logic_chain` so the summary bullet can jump to a beginner-readable detail section explaining the full closed loop.
 
 Run:
 
@@ -132,6 +138,7 @@ Use `references/html-report-spec.md` for report QA. The final chat response shou
 Before final delivery:
 
 - Confirm every final bullet has evidence or a visible risk label.
+- Confirm every final highlight has `detail_anchor` and `logic_chain` in standard/strict_report outputs.
 - Confirm safe bullets do not contain unverified business metrics, ownership, users, revenue, GMV, latency, or production impact.
 - Confirm role/disclosure assumptions are visible when not user-confirmed.
 - Confirm generated JSON passes `scripts/validate_analysis.py --strict`; in report mode include `--evidence project_evidence.json`.
@@ -145,6 +152,7 @@ Before final delivery:
 - Highlight scoring: `references/highlight-rubric.md`
 - Structured analysis schema: `references/analysis-schema.md`
 - Bullet, metric, ownership, and disclosure rules: `references/resume-bullet-rules.md`
+- Highlight logic-chain detail rules: `references/highlight-logic-chain.md`
 - Downstream prompt pack: `references/pitch-prompt-pack.md`
 - HTML report requirements: `references/html-report-spec.md`
 - Evidence collector: `scripts/collect_project_evidence.py`

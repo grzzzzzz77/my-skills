@@ -290,6 +290,39 @@
     .bullet, .enhanced-item {
       white-space: normal;
     }
+    .bullet-list {
+      margin: 0;
+      padding-left: 20px;
+      display: grid;
+      gap: 10px;
+      white-space: normal;
+    }
+    .bullet-list li {
+      padding-left: 3px;
+      line-height: 1.78;
+    }
+    .bullet-text {
+      display: inline;
+    }
+    .detail-link {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      margin-left: 8px;
+      border: 1px solid #b7c6d8;
+      border-radius: var(--radius);
+      background: #fff;
+      color: #1f3657;
+      padding: 3px 8px;
+      font-size: 12px;
+      font-weight: 850;
+      white-space: nowrap;
+    }
+    .detail-link:hover {
+      color: var(--teal);
+      border-color: #9bd8cf;
+      background: var(--teal-soft);
+    }
     .needs_confirmation { color: var(--amber); font-weight: 750; }
     .safe { color: var(--green); }
     .risky { color: var(--red); }
@@ -311,8 +344,13 @@
       padding: 0;
       overflow: hidden;
       box-shadow: none;
+      scroll-margin-top: 16px;
     }
     .highlight-card[hidden] { display: none; }
+    .highlight-card.focused-card {
+      border-color: #9bd8cf;
+      box-shadow: 0 0 0 3px rgba(15, 118, 110, .12);
+    }
     .card-main {
       display: grid;
       grid-template-columns: minmax(0, 1fr) 260px;
@@ -393,6 +431,7 @@
       background: #fff;
       margin-top: 12px;
       overflow: hidden;
+      scroll-margin-top: 16px;
     }
     summary {
       cursor: pointer;
@@ -425,6 +464,54 @@
     }
     .interview-notes ul {
       padding: 0 0 0 20px;
+    }
+    .logic-chain {
+      padding: 0 14px 14px;
+      color: #344054;
+    }
+    .logic-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    .logic-note {
+      border: 1px solid var(--line-soft);
+      border-radius: var(--radius);
+      background: var(--paper-2);
+      padding: 10px;
+      line-height: 1.68;
+    }
+    .logic-note.wide {
+      grid-column: 1 / -1;
+    }
+    .logic-note strong {
+      display: block;
+      color: #344054;
+      font-size: 13px;
+      margin-bottom: 4px;
+    }
+    .logic-note span {
+      color: #344054;
+    }
+    .logic-steps {
+      display: grid;
+      gap: 10px;
+      margin: 0 0 12px;
+      padding-left: 22px;
+    }
+    .logic-steps li {
+      padding-left: 3px;
+      line-height: 1.68;
+    }
+    .logic-steps p {
+      margin: 4px 0 6px;
+      color: #344054;
+    }
+    .evidence-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
     }
 
     .story-card {
@@ -476,6 +563,7 @@
       h1 { font-size: 30px; }
       h2 { font-size: 21px; }
       .facts, .bullet-compare, .card-main { grid-template-columns: 1fr; }
+      .logic-grid { grid-template-columns: 1fr; }
       .card-aside { border-left: 0; border-top: 1px solid var(--line-soft); padding: 14px 0 0; }
       .copy-row, .section-head, .highlight-toolbar { align-items: flex-start; flex-direction: column; }
       .copy-button { width: 100%; }
@@ -640,7 +728,10 @@
       button.addEventListener('click', async () => {
         const target = document.getElementById(button.dataset.copyTarget);
         if (!target) return;
-        const text = target.innerText || target.textContent || '';
+        const bulletTexts = Array.from(target.querySelectorAll('.bullet-text'));
+        const text = bulletTexts.length
+          ? bulletTexts.map(item => `- ${(item.innerText || item.textContent || '').trim()}`).join('\n')
+          : (target.innerText || target.textContent || '');
         try { await navigator.clipboard.writeText(text); } catch (error) { fallbackCopy(text); }
         const old = button.textContent;
         button.textContent = '已复制';
@@ -664,6 +755,18 @@
     }
     sectionLinks.forEach(link => {
       link.addEventListener('click', () => setActiveSection(link.dataset.sectionLink));
+    });
+
+    document.querySelectorAll('a[href^="#"]').forEach(link => {
+      link.addEventListener('click', () => {
+        const id = decodeURIComponent(link.getAttribute('href').slice(1));
+        const target = document.getElementById(id);
+        if (target && target.tagName.toLowerCase() === 'details') {
+          target.open = true;
+          target.closest('.highlight-card')?.classList.add('focused-card');
+          setTimeout(() => target.closest('.highlight-card')?.classList.remove('focused-card'), 1200);
+        }
+      });
     });
   </script>
 </body>

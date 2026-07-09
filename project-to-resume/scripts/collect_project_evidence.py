@@ -22,11 +22,26 @@ IGNORE_DIRS = {
     ".git", "node_modules", "dist", "build", ".next", ".nuxt", ".output",
     "coverage", ".venv", "venv", "__pycache__", ".turbo", ".cache",
     "Pods", "DerivedData", "target", ".gradle", ".idea", ".vscode",
+    ".pnpm-store", "vendor", "vendors",
 }
 
 IGNORE_FILES = {".DS_Store", "Thumbs.db"}
 
 SIGNAL_EXCLUDE_PREFIXES = ("examples/", "references/", "assets/", "docs/", "doc/")
+SIGNAL_EXCLUDE_DIR_PARTS = {
+    ".test",
+    "doc",
+    "docs",
+    "fixtures",
+    "preskill",
+    "screenshots",
+    "vendor",
+    "vendors",
+}
+SIGNAL_EXCLUDE_PATH_MARKERS = (
+    "src-tauri/resources/skills/",
+    "src-tauri/sidecar/.beima/",
+)
 SIGNAL_EXCLUDE_FILES = {"agents/openai.yaml"}
 
 TEXT_EXTS = {
@@ -191,7 +206,7 @@ FRAMEWORK_DEFINITIONS = {
 }
 
 PATTERNS = {
-    "frontend_pages": ["pages", "views", "app", "routes"],
+    "frontend_pages": ["pages", "views", "routes"],
     "components": ["components", "widgets"],
     "api_routes": ["api", "routes", "controllers", "server/api"],
     "services": ["services", "service", "api", "client"],
@@ -206,11 +221,15 @@ PATTERNS = {
 
 TEST_FILE_RE = re.compile(
     r"(^|/)(__tests__|tests?|specs?)(/|$)|"
+    r"(^|/)test_[^/]*\.py$|"
     r"(\.|-|_)(test|spec)\.(js|jsx|ts|tsx|mjs|cjs|py|go|java|rb)$|"
     r"(_test\.(py|go)$)|"
     r"(test\.(py|js|jsx|ts|tsx)$)",
     re.I,
 )
+
+LOW_SIGNAL_EVIDENCE_FILENAMES = {"build.mjs"}
+LOW_SIGNAL_EVIDENCE_PREFIXES = ("repro-",)
 
 CODE_GRAPH_EXTS = {
     ".js", ".jsx", ".ts", ".tsx", ".vue", ".svelte", ".py", ".go", ".java",
@@ -282,7 +301,13 @@ def is_ignored(path: Path) -> bool:
 
 def is_signal_excluded(rel: str) -> bool:
     normalized = rel.replace("\\", "/").lstrip("./")
-    return normalized in SIGNAL_EXCLUDE_FILES or normalized.startswith(SIGNAL_EXCLUDE_PREFIXES)
+    parts = normalized.split("/")
+    return (
+        normalized in SIGNAL_EXCLUDE_FILES
+        or normalized.startswith(SIGNAL_EXCLUDE_PREFIXES)
+        or any(part in SIGNAL_EXCLUDE_DIR_PARTS for part in parts)
+        or any(marker in normalized for marker in SIGNAL_EXCLUDE_PATH_MARKERS)
+    )
 
 
 def is_signal_source_file(path: Path, rel: str) -> bool:
@@ -294,6 +319,39 @@ def is_signal_source_file(path: Path, rel: str) -> bool:
         "package.json", "pyproject.toml", "requirements.txt",
         "pages.json", "manifest.json", "mcp.json",
     }
+
+
+def is_test_path(rel: str) -> bool:
+    return bool(TEST_FILE_RE.search(rel.replace("\\", "/")))
+
+
+def is_low_signal_evidence_path(rel: str) -> bool:
+    name = Path(rel).name.lower()
+    return name in LOW_SIGNAL_EVIDENCE_FILENAMES or name.startswith(LOW_SIGNAL_EVIDENCE_PREFIXES)
+
+
+def prioritize_evidence_paths(paths: list[str]) -> list[str]:
+    unique = []
+    seen = set()
+    for rel in paths:
+        normalized = rel.replace("\\", "/")
+        if normalized in seen:
+            continue
+        seen.add(normalized)
+        unique.append(normalized)
+
+    def priority(rel: str) -> tuple:
+        lowered = rel.lower()
+        core_source = any(marker in f"/{lowered}" for marker in ("/src/", "/app/"))
+        return (
+            is_test_path(rel),
+            is_low_signal_evidence_path(rel),
+            0 if core_source else 1,
+            rel.count("/"),
+            lowered,
+        )
+
+    return sorted(unique, key=priority)
 
 
 def iter_files(root: Path):
@@ -417,7 +475,23 @@ def manifest_names(manifests: dict) -> set[str]:
             for field in ("dependencies", "devDependencies"):
                 for value in manifest.get(field) or []:
                     names.add(str(value).lower())
+        elif isinstance(manifest, list):
+            for item in manifest:
+                if not isinstance(item, dict):
+                    continue
+                for field in ("dependencies", "devDependencies"):
+                    for value in item.get(field) or []:
+                        names.add(str(value).lower())
     return names
+
+
+def rel_has_named_file(rels: list[str], file_name: str) -> bool:
+    wanted = file_name.strip("/").replace("\\", "/")
+    if wanted in rels:
+        return True
+    if "/" in wanted:
+        return any(rel.endswith("/" + wanted) for rel in rels)
+    return any(wanted in rel.split("/") for rel in rels)
 
 
 def detect_framework_profiles(repo: Path, files: list[Path], manifests: dict) -> list[dict]:
@@ -446,7 +520,7 @@ def detect_framework_profiles(repo: Path, files: list[Path], manifests: dict) ->
             if any(dep_lower in item for item in deps):
                 signals.append(f"dependency:{dep}")
         for file_name in spec["files"]:
-            if file_name in rels:
+            if rel_has_named_file(rels, file_name):
                 signals.append(f"file:{file_name}")
         for pattern in spec["patterns"]:
             if re.search(pattern, sample_text, re.I):
@@ -468,6 +542,13 @@ def package_dependency_names(manifests: dict) -> set[str]:
     deps = set()
     for manifest in manifests.values():
         if not isinstance(manifest, dict):
+            if isinstance(manifest, list):
+                for entry in manifest:
+                    if not isinstance(entry, dict):
+                        continue
+                    for field in ("dependencies", "devDependencies"):
+                        for item in entry.get(field) or []:
+                            deps.add(str(item).lower())
             continue
         for field in ("dependencies", "devDependencies"):
             for item in manifest.get(field) or []:
@@ -565,11 +646,13 @@ def collect_node_backend_signals(repo: Path, files: list[Path], deps: set[str]) 
     }
     candidates = {}
     for bucket, needles in buckets.items():
-        matches = [rel for rel in rels if any(needle in rel.lower() for needle in needles)]
+        matches = prioritize_evidence_paths([
+            rel for rel in rels if any(needle in rel.lower() for needle in needles)
+        ])
         if matches:
             candidates[bucket] = matches[:12]
     source_hit_count = sum(len(values) for values in candidates.values())
-    if not backend_deps and not source_hit_count:
+    if not backend_deps:
         return {}
     return {
         "dependencies": backend_deps[:30],
@@ -578,6 +661,49 @@ def collect_node_backend_signals(repo: Path, files: list[Path], deps: set[str]) 
         "layer_candidates": candidates,
         "database_or_cache": sorted(dep for dep in backend_deps if dep in {"prisma", "@prisma/client", "typeorm", "sequelize", "mongoose", "mysql2", "pg", "redis", "ioredis"})[:20],
         "auth_or_validation": sorted(dep for dep in backend_deps if dep in {"jsonwebtoken", "passport", "zod", "joi"})[:20],
+    }
+
+
+def path_matches_needles(rel: str, needles: list[str]) -> bool:
+    lowered = rel.lower()
+    for needle in needles:
+        item = needle.lower()
+        if item in {"ai", "api", "mcp", "rag", "route", "routes", "router"}:
+            if re.search(rf"(^|[/_.-]){re.escape(item)}", lowered):
+                return True
+        elif item in lowered:
+            return True
+    return False
+
+
+def collect_python_backend_signals(repo: Path, files: list[Path], deps: set[str]) -> dict:
+    source_files = signal_files(repo, files)
+    rels = rel_file_list(repo, source_files)
+    py_deps = sorted(dep for dep in deps if dep in {"fastapi", "flask", "django", "sqlalchemy", "pydantic", "httpx", "pytest"})
+    buckets = {
+        "routes": ["routes", "router", "main.py"],
+        "proxy_or_gateway": ["proxy", "forwarder", "gateway"],
+        "auth": ["auth", "sign", "identity"],
+        "quota_or_metering": ["quota", "metering", "usage"],
+        "providers": ["provider", "providers", "registry"],
+        "tests": ["test_", "tests"],
+    }
+    candidates = {}
+    for bucket, needles in buckets.items():
+        matches = prioritize_evidence_paths([
+            rel for rel in rels
+            if rel.endswith(".py") and path_matches_needles(rel, needles)
+        ])
+        if matches:
+            candidates[bucket] = matches[:12]
+    source_hit_count = sum(len(values) for values in candidates.values())
+    if not py_deps and source_hit_count < 3:
+        return {}
+    return {
+        "dependencies": py_deps[:30],
+        "confidence": min(1.0, round(0.3 + 0.25 * bool(py_deps) + 0.07 * min(source_hit_count, 6), 2)),
+        "basis": "dependency+source" if py_deps and source_hit_count else ("dependency_only" if py_deps else "source_only"),
+        "layer_candidates": candidates,
     }
 
 
@@ -596,7 +722,7 @@ def collect_ai_agent_signals(repo: Path, files: list[Path], deps: set[str]) -> d
     }
     file_candidates = {}
     for bucket, needles in buckets.items():
-        matches = [rel for rel in rels if any(needle in rel.lower() for needle in needles)]
+        matches = prioritize_evidence_paths([rel for rel in rels if path_matches_needles(rel, needles)])
         if matches:
             file_candidates[bucket] = matches[:12]
     source_text = limited_source_text(repo, source_files, ("agent", "tool", "prompt", "workflow", "rag", "vector", "memory", "mcp", "llm", "ai"))
@@ -623,6 +749,7 @@ def collect_specialized_signals(repo: Path, files: list[Path], manifests: dict) 
     signals = {
         "uniapp": collect_uniapp_signals(repo, files, deps),
         "node_backend": collect_node_backend_signals(repo, files, deps),
+        "python_backend": collect_python_backend_signals(repo, files, deps),
         "ai_agent": collect_ai_agent_signals(repo, files, deps),
     }
     return {key: value for key, value in signals.items() if value}
@@ -767,24 +894,28 @@ def collect_code_graph(repo: Path, files: list[Path], max_files: int = 900) -> d
     scanned = 0
     for path in files:
         rel = str(path.relative_to(repo))
-        if not is_code_graph_candidate(path):
+        if not is_code_graph_candidate(path) or not is_signal_source_file(path, rel):
             continue
+        is_test = is_test_path(rel)
         scanned += 1
         if scanned > max_files:
             break
         text = read_text_sample(path, max_chars=20000)
-        if ENTRYPOINT_RE.search(rel) and len(entrypoints) < 40:
+        if not is_test and ENTRYPOINT_RE.search(rel) and len(entrypoints) < 40:
             entrypoints.append(rel)
-        if path.suffix.lower() == ".py" and len(ast_summaries) < 80:
+        if not is_test and path.suffix.lower() == ".py" and len(ast_summaries) < 80:
             summary = python_ast_summary(text, rel)
             if summary and (summary["classes"] or summary["functions"] or summary["route_decorators"]):
                 ast_summaries.append(summary)
-        for route in route_matches(text, rel):
-            if len(routes) < 120:
-                routes.append(route)
-        for call in api_call_matches(text, rel):
-            if len(api_calls) < 120:
-                api_calls.append(call)
+        if not is_test:
+            for route in route_matches(text, rel):
+                if len(routes) < 120:
+                    routes.append(route)
+            for call in api_call_matches(text, rel):
+                if len(api_calls) < 120:
+                    api_calls.append(call)
+        if is_test:
+            continue
         for target in import_targets(text, path.suffix.lower()):
             if is_local_import(target) and len(import_edges) < 220:
                 import_edges.append({"source": rel, "target": target})
@@ -867,6 +998,63 @@ def manifest_summary(root: Path) -> dict:
     return summaries
 
 
+def collect_workspace_projects(root: Path, files: list[Path]) -> list[dict]:
+    workspace_manifest_names = {
+        "package.json", "pyproject.toml", "requirements.txt", "Cargo.toml",
+        "go.mod", "pom.xml", "Dockerfile", "docker-compose.yml", "vite.config.ts",
+    }
+    grouped: dict[str, set[str]] = defaultdict(set)
+    for path in files:
+        rel = str(path.relative_to(root)).replace("\\", "/")
+        if path.name in workspace_manifest_names and not is_signal_excluded(rel):
+            rel_dir = str(path.parent.relative_to(root)).replace("\\", "/") or "."
+            grouped[rel_dir].add(path.name)
+
+    projects = []
+    for rel_dir, names in sorted(grouped.items(), key=lambda item: (item[0].count("/"), item[0])):
+        project_root = root if rel_dir == "." else root / rel_dir
+        package = load_json(project_root / "package.json") if "package.json" in names else None
+        deps: list[str] = []
+        dev_deps: list[str] = []
+        scripts: list[str] = []
+        package_name = None
+        if isinstance(package, dict):
+            package_name = package.get("name")
+            deps = sorted(list((package.get("dependencies") or {}).keys()))[:60]
+            dev_deps = sorted(list((package.get("devDependencies") or {}).keys()))[:60]
+            scripts = sorted((package.get("scripts") or {}).keys())[:30]
+
+        py_deps: list[str] = []
+        pyproject = project_root / "pyproject.toml"
+        if "pyproject.toml" in names and pyproject.exists():
+            text = read_text_sample(pyproject, max_chars=40000)
+            py_deps = sorted(set(re.findall(r"['\"]([A-Za-z0-9_.-]+)(?:[<>=~!][^'\"]*)?['\"]", text)))[:80]
+
+        all_deps_lower = {item.lower() for item in deps + dev_deps + py_deps}
+        project_type = []
+        if {"react", "@vitejs/plugin-react", "vite"} & all_deps_lower or "vite.config.ts" in names:
+            project_type.append("frontend")
+        if {"fastapi", "flask", "django", "sqlalchemy"} & all_deps_lower or "pyproject.toml" in names:
+            project_type.append("python-backend")
+        if "Cargo.toml" in names or rel_dir.endswith("src-tauri"):
+            project_type.append("rust-tauri")
+        if {"openai", "anthropic", "@modelcontextprotocol/sdk", "ai"} & all_deps_lower:
+            project_type.append("ai-app")
+
+        projects.append({
+            "path": rel_dir,
+            "name": package_name or (project_root.name if rel_dir != "." else root.name),
+            "manifest_files": sorted(names),
+            "project_type": project_type or ["unknown"],
+            "dependencies": deps[:40] or py_deps[:40],
+            "devDependencies": dev_deps[:40],
+            "scripts": scripts,
+        })
+        if len(projects) >= 40:
+            break
+    return projects
+
+
 def git_summary(root: Path, author: str | None) -> dict:
     inside = run(["git", "rev-parse", "--is-inside-work-tree"], root) == "true"
     if not inside:
@@ -930,9 +1118,11 @@ def pattern_counts(rel_files: list[str]) -> dict:
         lowered = rel.lower()
         for key, needles in PATTERNS.items():
             if key == "tests":
-                matched = bool(TEST_FILE_RE.search(rel))
+                matched = is_test_path(rel)
+            elif is_test_path(rel):
+                matched = False
             else:
-                matched = any(needle.lower() in lowered for needle in needles)
+                matched = path_matches_needles(rel, needles)
             if matched:
                 counts[key] += 1
                 if len(examples[key]) < 12:
@@ -987,6 +1177,17 @@ def highlight_seeds(evidence: dict) -> list[dict]:
             "evidence_count": len(candidates) + len(node.get("dependencies") or []),
             "example_paths": candidates[:12],
         })
+    if specialized.get("python_backend"):
+        python = specialized["python_backend"]
+        candidates = []
+        for values in (python.get("layer_candidates") or {}).values():
+            candidates.extend(values[:4])
+        seeds.append({
+            "category": "Python API / 网关服务",
+            "reason": "检测到 FastAPI/Flask/Django、代理转发、鉴权、配额或计量等 Python 后端服务结构，可提炼 API 网关、可靠性和服务治理亮点。",
+            "evidence_count": len(candidates) + len(python.get("dependencies") or []),
+            "example_paths": candidates[:12],
+        })
     if specialized.get("ai_agent"):
         agent = specialized["ai_agent"]
         candidates = []
@@ -995,7 +1196,7 @@ def highlight_seeds(evidence: dict) -> list[dict]:
         seeds.append({
             "category": "AI Agent 应用落地",
             "reason": "检测到模型调用、Prompt、工具调用、RAG、Memory、Workflow 或 MCP 信号，可提炼 AI 应用工程化落地亮点。",
-            "evidence_count": len(candidates) + sum((agent.get("pattern_counts") or {}).values()),
+            "evidence_count": len(candidates) + min(sum((agent.get("pattern_counts") or {}).values()), 50),
             "example_paths": candidates[:12],
         })
     return seeds
@@ -1004,9 +1205,10 @@ def highlight_seeds(evidence: dict) -> list[dict]:
 def collect(repo: Path, author: str | None) -> dict:
     files = list(iter_files(repo))
     rel_files = [str(path.relative_to(repo)) for path in files]
+    signal_source_files = signal_files(repo, files)
     signal_rel_files = [
         str(path.relative_to(repo)).replace("\\", "/")
-        for path in signal_files(repo, files)
+        for path in signal_source_files
     ]
     ext_counter = Counter(path.suffix.lower() or "[no_ext]" for path in files)
     lang_counter = Counter()
@@ -1017,6 +1219,7 @@ def collect(repo: Path, author: str | None) -> dict:
         total_lines += lines
         if ext in LANG_BY_EXT:
             lang_counter[LANG_BY_EXT[ext]] += lines or 1
+    signal_lines = sum(count_lines(path) for path in signal_source_files)
 
     key_files = []
     for name in KEY_FILES:
@@ -1026,6 +1229,9 @@ def collect(repo: Path, author: str | None) -> dict:
 
     top_dirs = Counter(rel.split("/", 1)[0] for rel in rel_files if "/" in rel)
     manifests = manifest_summary(repo)
+    workspace_projects = collect_workspace_projects(repo, files)
+    if workspace_projects:
+        manifests["workspace_projects"] = workspace_projects
     docs = collect_docs(repo, files)
     doc_bits = []
     for doc in docs[:12]:
@@ -1036,15 +1242,19 @@ def collect(repo: Path, author: str | None) -> dict:
         "repo": str(repo),
         "project_name": repo.name,
         "files_total": len(files),
+        "signal_files_total": len(signal_rel_files),
         "file_index": rel_files[:5000],
         "file_index_truncated": len(rel_files) > 5000,
         "evidence_paths_index": rel_files,
         "signal_policy": {
             "exclude_from_signals_prefixes": list(SIGNAL_EXCLUDE_PREFIXES),
+            "exclude_from_signals_dir_parts": sorted(SIGNAL_EXCLUDE_DIR_PARTS),
+            "exclude_from_signals_path_markers": list(SIGNAL_EXCLUDE_PATH_MARKERS),
             "exclude_from_signals_files": sorted(SIGNAL_EXCLUDE_FILES),
             "signal_files_total": len(signal_rel_files),
         },
         "lines_total_estimate": total_lines,
+        "signal_lines_estimate": signal_lines,
         "extensions": ext_counter.most_common(30),
         "languages_by_lines": lang_counter.most_common(20),
         "top_directories": top_dirs.most_common(30),
@@ -1081,6 +1291,7 @@ def write_markdown(evidence: dict, out: Path) -> None:
         f"- Evidence path index: {len(evidence.get('evidence_paths_index') or [])} paths",
         f"- File index truncated: {evidence.get('file_index_truncated')}",
         f"- Estimated text lines: {evidence['lines_total_estimate']}",
+        f"- Signal text lines: {evidence.get('signal_lines_estimate', 0)}",
         "",
         "## Languages",
     ]
@@ -1117,7 +1328,21 @@ def write_markdown(evidence: dict, out: Path) -> None:
     if signal_policy:
         lines.extend(["", "## Signal Policy"])
         lines.append("- Excluded from framework/business signals: " + ", ".join(signal_policy.get("exclude_from_signals_prefixes", [])))
+        extra_parts = signal_policy.get("exclude_from_signals_dir_parts") or []
+        if extra_parts:
+            lines.append("- Excluded signal directory parts: " + ", ".join(extra_parts))
+        markers = signal_policy.get("exclude_from_signals_path_markers") or []
+        if markers:
+            lines.append("- Excluded signal path markers: " + ", ".join(markers))
         lines.append(f"- Signal files scanned: {signal_policy.get('signal_files_total', 0)}")
+    workspace_projects = (evidence.get("manifests") or {}).get("workspace_projects") or []
+    if workspace_projects:
+        lines.extend(["", "## Workspace Projects"])
+        for item in workspace_projects[:12]:
+            lines.append(
+                f"- `{item.get('path')}` ({', '.join(item.get('project_type') or [])}) "
+                f"manifests={', '.join(item.get('manifest_files') or [])}"
+            )
     if profiles:
         lines.extend(["", "## Framework Profiles"])
         for item in profiles[:10]:
@@ -1144,6 +1369,13 @@ def write_markdown(evidence: dict, out: Path) -> None:
             if node.get("dependencies"):
                 lines.append("  - dependencies: " + ", ".join(node.get("dependencies", [])[:12]))
             for bucket, values in (node.get("layer_candidates") or {}).items():
+                lines.append(f"  - {bucket}: " + ", ".join(f"`{value}`" for value in values[:6]))
+        python = specialized.get("python_backend") or {}
+        if python:
+            lines.append("- Python Backend / API Gateway:")
+            if python.get("dependencies"):
+                lines.append("  - dependencies: " + ", ".join(python.get("dependencies", [])[:12]))
+            for bucket, values in (python.get("layer_candidates") or {}).items():
                 lines.append(f"  - {bucket}: " + ", ".join(f"`{value}`" for value in values[:6]))
         agent = specialized.get("ai_agent") or {}
         if agent:

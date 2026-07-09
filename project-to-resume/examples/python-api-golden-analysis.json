@@ -5,7 +5,16 @@
   "readiness": "可直接整理为后端自动化项目经历，生产规模与准确率指标需要确认",
   "role_assumption": "未确认，默认使用“负责核心模块开发/参与服务建设”等保守表述。",
   "disclosure_assumption": "不写真实公司、员工、票据号码、内部审批链接或生产库信息。",
-  "keywords": ["Python", "FastAPI", "PDF 解析", "结构化抽取", "校验规则", "自动化流程", "pytest", "Pydantic"],
+  "keywords": [
+    "Python",
+    "FastAPI",
+    "PDF 解析",
+    "结构化抽取",
+    "校验规则",
+    "自动化流程",
+    "pytest",
+    "Pydantic"
+  ],
   "facts": [
     {
       "label": "业务流",
@@ -43,7 +52,11 @@
       "score": 16,
       "risk": "safe",
       "readiness": "direct",
-      "evidence": ["app/services/invoice_parser.py", "app/models/invoice.py", "tests/test_invoice_parser.py"],
+      "evidence": [
+        "app/services/invoice_parser.py",
+        "app/models/invoice.py",
+        "tests/test_invoice_parser.py"
+      ],
       "safe_bullet": "负责发票解析核心模块开发，基于文本抽取、字段归一化和结构化模型，将票据内容转为可复核的报销数据。",
       "enhanced_bullet": "负责发票解析核心模块开发，支持单次处理 X 张票据，字段抽取准确率达到 Y%，将人工整理时间从 A 分钟缩短至 B 分钟。",
       "why": "能体现后端数据处理、规则建模和自动化流程落地能力。",
@@ -54,8 +67,48 @@
         "result": "代码层面形成可复核的结构化报销数据生成流程；准确率和节省时间需用户确认。",
         "tradeoff": "规则解析可解释性强，但对异常版式需要保留人工复核入口。"
       },
-      "data_to_confirm": ["单次处理票据数量", "字段抽取准确率", "人工整理耗时变化"],
-      "usage": "direct_paste"
+      "data_to_confirm": [
+        "单次处理票据数量",
+        "字段抽取准确率",
+        "人工整理耗时变化"
+      ],
+      "usage": "direct_paste",
+      "detail_anchor": "python-api-highlight-01",
+      "logic_chain": {
+        "plain_summary": "负责发票解析核心模块开发，基于文本抽取、字段归一化和结构化模型，将票据内容转为可复核的报销数据。",
+        "beginner_context": "人工整理报销票据需要反复核对金额、日期和发票信息，容易漏填或填错。",
+        "problem": "人工整理报销票据需要反复核对金额、日期和发票信息，容易漏填或填错。",
+        "trigger": "负责票据字段解析、数据归一化和基础校验链路。",
+        "flow_steps": [
+          {
+            "step": "入口触发",
+            "explanation": "负责票据字段解析、数据归一化和基础校验链路。",
+            "evidence": [
+              "app/services/invoice_parser.py"
+            ]
+          },
+          {
+            "step": "核心处理",
+            "explanation": "拆分文本抽取、字段解析、数据模型和异常提示模块，并补充解析规则测试。",
+            "evidence": [
+              "app/services/invoice_parser.py",
+              "app/models/invoice.py",
+              "tests/test_invoice_parser.py"
+            ]
+          },
+          {
+            "step": "结果反馈",
+            "explanation": "代码层面形成可复核的结构化报销数据生成流程；准确率和节省时间需用户确认。",
+            "evidence": [
+              "tests/test_invoice_parser.py"
+            ]
+          }
+        ],
+        "closure": "代码层面形成可复核的结构化报销数据生成流程；准确率和节省时间需用户确认。；单次处理票据数量、字段抽取准确率、人工整理耗时变化需确认后才能写成更强业务结果。",
+        "difficulty": "能体现后端数据处理、规则建模和自动化流程落地能力。；规则解析可解释性强，但对异常版式需要保留人工复核入口。",
+        "resume_connection": "安全版可写：负责发票解析核心模块开发，基于文本抽取、字段归一化和结构化模型，将票据内容转为可复核的报销数据。 增强版需确认：负责发票解析核心模块开发，支持单次处理 X 张票据，字段抽取准确率达到 Y%，将人工整理时间从 A 分钟缩短至 B 分钟。",
+        "limits": "不要直接声称未验证的所有权、上线规模或效果指标；待确认项：单次处理票据数量、字段抽取准确率、人工整理耗时变化。"
+      }
     },
     {
       "title": "金额日期校验与异常兜底",
@@ -63,7 +116,11 @@
       "score": 14,
       "risk": "safe",
       "readiness": "rewrite",
-      "evidence": ["app/core/validators.py", "app/services/reimbursement.py", "tests/test_invoice_parser.py"],
+      "evidence": [
+        "app/core/validators.py",
+        "app/services/reimbursement.py",
+        "tests/test_invoice_parser.py"
+      ],
       "safe_bullet": "设计报销数据生成前的校验与异常兜底逻辑，围绕金额缺失、日期异常和字段解析失败等场景输出明确错误提示，提升自动化流程的可复核性。",
       "enhanced_bullet": "设计报销数据生成前的校验与异常兜底逻辑，覆盖 X 类异常场景，拦截 Y+ 条异常票据数据，减少人工返工约 Z%。",
       "why": "能体现可靠性意识和真实业务流程中的异常处理能力。",
@@ -74,8 +131,48 @@
         "result": "异常票据能够被识别并提示人工复核；拦截数量和返工变化需确认。",
         "tradeoff": "更严格的校验能降低错误录入，但可能增加部分边界票据的人工确认成本。"
       },
-      "data_to_confirm": ["异常场景数量", "异常拦截数量", "人工返工变化"],
-      "usage": "rewrite_candidate"
+      "data_to_confirm": [
+        "异常场景数量",
+        "异常拦截数量",
+        "人工返工变化"
+      ],
+      "usage": "rewrite_candidate",
+      "detail_anchor": "python-api-highlight-02",
+      "logic_chain": {
+        "plain_summary": "设计报销数据生成前的校验与异常兜底逻辑，围绕金额缺失、日期异常和字段解析失败等场景输出明确错误提示，提升自动化流程的可复核性。",
+        "beginner_context": "票据来源和格式不稳定，自动化流程不能只处理理想输入。",
+        "problem": "票据来源和格式不稳定，自动化流程不能只处理理想输入。",
+        "trigger": "负责报销数据生成前的异常判断和错误提示。",
+        "flow_steps": [
+          {
+            "step": "入口触发",
+            "explanation": "负责报销数据生成前的异常判断和错误提示。",
+            "evidence": [
+              "app/core/validators.py"
+            ]
+          },
+          {
+            "step": "核心处理",
+            "explanation": "按字段缺失、金额不一致、日期异常和解析失败拆分校验规则，并用测试覆盖典型异常。",
+            "evidence": [
+              "app/core/validators.py",
+              "app/services/reimbursement.py",
+              "tests/test_invoice_parser.py"
+            ]
+          },
+          {
+            "step": "结果反馈",
+            "explanation": "异常票据能够被识别并提示人工复核；拦截数量和返工变化需确认。",
+            "evidence": [
+              "tests/test_invoice_parser.py"
+            ]
+          }
+        ],
+        "closure": "异常票据能够被识别并提示人工复核；拦截数量和返工变化需确认。；异常场景数量、异常拦截数量、人工返工变化需确认后才能写成更强业务结果。",
+        "difficulty": "能体现可靠性意识和真实业务流程中的异常处理能力。；更严格的校验能降低错误录入，但可能增加部分边界票据的人工确认成本。",
+        "resume_connection": "安全版可写：设计报销数据生成前的校验与异常兜底逻辑，围绕金额缺失、日期异常和字段解析失败等场景输出明确错误提示，提升自动化流程的可复核性。 增强版需确认：设计报销数据生成前的校验与异常兜底逻辑，覆盖 X 类异常场景，拦截 Y+ 条异常票据数据，减少人工返工约 Z%。",
+        "limits": "不要直接声称未验证的所有权、上线规模或效果指标；待确认项：异常场景数量、异常拦截数量、人工返工变化。"
+      }
     },
     {
       "title": "报销流程服务编排",
@@ -83,7 +180,11 @@
       "score": 13,
       "risk": "safe",
       "readiness": "direct",
-      "evidence": ["app/main.py", "app/services/reimbursement.py", "app/models/invoice.py"],
+      "evidence": [
+        "app/main.py",
+        "app/services/reimbursement.py",
+        "app/models/invoice.py"
+      ],
       "safe_bullet": "封装报销流程服务编排，将文件读取、解析、校验、结果生成和异常返回拆分为清晰服务层，提升后续规则扩展和接口维护效率。",
       "enhanced_bullet": "封装报销流程服务编排，沉淀 X 个可复用服务方法，支撑 Y 类票据处理规则扩展。",
       "why": "能体现后端分层、服务编排和可维护性。",
@@ -94,8 +195,48 @@
         "result": "服务边界更清晰，后续新增票据类型或校验规则更容易定位修改点。",
         "tradeoff": "分层会增加少量文件跳转，但换来更好的测试和扩展空间。"
       },
-      "data_to_confirm": ["服务方法数量", "票据类型数量", "新增规则耗时"],
-      "usage": "direct_paste"
+      "data_to_confirm": [
+        "服务方法数量",
+        "票据类型数量",
+        "新增规则耗时"
+      ],
+      "usage": "direct_paste",
+      "detail_anchor": "python-api-highlight-03",
+      "logic_chain": {
+        "plain_summary": "封装报销流程服务编排，将文件读取、解析、校验、结果生成和异常返回拆分为清晰服务层，提升后续规则扩展和接口维护效率。",
+        "beginner_context": "票据处理流程包含多个步骤，若写在接口层会难以测试和扩展。",
+        "problem": "票据处理流程包含多个步骤，若写在接口层会难以测试和扩展。",
+        "trigger": "将业务处理拆到服务层并形成可复用流程。",
+        "flow_steps": [
+          {
+            "step": "入口触发",
+            "explanation": "将业务处理拆到服务层并形成可复用流程。",
+            "evidence": [
+              "app/main.py"
+            ]
+          },
+          {
+            "step": "核心处理",
+            "explanation": "把读取、解析、校验、生成结果和异常返回拆成独立函数，并让接口层只负责参数接收和响应。",
+            "evidence": [
+              "app/main.py",
+              "app/services/reimbursement.py",
+              "app/models/invoice.py"
+            ]
+          },
+          {
+            "step": "结果反馈",
+            "explanation": "服务边界更清晰，后续新增票据类型或校验规则更容易定位修改点。",
+            "evidence": [
+              "app/models/invoice.py"
+            ]
+          }
+        ],
+        "closure": "服务边界更清晰，后续新增票据类型或校验规则更容易定位修改点。；服务方法数量、票据类型数量、新增规则耗时需确认后才能写成更强业务结果。",
+        "difficulty": "能体现后端分层、服务编排和可维护性。；分层会增加少量文件跳转，但换来更好的测试和扩展空间。",
+        "resume_connection": "安全版可写：封装报销流程服务编排，将文件读取、解析、校验、结果生成和异常返回拆分为清晰服务层，提升后续规则扩展和接口维护效率。 增强版需确认：封装报销流程服务编排，沉淀 X 个可复用服务方法，支撑 Y 类票据处理规则扩展。",
+        "limits": "不要直接声称未验证的所有权、上线规模或效果指标；待确认项：服务方法数量、票据类型数量、新增规则耗时。"
+      }
     },
     {
       "title": "解析规则测试与回归保护",
@@ -103,7 +244,11 @@
       "score": 12,
       "risk": "safe",
       "readiness": "rewrite",
-      "evidence": ["tests/test_invoice_parser.py", "app/services/invoice_parser.py", "app/core/validators.py"],
+      "evidence": [
+        "tests/test_invoice_parser.py",
+        "app/services/invoice_parser.py",
+        "app/core/validators.py"
+      ],
       "safe_bullet": "补充发票解析与校验规则测试，覆盖正常解析、字段缺失和异常金额等场景，降低规则迭代对历史票据处理逻辑的影响。",
       "enhanced_bullet": "补充发票解析与校验规则测试，覆盖 X 类票据样例和 Y 类异常场景，提升规则迭代稳定性。",
       "why": "能体现测试意识，尤其适合后端自动化和规则类项目。",
@@ -114,8 +259,48 @@
         "result": "规则改动后可以快速发现明显回归；覆盖率和样例数量需确认。",
         "tradeoff": "测试样例维护有成本，但规则类项目非常依赖回归保护。"
       },
-      "data_to_confirm": ["测试用例数量", "票据样例类型", "覆盖率"],
-      "usage": "rewrite_candidate"
+      "data_to_confirm": [
+        "测试用例数量",
+        "票据样例类型",
+        "覆盖率"
+      ],
+      "usage": "rewrite_candidate",
+      "detail_anchor": "python-api-highlight-04",
+      "logic_chain": {
+        "plain_summary": "补充发票解析与校验规则测试，覆盖正常解析、字段缺失和异常金额等场景，降低规则迭代对历史票据处理逻辑的影响。",
+        "beginner_context": "解析规则迭代容易修好一种票据却破坏另一种票据。",
+        "problem": "解析规则迭代容易修好一种票据却破坏另一种票据。",
+        "trigger": "建立基础回归测试保护解析和校验逻辑。",
+        "flow_steps": [
+          {
+            "step": "入口触发",
+            "explanation": "建立基础回归测试保护解析和校验逻辑。",
+            "evidence": [
+              "tests/test_invoice_parser.py"
+            ]
+          },
+          {
+            "step": "核心处理",
+            "explanation": "构造正常、缺字段、金额异常和日期异常样例，并断言解析结果和错误提示。",
+            "evidence": [
+              "tests/test_invoice_parser.py",
+              "app/services/invoice_parser.py",
+              "app/core/validators.py"
+            ]
+          },
+          {
+            "step": "结果反馈",
+            "explanation": "规则改动后可以快速发现明显回归；覆盖率和样例数量需确认。",
+            "evidence": [
+              "app/core/validators.py"
+            ]
+          }
+        ],
+        "closure": "规则改动后可以快速发现明显回归；覆盖率和样例数量需确认。；测试用例数量、票据样例类型、覆盖率需确认后才能写成更强业务结果。",
+        "difficulty": "能体现测试意识，尤其适合后端自动化和规则类项目。；测试样例维护有成本，但规则类项目非常依赖回归保护。",
+        "resume_connection": "安全版可写：补充发票解析与校验规则测试，覆盖正常解析、字段缺失和异常金额等场景，降低规则迭代对历史票据处理逻辑的影响。 增强版需确认：补充发票解析与校验规则测试，覆盖 X 类票据样例和 Y 类异常场景，提升规则迭代稳定性。",
+        "limits": "不要直接声称未验证的所有权、上线规模或效果指标；待确认项：测试用例数量、票据样例类型、覆盖率。"
+      }
     },
     {
       "title": "处理性能与准确率指标",
@@ -123,7 +308,10 @@
       "score": 10,
       "risk": "needs_confirmation",
       "readiness": "confirm",
-      "evidence": ["app/services/invoice_parser.py", "tests/test_invoice_parser.py"],
+      "evidence": [
+        "app/services/invoice_parser.py",
+        "tests/test_invoice_parser.py"
+      ],
       "safe_bullet": "围绕票据解析链路沉淀可观察的处理步骤，为后续统计处理耗时、字段准确率和异常占比提供基础。",
       "enhanced_bullet": "围绕票据解析链路优化处理流程，在 X 张样例票据上字段准确率达到 Y%，单张处理耗时控制在 Z 秒内。",
       "why": "性能和准确率是自动化项目最有说服力的指标，但必须来自实测或用户确认。",
@@ -134,8 +322,47 @@
         "result": "可以把项目结果从“能用”升级为“效果可衡量”；具体数字需确认。",
         "tradeoff": "没有真实生产数据时，只能写样例集或测试集结果，不能冒充线上指标。"
       },
-      "data_to_confirm": ["样例票据数量", "字段准确率", "单张处理耗时"],
-      "usage": "confirm_before_use"
+      "data_to_confirm": [
+        "样例票据数量",
+        "字段准确率",
+        "单张处理耗时"
+      ],
+      "usage": "confirm_before_use",
+      "detail_anchor": "python-api-highlight-05",
+      "logic_chain": {
+        "plain_summary": "围绕票据解析链路沉淀可观察的处理步骤，为后续统计处理耗时、字段准确率和异常占比提供基础。",
+        "beginner_context": "自动化报销不仅要能跑通，还要解释处理质量和效率。",
+        "problem": "自动化报销不仅要能跑通，还要解释处理质量和效率。",
+        "trigger": "为解析链路整理可确认的结果指标。",
+        "flow_steps": [
+          {
+            "step": "入口触发",
+            "explanation": "为解析链路整理可确认的结果指标。",
+            "evidence": [
+              "app/services/invoice_parser.py"
+            ]
+          },
+          {
+            "step": "核心处理",
+            "explanation": "从测试样例、处理耗时和异常统计三个角度设计可验证指标。",
+            "evidence": [
+              "app/services/invoice_parser.py",
+              "tests/test_invoice_parser.py"
+            ]
+          },
+          {
+            "step": "结果反馈",
+            "explanation": "可以把项目结果从“能用”升级为“效果可衡量”；具体数字需确认。",
+            "evidence": [
+              "tests/test_invoice_parser.py"
+            ]
+          }
+        ],
+        "closure": "可以把项目结果从“能用”升级为“效果可衡量”；具体数字需确认。；样例票据数量、字段准确率、单张处理耗时需确认后才能写成更强业务结果。",
+        "difficulty": "性能和准确率是自动化项目最有说服力的指标，但必须来自实测或用户确认。；没有真实生产数据时，只能写样例集或测试集结果，不能冒充线上指标。",
+        "resume_connection": "安全版可写：围绕票据解析链路沉淀可观察的处理步骤，为后续统计处理耗时、字段准确率和异常占比提供基础。 增强版需确认：围绕票据解析链路优化处理流程，在 X 张样例票据上字段准确率达到 Y%，单张处理耗时控制在 Z 秒内。",
+        "limits": "不要直接声称未验证的所有权、上线规模或效果指标；待确认项：样例票据数量、字段准确率、单张处理耗时。"
+      }
     },
     {
       "title": "高风险：节省大量人工时间",
@@ -143,7 +370,10 @@
       "score": 8,
       "risk": "risky",
       "readiness": "idea",
-      "evidence": ["app/services/reimbursement.py", "app/services/invoice_parser.py"],
+      "evidence": [
+        "app/services/reimbursement.py",
+        "app/services/invoice_parser.py"
+      ],
       "safe_bullet": "不要直接写“让报销效率提升 80% 或节省大量人工成本”；除非能确认处理量、人工耗时对比和真实使用范围。",
       "enhanced_bullet": "确认真实处理量和人工耗时对比后，可改写为“将单次报销材料整理从 A 分钟缩短至 B 分钟，覆盖 X 类票据场景”。",
       "why": "自动化项目很容易夸大收益，必须把效率数据和业务范围拆成可验证项。",
@@ -154,8 +384,47 @@
         "result": "简历表达更稳，面试时可以解释哪些是已实现能力、哪些是待确认收益。",
         "tradeoff": "缺少数字时冲击力略弱，但真实性更强。"
       },
-      "data_to_confirm": ["处理量", "人工耗时基线", "上线使用范围"],
-      "usage": "do_not_paste"
+      "data_to_confirm": [
+        "处理量",
+        "人工耗时基线",
+        "上线使用范围"
+      ],
+      "usage": "do_not_paste",
+      "detail_anchor": "python-api-highlight-06",
+      "logic_chain": {
+        "plain_summary": "不要直接写“让报销效率提升 80% 或节省大量人工成本”；除非能确认处理量、人工耗时对比和真实使用范围。",
+        "beginner_context": "自动化类项目天然适合写效率提升，但数字容易被追问。",
+        "problem": "自动化类项目天然适合写效率提升，但数字容易被追问。",
+        "trigger": "避免在没有证据时直接写大幅提升。",
+        "flow_steps": [
+          {
+            "step": "入口触发",
+            "explanation": "避免在没有证据时直接写大幅提升。",
+            "evidence": [
+              "app/services/reimbursement.py"
+            ]
+          },
+          {
+            "step": "核心处理",
+            "explanation": "先使用流程自动化和可复核性表述，把效率数字放到待确认项。",
+            "evidence": [
+              "app/services/reimbursement.py",
+              "app/services/invoice_parser.py"
+            ]
+          },
+          {
+            "step": "结果反馈",
+            "explanation": "简历表达更稳，面试时可以解释哪些是已实现能力、哪些是待确认收益。",
+            "evidence": [
+              "app/services/invoice_parser.py"
+            ]
+          }
+        ],
+        "closure": "简历表达更稳，面试时可以解释哪些是已实现能力、哪些是待确认收益。；处理量、人工耗时基线、上线使用范围需确认后才能写成更强业务结果。",
+        "difficulty": "自动化项目很容易夸大收益，必须把效率数据和业务范围拆成可验证项。；缺少数字时冲击力略弱，但真实性更强。",
+        "resume_connection": "安全版可写：不要直接写“让报销效率提升 80% 或节省大量人工成本”；除非能确认处理量、人工耗时对比和真实使用范围。 增强版需确认：确认真实处理量和人工耗时对比后，可改写为“将单次报销材料整理从 A 分钟缩短至 B 分钟，覆盖 X 类票据场景”。",
+        "limits": "不要直接声称未验证的所有权、上线规模或效果指标；待确认项：处理量、人工耗时基线、上线使用范围。"
+      }
     }
   ],
   "safe_bullets": [
@@ -164,8 +433,14 @@
     "封装报销流程服务编排，将文件读取、解析、校验、结果生成和异常返回拆分为清晰服务层，提升后续规则扩展和接口维护效率。"
   ],
   "confirmation_items": [
-    {"title": "自动化收益指标", "text": "确认票据处理量、字段抽取准确率、人工整理时间变化后，可写增强版 bullet。"},
-    {"title": "服务质量指标", "text": "确认接口响应时间、异常拦截数量和测试覆盖后，再写性能或质量结果。"}
+    {
+      "title": "自动化收益指标",
+      "text": "确认票据处理量、字段抽取准确率、人工整理时间变化后，可写增强版 bullet。"
+    },
+    {
+      "title": "服务质量指标",
+      "text": "确认接口响应时间、异常拦截数量和测试覆盖后，再写性能或质量结果。"
+    }
   ],
   "interview_stories": [],
   "prompt_pack": ""

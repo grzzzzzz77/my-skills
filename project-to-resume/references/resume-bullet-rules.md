@@ -173,6 +173,8 @@ Before writing a safe bullet, check whether it names at least two of:
 
 If it does not, keep it as a project fact rather than a resume highlight.
 
+After writing a safe bullet for standard or strict_report mode, write its beginner-readable logic chain using `references/highlight-logic-chain.md`. If the chain cannot explain the trigger, technical process, output, and evidence-backed closure, the bullet is probably still too generic.
+
 ## Chinese-First Technical Wording
 
 Default strict-report highlights should lead with the technical concept, then explain the project context. Use Chinese as the default expression for the concept. English should be kept only when it is a real professional term, framework/protocol name, abbreviation, or code-level identifier that Chinese technical resumes commonly keep as English.

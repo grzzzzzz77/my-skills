@@ -65,6 +65,6 @@ Browse all available skills with `/plugin` after adding the marketplace, or see 
 | 39 | **smart-interview-prep** | 全技术栈智能面试模拟器（13 个技术域）。支持交互式模拟面试与一键生成题库两种模式，提供 6 种面试官风格、编码题、JD 匹配分析、AI 辅助开发考察、自动追问和 1-10 分制加权评分报告。 |
 | 40 | **research-company** | 面向求职者的公司深度调研与背调报告技能。用于投递、面试或入职前了解目标公司做什么、产品与商业模式、市场位置、组织文化、领导层、招聘动机、岗位机会、风险点和可追问问题；要求来源引用，不确定信息需标记为未验证。 |
 | 41 | **qiaomu-novel-generator** | 中文原创短篇小说生成技能。把主题、人物设定、梗概、经典桥段灵感或已有片段，先整理成剧情钩子、人物欲望、冲突升级、大纲和可选策略，再生成完整、强吸引力、低 AI 味的中文故事；支持爽文、武侠、修仙、悬疑、科幻、现代组织内斗等方向，并强调不复制受版权保护内容。 |
-| 42 | **project-to-resume** | 本地代码项目转简历亮点技能。要求有仓库、项目路径、代码文件、diff 或明确代码片段作为证据；支持 micro 局部证据模式、quick bullets、standard JSON 分析、strict_report 中文 HTML 报告、STAR 面试话术、100 分含金量评分、evidence-safe/potential 双评分和 verified/code-derived/estimated 指标策略；默认产物写入当前工作目录 outputs/project-to-resume/{project-name}/，估算指标只作为待确认占位，不会伪装成事实。 |
+| 42 | **project-to-resume** | 本地代码项目转简历亮点技能。要求有仓库、项目路径、代码文件、diff 或明确代码片段作为证据；支持 micro 局部证据模式、quick bullets、standard JSON 分析、strict_report 中文 HTML 报告、多子项目 workspace 识别与资源包噪声过滤、每条亮点的锚点跳转与小白可懂闭环链路详情、STAR 面试话术、100 分含金量评分、evidence-safe/potential 双评分和 verified/code-derived/estimated 指标策略；默认产物写入当前工作目录 outputs/project-to-resume/{project-name}/，估算指标只作为待确认占位，不会伪装成事实。 |
 | 43 | **resume-optimize** | 无 JD 一次性简历安全优化技能。基于原简历输出 evidence-safe Markdown 草稿、事实边界、改写说明、待确认项和 ATS/排版建议；支持 quick/full/file 模式，不做 JD 匹配、岗位打分、投递追踪或代码仓库提炼。 |
 | 44 | **resume-scorecard** | 简历评分卡技能。专注对简历做 100 分质量评分、无 JD 单独评分、JD 匹配评分、ATS/可读性检查、独立排版/外观评分、PDF/DOCX/纯文本证据降级、经验年限均分对标、可信度与面试风险诊断，以及同岗位或跨行业多版本对比；默认输出评分、扣分原因、排版扣分、年限段参考均分、提分杠杆和中文 HTML 报告，并带 strict 校验、敏感信息检查和自动脱敏渲染。 |

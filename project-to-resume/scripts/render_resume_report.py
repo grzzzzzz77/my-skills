@@ -68,6 +68,14 @@ def first_text(values: list[Any], fallback: str) -> str:
     return fallback
 
 
+def slugify_anchor(value: Any, fallback: str) -> str:
+    text = str(value or "").strip().lower()
+    text = re.sub(r"[^a-z0-9_-]+", "-", text).strip("-")
+    if not text or not re.match(r"^[a-z0-9]", text):
+        text = fallback
+    return text[:80]
+
+
 def normalize_highlight(item: dict, index: int) -> dict:
     risk = item.get("risk") or item.get("risk_label") or "needs_confirmation"
     if risk not in RISK_LABELS:
@@ -75,6 +83,7 @@ def normalize_highlight(item: dict, index: int) -> dict:
     readiness = item.get("readiness") or "confirm"
     if readiness not in READINESS_LABELS:
         readiness = "confirm"
+    anchor = slugify_anchor(item.get("detail_anchor") or item.get("anchor") or item.get("title"), f"highlight-{index + 1}")
     return {
         "title": item.get("title") or f"候选亮点 {index + 1}",
         "category": item.get("category") or "未分类",
@@ -88,6 +97,8 @@ def normalize_highlight(item: dict, index: int) -> dict:
         "interview": item.get("interview") or item.get("star") or {},
         "data_to_confirm": as_list(item.get("data_to_confirm")),
         "usage": item.get("usage") or item.get("downstream_usage") or "",
+        "detail_anchor": anchor,
+        "logic_chain": item.get("logic_chain") if isinstance(item.get("logic_chain"), dict) else {},
         "score_breakdown": item.get("score_breakdown") if isinstance(item.get("score_breakdown"), dict) else {},
         "score_rationale": item.get("score_rationale") or "",
         "_source_index": index,
@@ -162,6 +173,17 @@ def sort_highlights(highlights: list[dict], evidence: dict, analysis: dict) -> l
             item.get("_source_index", 0),
         ),
     )
+
+
+def ensure_unique_anchors(highlights: list[dict]) -> list[dict]:
+    seen: dict[str, int] = {}
+    for item in highlights:
+        anchor = item.get("detail_anchor") or "highlight"
+        count = seen.get(anchor, 0)
+        seen[anchor] = count + 1
+        if count:
+            item["detail_anchor"] = f"{anchor}-{count + 1}"
+    return highlights
 
 
 def draft_highlights_from_evidence(evidence: dict) -> list[dict]:
@@ -343,17 +365,39 @@ def build_filter_buttons(highlights: list[dict], field: str, labels: dict | None
 
 
 def build_safe_bullets(highlights: list[dict], analysis: dict) -> tuple[str, int]:
-    bullets = [str(item).strip() for item in as_list(analysis.get("safe_bullets")) if str(item).strip()]
-    if not bullets:
-        bullets = [
-            item["safe_bullet"].strip()
+    configured = [str(item).strip() for item in as_list(analysis.get("safe_bullets")) if str(item).strip()]
+    rows: list[dict] = []
+    if configured:
+        used_indexes: set[int] = set()
+        for bullet in configured:
+            match_index = next(
+                (
+                    index for index, item in enumerate(highlights)
+                    if index not in used_indexes and str(item.get("safe_bullet", "")).strip() == bullet
+                ),
+                None,
+            )
+            if match_index is not None:
+                used_indexes.add(match_index)
+                rows.append({"bullet": bullet, "anchor": highlights[match_index].get("detail_anchor")})
+            else:
+                rows.append({"bullet": bullet, "anchor": ""})
+    else:
+        rows = [
+            {"bullet": item["safe_bullet"].strip(), "anchor": item.get("detail_anchor")}
             for item in highlights
             if item["risk"] == "safe" and item.get("safe_bullet", "").strip()
         ]
-    if not bullets:
-        bullets = ["暂无可直接粘贴的安全 bullet。请先补充结构化分析或确认个人负责边界。"]
-    text = "\n".join(f"- {bullet}" for bullet in bullets)
-    return h(text), len(bullets)
+    if not rows:
+        rows = [{"bullet": "暂无可直接粘贴的安全 bullet。请先补充结构化分析或确认个人负责边界。", "anchor": ""}]
+    items = []
+    for row in rows:
+        link = (
+            f'<a class="detail-link" href="#{h(row["anchor"])}">查看链路详情</a>'
+            if row.get("anchor") else ""
+        )
+        items.append(f'<li><span class="bullet-text">{h(row["bullet"])}</span>{link}</li>')
+    return '<ol class="bullet-list">' + "".join(items) + "</ol>", len(rows)
 
 
 def build_confirmation_items(highlights: list[dict], analysis: dict) -> str:
@@ -406,6 +450,49 @@ def render_interview_notes(notes: Any) -> str:
     return h(notes)
 
 
+def render_evidence_tags(values: Any) -> str:
+    evidence = [str(item).strip() for item in as_list(values) if str(item).strip()]
+    if not evidence:
+        return ""
+    return '<div class="evidence-tags">' + "".join(f"<code>{h(item)}</code>" for item in evidence[:8]) + "</div>"
+
+
+def render_logic_chain(chain: Any) -> str:
+    if not isinstance(chain, dict) or not chain:
+        return '<div class="interview-notes">暂无闭环链路详情。请在 project_resume_analysis.json 中补充 logic_chain。</div>'
+
+    summary_fields = [
+        ("plain_summary", "一句话解释"),
+        ("beginner_context", "小白背景"),
+        ("problem", "原问题"),
+        ("trigger", "触发入口"),
+        ("closure", "闭环结果"),
+        ("resume_connection", "简历边界"),
+    ]
+    summary_html = "".join(
+        f'<div class="logic-note"><strong>{label}</strong><span>{h(chain.get(key))}</span></div>'
+        for key, label in summary_fields
+        if str(chain.get(key, "")).strip()
+    )
+    step_rows = []
+    for index, step in enumerate(as_list(chain.get("flow_steps"))):
+        if isinstance(step, dict):
+            evidence_html = render_evidence_tags(step.get("evidence") or step.get("evidence_paths"))
+            step_rows.append(
+                f'<li><strong>{h(step.get("step") or f"步骤 {index + 1}")}</strong>'
+                f'<p>{h(step.get("explanation") or "")}</p>{evidence_html}</li>'
+            )
+        elif str(step).strip():
+            step_rows.append(f"<li><strong>步骤 {index + 1}</strong><p>{h(step)}</p></li>")
+    steps_html = "<ol class=\"logic-steps\">" + "".join(step_rows) + "</ol>" if step_rows else ""
+    tail_html = "".join(
+        f'<div class="logic-note wide"><strong>{label}</strong><span>{h(chain.get(key))}</span></div>'
+        for key, label in [("difficulty", "复杂点"), ("limits", "不可直接声称")]
+        if str(chain.get(key, "")).strip()
+    )
+    return f'<div class="logic-chain"><div class="logic-grid">{summary_html}</div>{steps_html}<div class="logic-grid">{tail_html}</div></div>'
+
+
 def build_highlight_cards(highlights: list[dict]) -> str:
     rows = []
     for item in highlights:
@@ -435,12 +522,14 @@ def build_highlight_cards(highlights: list[dict]) -> str:
                 f'{h(item.get("score_rationale") or "；".join(score_parts))}'
                 f'</div>'
             )
+        anchor = item.get("detail_anchor") or f"highlight-{item.get('_source_index', 0) + 1}"
         rows.append(f"""
-          <article class="highlight-card" data-category="{h(item['category'])}" data-risk="{h(item['risk'])}" data-readiness="{h(item['readiness'])}">
+          <article class="highlight-card" id="card-{h(anchor)}" data-category="{h(item['category'])}" data-risk="{h(item['risk'])}" data-readiness="{h(item['readiness'])}">
             <div class="card-main">
               <div>
                 <div class="card-title-row">
                   <h3>{h(item['title'])}</h3>
+                  <a class="detail-link" href="#{h(anchor)}">链路详情</a>
                 </div>
                 <div class="card-tags">
                   <span class="tag">{h(item['category'])}</span>
@@ -465,6 +554,10 @@ def build_highlight_cards(highlights: list[dict]) -> str:
               <details>
                 <summary>证据路径</summary>
                 {evidence_html}
+              </details>
+              <details id="{h(anchor)}" class="logic-detail">
+                <summary>亮点闭环链路</summary>
+                {render_logic_chain(item.get('logic_chain'))}
               </details>
               <details>
                 <summary>面试 STAR / 取舍</summary>
@@ -499,7 +592,9 @@ def build_evidence_appendix(evidence: dict) -> str:
     specialized = evidence.get("specialized_signals") or {}
     uni = specialized.get("uniapp") or {}
     node = specialized.get("node_backend") or {}
+    python = specialized.get("python_backend") or {}
     agent = specialized.get("ai_agent") or {}
+    workspace_projects = (evidence.get("manifests") or {}).get("workspace_projects") or []
     specialized_rows = []
     if uni:
         specialized_rows.append(
@@ -511,6 +606,8 @@ def build_evidence_appendix(evidence: dict) -> str:
         )
     if node:
         specialized_rows.append("Node 后端依赖: " + ", ".join((node.get("dependencies") or [])[:12]))
+    if python:
+        specialized_rows.append("Python 后端/API 网关: " + ", ".join((python.get("dependencies") or [])[:12]))
     if agent:
         patterns = agent.get("pattern_counts") or {}
         specialized_rows.append("AI Agent 信号: " + ", ".join(f"{key}={value}" for key, value in patterns.items()))
@@ -518,6 +615,7 @@ def build_evidence_appendix(evidence: dict) -> str:
         ("关键文件", evidence.get("key_files")),
         ("主要目录", [f"{name}/: {count} files" for name, count in evidence.get("top_directories", [])[:12]]),
         ("文档来源", [doc.get("path") for doc in evidence.get("docs", [])[:12]]),
+        ("子项目入口", [f"{item.get('path')} ({', '.join(item.get('project_type') or [])})" for item in workspace_projects[:12]]),
         ("框架识别", [f"{item.get('name')} ({item.get('role')}, confidence={item.get('confidence')})" for item in profiles[:12]]),
         ("专项识别", specialized_rows),
         ("入口文件", graph.get("entrypoints")),
@@ -566,6 +664,33 @@ def build_prompt_pack(evidence: dict, analysis: dict, highlights: list[dict]) ->
         if str(item).strip()
     ]
     risky.extend(str(item) for item in as_list(strategy.get("metrics_not_to_claim")) if str(item).strip())
+    logic_details = []
+    for item in highlights:
+        chain = item.get("logic_chain")
+        if not isinstance(chain, dict) or not chain:
+            continue
+        steps = []
+        for step in as_list(chain.get("flow_steps"))[:6]:
+            if isinstance(step, dict):
+                name = str(step.get("step") or "").strip()
+                explanation = str(step.get("explanation") or "").strip()
+                if name or explanation:
+                    steps.append(f"{name}：{explanation}" if name else explanation)
+            elif str(step).strip():
+                steps.append(str(step).strip())
+        evidence = []
+        for step in as_list(chain.get("flow_steps")):
+            if isinstance(step, dict):
+                evidence.extend(str(path) for path in as_list(step.get("evidence") or step.get("evidence_paths")) if str(path).strip())
+        logic_details.append(
+            "\n".join([
+                f"{item.get('title')}（#{item.get('detail_anchor')}）",
+                f"一句话解释：{chain.get('plain_summary', '')}",
+                "闭环链路：" + (" -> ".join(steps) if steps else str(chain.get("closure", ""))),
+                "证据：" + ("、".join(dict.fromkeys(evidence)) if evidence else "见 highlight evidence"),
+                f"简历边界：{chain.get('resume_connection') or chain.get('limits') or '按风险标签使用'}",
+            ])
+        )
     confirmation_questions = [str(item) for item in as_list(pitch.get("truth_questions")) if str(item).strip()]
     for item in as_list(strategy.get("estimated_metric_suggestions")):
         if isinstance(item, dict) and str(item.get("confirmation_needed", "")).strip():
@@ -588,6 +713,7 @@ def build_prompt_pack(evidence: dict, analysis: dict, highlights: list[dict]) ->
         "\n".join(facts),
         bullet_section("【可安全使用的指标】", safe_metrics, "暂无已验证或代码推导指标。"),
         bullet_section("【可直接写入简历的 bullet】", safe_bullets, "暂无，请先补充可证实的项目贡献。"),
+        bullet_section("【亮点链路详情，用于理解和面试复述】", logic_details, "暂无，请先补充 logic_chain。"),
         bullet_section("【增强版 bullet，需要我确认数据后再用】", enhanced, "暂无。"),
         bullet_section("【估算指标方向，不可直接当事实】", estimated_metrics, "暂无。"),
         bullet_section("【不要直接写的高风险表述】", risky, "暂无。"),
@@ -600,7 +726,7 @@ def render_report(evidence: dict, analysis: dict, template: str) -> tuple[str, s
     highlights = [normalize_highlight(item, i) for i, item in enumerate(as_list(analysis.get("highlights")) if analysis.get("highlights") else []) if isinstance(item, dict)]
     if not highlights:
         highlights = draft_highlights_from_evidence(evidence)
-    highlights = sort_highlights(highlights, evidence, analysis)
+    highlights = ensure_unique_anchors(sort_highlights(highlights, evidence, analysis))
     prompt_pack = build_prompt_pack(evidence, analysis, highlights)
     safe_bullets_html, safe_count = build_safe_bullets(highlights, analysis)
     replacements = {

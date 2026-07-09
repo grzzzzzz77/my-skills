@@ -17,6 +17,14 @@ Rate each candidate from 0-3.
 
 Prioritize candidates scoring 12+ total. Keep 9-11 as backup. Discard or label risky below 9 unless the user asks for exhaustive notes.
 
+For strict reports, a high-scoring highlight should also pass the closed-loop test:
+
+```text
+problem/trigger -> technical mechanism -> output/feedback -> evidence-backed closure -> resume boundary
+```
+
+If the chain cannot be explained to a beginner with concrete evidence paths, reduce `resume_readability` or `handoff_readiness` instead of compensating with stronger wording.
+
 In strict reports, add a short `score_breakdown` or `score_rationale` when useful so the reader understands why a highlight is ranked high. Keep it concise:
 
 ```json
@@ -95,6 +103,8 @@ When the project is an AI application, AI Agent platform, model-powered workflow
 - Keep ordinary page delivery, generic forms, CRUD, or marketing/business modules below the AI core unless their technical difficulty is clearly higher.
 - In the report order, place AI core highlights before general frontend/backend delivery when their evidence is strong. For example: `记忆/上下文注入`、`Agent 协同/工具调用`、`RAG/检索`、`模型路由/Provider 编排` should usually appear before `普通页面状态`、`支付`、`上传`、`埋点`.
 - Do not inflate unsupported AI claims. The bonus only applies when the repository contains code evidence such as prompt/context builders, memory stores, tool registration, MCP config, agent protocol handlers, model routing, stream processors, or tests.
+- In desktop AI clients or skill-market repositories, distinguish core product code from bundled skills, vendored templates, generated resources, screenshots, and copied sidecar assets. Do not award AI/Agent bonus for resource packs alone; prefer source directories that participate in runtime flows, tests, stores, IPC, API routes, or product UI.
+- When tests are strong, use them to raise `evidence_strength` and close the chain. Do not let test paths outrank runtime source files unless the highlight itself is about testing infrastructure.
 
 Recommended AI-app priority tiers:
 

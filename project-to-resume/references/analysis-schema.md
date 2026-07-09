@@ -92,6 +92,34 @@ If `--analysis` is omitted, the renderer creates an evidence-only draft report. 
       "risk": "safe",
       "readiness": "direct",
       "evidence": ["src/router/guard.ts", "src/stores/user.ts"],
+      "detail_anchor": "permission-access-control",
+      "logic_chain": {
+        "plain_summary": "这个亮点是在说：用户进入后台页面前，系统会根据登录态和角色权限判断能否访问对应入口。",
+        "beginner_context": "后台系统通常会给运营、客服、管理员展示不同菜单；权限链路负责把“谁能看什么”落到页面访问控制里。",
+        "problem": "页面入口和角色增多后，如果每个页面各自判断权限，容易遗漏、重复和出现未授权访问体验问题。",
+        "trigger": "用户登录后访问后台页面或刷新页面时触发路由守卫和用户权限状态读取。",
+        "flow_steps": [
+          {
+            "step": "入口触发",
+            "explanation": "路由跳转进入守卫逻辑，先判断登录态、目标页面和是否需要权限。",
+            "evidence": ["src/router/guard.ts"]
+          },
+          {
+            "step": "权限状态读取",
+            "explanation": "用户状态模块保存角色、菜单或权限标识，为路由判断提供统一来源。",
+            "evidence": ["src/stores/user.ts"]
+          },
+          {
+            "step": "访问结果反馈",
+            "explanation": "符合权限时进入页面，不符合时进入登录、无权限或兜底路径，形成访问控制闭环。",
+            "evidence": ["src/router/guard.ts"]
+          }
+        ],
+        "closure": "代码证据能证明页面访问链路被集中处理；角色数量、页面数量和配置效率属于待确认业务指标。",
+        "difficulty": "难点在于登录态刷新、菜单配置、路由跳转和未授权兜底要协同，否则容易出现空白页、死循环或越权入口。",
+        "resume_connection": "安全版可写“基于路由守卫、菜单配置和登录态校验封装访问控制链路”；增强版需要确认角色/页面数量和效率变化。",
+        "limits": "不能直接写主导权限体系、覆盖全部角色或提升配置效率，除非用户确认个人边界和真实指标。"
+      },
       "safe_bullet": "负责后台权限与菜单配置模块开发，基于路由守卫、菜单配置和登录态校验封装访问控制链路，支撑多角色后台页面访问控制。",
       "enhanced_bullet": "负责后台权限与菜单配置模块开发，覆盖 X 类角色和 Y+ 页面入口，将新增角色配置时间缩短约 Z%。",
       "why": "能体现业务权限抽象、前端架构和安全意识。",
@@ -154,11 +182,17 @@ The fixture check runs `render_resume_report.py --strict`, so it exercises evide
 - `metric_strategy.estimated_metric_suggestions`: must stay under enhanced/confirmation sections and use placeholders or ranges, not factual claims.
 - `metric_strategy.metrics_not_to_claim`: list metrics that would overstate the project unless the user provides proof.
 - `evidence`: required for every highlight.
+- `detail_anchor`: recommended for quick output and required for standard/strict_report highlights; use a stable, lowercase, URL-safe id so bullets can jump to the matching detail card.
+- `logic_chain`: recommended for quick output and required for standard/strict_report highlights. It must explain the closed loop behind the highlight in beginner-readable language.
+- `logic_chain.flow_steps`: use 3-6 steps. Each step should include `step`, `explanation`, and evidence paths/counts/signals when possible.
+- `logic_chain.closure`: must explicitly state how the chain ends: returned UI state, generated output, persisted data, test assertion, error fallback, model response, or a clearly labeled user-confirmation point.
 - `safe_bullet`: must be conservative and evidence-backed.
 - `interview`: must include `situation`, `task`, `action`, `result`, and `tradeoff`.
 - `enhanced_bullet`: may include `X/Y/Z` placeholders or suggested metrics, but must remain under confirmation sections.
 - `facts`: include business flows, module map, API/page map, data flow, integration points, quality signals, and contribution boundary when known.
 - Evidence fixtures and generated evidence should include `evidence_paths_index` for complete strict path validation. `file_index` may be truncated for readability.
+- For multi-app workspaces, review `manifests.workspace_projects`, top-level `signal_files_total`, `signal_policy.signal_files_total`, and `signal_lines_estimate` before selecting highlights. Mention which subproject evidence was used when root evidence includes bundled resources, generated assets, or vendored examples.
+- Use implementation files as the primary `logic_chain.flow_steps` evidence. Use tests, fixtures, and reproduction scripts as verification or closure evidence, not as the runtime path unless the highlight is specifically about testing or tooling.
 
 ## Highlight Ordering
 
@@ -174,3 +208,13 @@ Before writing highlights, capture at least one of these maps when evidence allo
 - AI/data project: input -> processing/prompt/model -> output -> evaluation/guardrail.
 
 Use these maps to avoid generic bullets like "负责项目开发".
+
+## Anchor-Linked Detail Notes
+
+For HTML reports and reusable analyses, every highlight should support this reading path:
+
+```text
+safe bullet / highlight summary -> 查看链路详情 -> beginner explanation -> evidence map -> interview story
+```
+
+Load `references/highlight-logic-chain.md` before writing these fields. If a highlight cannot be explained as a closed loop, downgrade it to a project fact, backup idea, or risky note instead of forcing it into the final highlight list.
