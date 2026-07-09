@@ -30,7 +30,7 @@ For final delivery, render with `--strict` so invalid `project_resume_analysis.j
 
 3. Highlight Explorer
    - Show all highlight cards by default.
-   - Show technical-first highlight titles, category, risk label, resume readiness, visible count, safe bullet, enhanced bullet, evidence paths, and STAR notes.
+   - Show technical-first highlight titles, category, risk label, resume readiness, visible count, technical mechanism, technical difficulty, business value, safe bullet, enhanced bullet, evidence paths, and STAR notes.
    - Every card must expose a stable anchor target for its detail view, using `detail_anchor` when present.
    - Every serious highlight must include a beginner-readable closed-loop logic chain: problem, trigger, flow steps, closure, difficulty, resume boundary, and limits.
    - Use expandable details for dense evidence/interview content.
@@ -83,6 +83,9 @@ Each highlight card must include:
 - Category
 - Readiness score
 - Risk label
+- Technical mechanism
+- Technical difficulty / edge cases
+- Business value
 - Evidence paths or counts
 - Detail anchor
 - Closed-loop logic chain

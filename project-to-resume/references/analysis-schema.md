@@ -92,6 +92,9 @@ If `--analysis` is omitted, the renderer creates an evidence-only draft report. 
       "risk": "safe",
       "readiness": "direct",
       "evidence": ["src/router/guard.ts", "src/stores/user.ts"],
+      "technical_mechanism": "通过路由守卫、登录态读取、用户权限状态和菜单配置，把页面访问判断集中到统一入口。",
+      "technical_difficulty": "难点在于刷新登录态、动态菜单、未授权兜底和路由跳转不能互相打架，否则容易出现空白页、死循环或越权入口。",
+      "business_value": "支撑运营、客服、管理员等不同角色进入对应后台功能，降低多角色页面入口维护成本。",
       "detail_anchor": "permission-access-control",
       "logic_chain": {
         "plain_summary": "这个亮点是在说：用户进入后台页面前，系统会根据登录态和角色权限判断能否访问对应入口。",
@@ -182,6 +185,9 @@ The fixture check runs `render_resume_report.py --strict`, so it exercises evide
 - `metric_strategy.estimated_metric_suggestions`: must stay under enhanced/confirmation sections and use placeholders or ranges, not factual claims.
 - `metric_strategy.metrics_not_to_claim`: list metrics that would overstate the project unless the user provides proof.
 - `evidence`: required for every highlight.
+- `technical_mechanism`: required for standard/strict_report highlights. Explain the concrete implementation mechanism: protocol parsing, state machine, request guard, renderer, adapter, abstraction, data mapping, caching, retry, validation, or module boundary. Avoid restating the business flow.
+- `technical_difficulty`: required for standard/strict_report highlights. Name the hard edge case or engineering tradeoff: race condition, stale response, long session, upload failure, payment state, permission refresh, streaming chunk order, schema mismatch, error fallback, or maintainability pressure.
+- `business_value`: required for standard/strict_report highlights. Connect the mechanism to a user/business outcome without inventing unverified metrics.
 - `detail_anchor`: recommended for quick output and required for standard/strict_report highlights; use a stable, lowercase, URL-safe id so bullets can jump to the matching detail card.
 - `logic_chain`: recommended for quick output and required for standard/strict_report highlights. It must explain the closed loop behind the highlight in beginner-readable language.
 - `logic_chain.flow_steps`: use 3-6 steps. Each step should include `step`, `explanation`, and evidence paths/counts/signals when possible.
@@ -208,6 +214,21 @@ Before writing highlights, capture at least one of these maps when evidence allo
 - AI/data project: input -> processing/prompt/model -> output -> evaluation/guardrail.
 
 Use these maps to avoid generic bullets like "负责项目开发".
+
+## Technical-Business Balance Gate
+
+Every accepted highlight in `standard` or `strict_report` should pass this shape:
+
+```text
+技术机制 -> 技术难点/边界 -> 业务场景/价值 -> 证据闭环 -> 可写入简历的保守表达
+```
+
+Reject or rewrite highlights that only say "围绕某业务场景串联 A/B/C，形成闭环". That is a project flow summary, not a high-value technical highlight. Good strict-report highlights should let a reader answer:
+
+- What implementation mechanism did the candidate use?
+- What could go wrong technically, and how did the code reduce that risk?
+- Which business scenario benefits from that mechanism?
+- Which files prove the mechanism exists?
 
 ## Anchor-Linked Detail Notes
 

@@ -13,6 +13,7 @@ from typing import Any
 RISK_VALUES = {"safe", "needs_confirmation", "risky"}
 READINESS_VALUES = {"direct", "rewrite", "confirm", "idea"}
 STAR_KEYS = ("situation", "task", "action", "result", "tradeoff")
+TECH_BUSINESS_KEYS = ("technical_mechanism", "technical_difficulty", "business_value")
 LOGIC_CHAIN_TEXT_KEYS = (
     "plain_summary",
     "beginner_context",
@@ -197,6 +198,15 @@ def validate_highlight(item: Any, index: int, findings: list[dict], evidence_con
     for key in ("title", "category", "safe_bullet", "why"):
         if not is_nonempty_text(item.get(key)):
             add(findings, "error", f"{path}.{key}", f"{key} is required")
+
+    for key in TECH_BUSINESS_KEYS:
+        if not is_nonempty_text(item.get(key)):
+            add(
+                findings,
+                "warning",
+                f"{path}.{key}",
+                f"{key} is required for technical-business balanced strict reports",
+            )
 
     risk = item.get("risk")
     if risk not in RISK_VALUES:

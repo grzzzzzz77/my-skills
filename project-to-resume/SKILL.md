@@ -1,6 +1,6 @@
 ---
 name: project-to-resume
-description: Turn local code evidence into evidence-backed resume bullets, project highlights, anchor-linked highlight logic-chain details, STAR interview stories, optional HTML reports, and downstream resume-rewrite prompt packs. Requires a local repository, project path, or explicit code files/snippets as evidence; not for resume polishing without code evidence. Use for codebase-to-resume, 代码项目转简历, 项目亮点, 简历项目描述, project bullets, contribution packaging, 项目链路闭环, 亮点详情跳转, project value scoring, and portfolio/interview story extraction across frontend/uni-app, Node/backend, AI/Agent, data automation, and full-stack projects.
+description: Turn local code evidence into evidence-backed resume bullets, technical-business balanced project highlights, anchor-linked highlight logic-chain details, STAR interview stories, optional HTML reports, and downstream resume-rewrite prompt packs. Requires a local repository, project path, or explicit code files/snippets as evidence; not for resume polishing without code evidence. Use for codebase-to-resume, 代码项目转简历, 技术亮点, 业务价值, 简历项目描述, project bullets, contribution packaging, 项目链路闭环, 亮点详情跳转, project value scoring, and portfolio/interview story extraction across frontend/uni-app, Node/backend, AI/Agent, data automation, and full-stack projects.
 ---
 
 # Project To Resume
@@ -107,7 +107,7 @@ Return:
 
 ### Standard Output
 
-Create and validate `project_resume_analysis.json` using `references/analysis-schema.md`. For every final highlight, include a stable `detail_anchor` and `logic_chain` so the summary bullet can jump to a beginner-readable detail section explaining the full closed loop.
+Create and validate `project_resume_analysis.json` using `references/analysis-schema.md`. For every final highlight, include `technical_mechanism`, `technical_difficulty`, `business_value`, a stable `detail_anchor`, and `logic_chain` so the summary bullet can jump to a beginner-readable detail section explaining the full closed loop. The title and first sentence should expose the technical mechanism before the business scenario.
 
 Run:
 
@@ -138,6 +138,7 @@ Use `references/html-report-spec.md` for report QA. The final chat response shou
 Before final delivery:
 
 - Confirm every final bullet has evidence or a visible risk label.
+- Confirm every final highlight balances technical mechanism, technical difficulty, and business value. Do not accept cards that only describe product workflow.
 - Confirm every final highlight has `detail_anchor` and `logic_chain` in standard/strict_report outputs.
 - Confirm safe bullets do not contain unverified business metrics, ownership, users, revenue, GMV, latency, or production impact.
 - Confirm role/disclosure assumptions are visible when not user-confirmed.

@@ -1,5 +1,5 @@
 interface:
   display_name: "项目转简历"
-  short_description: "基于本地代码证据生成带链路详情的项目简历亮点与报告"
+  short_description: "基于代码证据生成技术业务兼顾的项目简历亮点"
   brand_color: "#2563EB"
-  default_prompt: "Use $project-to-resume to analyze this local repository or provided code evidence and generate evidence-backed project resume bullets with anchor-linked logic-chain details; use micro mode for 1-2 files/snippets and strict_report only when I ask for a report."
+  default_prompt: "Use $project-to-resume to analyze this local repository and generate evidence-backed, technical-business balanced resume highlights with anchor-linked logic-chain details."

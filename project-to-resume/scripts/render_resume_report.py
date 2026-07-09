@@ -91,6 +91,9 @@ def normalize_highlight(item: dict, index: int) -> dict:
         "risk": risk,
         "readiness": readiness,
         "evidence": as_list(item.get("evidence") or item.get("evidence_paths")),
+        "technical_mechanism": item.get("technical_mechanism") or "",
+        "technical_difficulty": item.get("technical_difficulty") or "",
+        "business_value": item.get("business_value") or "",
         "safe_bullet": item.get("safe_bullet") or item.get("bullet") or "",
         "enhanced_bullet": item.get("enhanced_bullet") or "",
         "why": item.get("why") or item.get("value") or "",
@@ -522,6 +525,13 @@ def build_highlight_cards(highlights: list[dict]) -> str:
                 f'{h(item.get("score_rationale") or "；".join(score_parts))}'
                 f'</div>'
             )
+        tech_business_html = f"""
+                <div class="tech-business-grid">
+                  <div class="tech-business-note"><strong>技术机制</strong><span>{h(item.get('technical_mechanism') or '待补充')}</span></div>
+                  <div class="tech-business-note"><strong>技术难点</strong><span>{h(item.get('technical_difficulty') or '待补充')}</span></div>
+                  <div class="tech-business-note wide"><strong>业务价值</strong><span>{h(item.get('business_value') or '待补充')}</span></div>
+                </div>
+        """
         anchor = item.get("detail_anchor") or f"highlight-{item.get('_source_index', 0) + 1}"
         rows.append(f"""
           <article class="highlight-card" id="card-{h(anchor)}" data-category="{h(item['category'])}" data-risk="{h(item['risk'])}" data-readiness="{h(item['readiness'])}">
@@ -538,6 +548,7 @@ def build_highlight_cards(highlights: list[dict]) -> str:
                   <span class="tag">评分：{h(item.get('score') or '未评')}</span>
                 </div>
                 <p class="card-value">{h(item.get('why') or '待补充')}</p>
+                {tech_business_html}
                 <div class="bullet-compare">
                   <div class="bullet-block"><strong>安全版</strong>{h(item.get('safe_bullet') or '待补充')}</div>
                   <div class="bullet-block"><strong>增强版</strong>{h(item.get('enhanced_bullet') or '待确认数据后再写')}</div>
@@ -685,6 +696,9 @@ def build_prompt_pack(evidence: dict, analysis: dict, highlights: list[dict]) ->
         logic_details.append(
             "\n".join([
                 f"{item.get('title')}（#{item.get('detail_anchor')}）",
+                f"技术机制：{item.get('technical_mechanism') or '待补充'}",
+                f"技术难点：{item.get('technical_difficulty') or '待补充'}",
+                f"业务价值：{item.get('business_value') or '待补充'}",
                 f"一句话解释：{chain.get('plain_summary', '')}",
                 "闭环链路：" + (" -> ".join(steps) if steps else str(chain.get("closure", ""))),
                 "证据：" + ("、".join(dict.fromkeys(evidence)) if evidence else "见 highlight evidence"),

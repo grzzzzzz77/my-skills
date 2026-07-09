@@ -205,6 +205,14 @@ Before accepting a highlight, rewrite it through this lens:
 业务矛盾 / 技术风险 -> 具体机制 -> 覆盖范围 -> 可验证结果或需确认结果
 ```
 
+For strict reports, also write the three explicit fields below before composing the bullet:
+
+- `technical_mechanism`: what code-level mechanism or abstraction exists.
+- `technical_difficulty`: what edge case, reliability risk, performance/state pressure, integration boundary, or maintainability problem made it non-trivial.
+- `business_value`: which product/user/business flow the mechanism protects or improves, without inventing metrics.
+
+If `business_value` is strong but `technical_mechanism` is vague, downgrade the highlight to a project fact or rewrite it around the strongest mechanism. If `technical_mechanism` is strong but the product scenario is unclear, keep it as an engineering-quality highlight and state the business value conservatively.
+
 Prefer:
 
 - Request race control, stale response prevention, pagination state boundaries.
