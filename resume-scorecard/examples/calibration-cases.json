@@ -1,0 +1,198 @@
+{
+  "schema_version": "1.0",
+  "purpose": "Synthetic anchor cases for human/agent forward-testing. Ranges calibrate demonstrated evidence, not personal worth or hiring probability.",
+  "cases": [
+    {
+      "id": "eng-entry-strong-projects",
+      "role_family": "engineering_data",
+      "candidate_stage": "intern_entry",
+      "profile": "Two production-like projects, clear contribution, tests and deployment artifacts, no business metrics.",
+      "expected": {"career_capital": [78, 88], "communication_quality": [75, 88]},
+      "invariant": "Absence of business metrics must not push career capital below 75 when complexity, artifacts, and ownership are clear."
+    },
+    {
+      "id": "eng-early-strong-no-metrics",
+      "role_family": "engineering_data",
+      "candidate_stage": "early_career",
+      "profile": "Owns a cross-platform module with reliability and tradeoff evidence; exact company metrics are confidential.",
+      "expected": {"career_capital": [82, 91], "communication_quality": [72, 86]},
+      "invariant": "Credible scope and reliability evidence can support 85+ career capital without exact percentages."
+    },
+    {
+      "id": "eng-experienced-list-only",
+      "role_family": "engineering_data",
+      "candidate_stage": "experienced_ic",
+      "profile": "Long technology list and many features, but little ownership, tradeoff, or production evidence.",
+      "expected": {"career_capital": [55, 68], "communication_quality": [58, 72]},
+      "invariant": "Technology count alone must not produce a strong score."
+    },
+    {
+      "id": "eng-senior-system-owner",
+      "role_family": "engineering_data",
+      "candidate_stage": "senior_ic",
+      "profile": "System-level decisions, incident learning, cost/reliability impact, mentoring, and cross-team adoption.",
+      "expected": {"career_capital": [90, 97], "communication_quality": [84, 94]},
+      "invariant": "Strong system scope may exceed 90 without people-management evidence."
+    },
+    {
+      "id": "product-entry-research-artifacts",
+      "role_family": "product_design",
+      "candidate_stage": "intern_entry",
+      "profile": "Research, prototype, usability findings, and shipped iteration with a clear junior contribution.",
+      "expected": {"career_capital": [75, 86], "communication_quality": [76, 88]},
+      "invariant": "Do not require revenue impact from an entry-level product/design case."
+    },
+    {
+      "id": "product-early-feature-list",
+      "role_family": "product_design",
+      "candidate_stage": "early_career",
+      "profile": "Lists many features but omits user problem, decisions, validation, and contribution boundary.",
+      "expected": {"career_capital": [55, 69], "communication_quality": [52, 68]},
+      "invariant": "Feature volume is not equivalent to product depth."
+    },
+    {
+      "id": "design-experienced-system",
+      "role_family": "product_design",
+      "candidate_stage": "experienced_ic",
+      "profile": "Design-system ownership, research synthesis, cross-team adoption, and documented accessibility decisions.",
+      "expected": {"career_capital": [84, 93], "communication_quality": [80, 92]},
+      "invariant": "Visual polish alone is insufficient; adoption and decisions support the high range."
+    },
+    {
+      "id": "product-career-changer",
+      "role_family": "product_design",
+      "candidate_stage": "career_changer",
+      "profile": "Strong operations history plus two credible product cases; target-specific experience is limited.",
+      "expected": {"career_capital": [72, 84], "communication_quality": [74, 88]},
+      "invariant": "Prior-lane achievements remain valuable; target gaps concentrate in relevance and JD fit."
+    },
+    {
+      "id": "sales-entry-campus",
+      "role_family": "sales_growth_ops",
+      "candidate_stage": "intern_entry",
+      "profile": "Campus campaign with channel mechanics, conversion funnel, and clear personal execution.",
+      "expected": {"career_capital": [70, 83], "communication_quality": [74, 88]},
+      "invariant": "Use stage-appropriate scale; do not demand enterprise quota evidence."
+    },
+    {
+      "id": "sales-early-team-total",
+      "role_family": "sales_growth_ops",
+      "candidate_stage": "early_career",
+      "profile": "Claims a large team revenue number but does not identify territory, quota, cycle, or personal attribution.",
+      "expected": {"career_capital": [58, 72], "communication_quality": [50, 66]},
+      "invariant": "Large un-attributed numbers cannot create a strong score."
+    },
+    {
+      "id": "ops-experienced-playbook",
+      "role_family": "sales_growth_ops",
+      "candidate_stage": "experienced_ic",
+      "profile": "Builds a repeatable operations playbook, reduces cycle time, and owns cross-functional rollout.",
+      "expected": {"career_capital": [82, 92], "communication_quality": [80, 92]},
+      "invariant": "Operational quality and repeatability count as value, not only revenue."
+    },
+    {
+      "id": "growth-senior-experiments",
+      "role_family": "sales_growth_ops",
+      "candidate_stage": "senior_ic",
+      "profile": "Owns multi-channel experimentation, budget decisions, unit economics, and durable growth systems.",
+      "expected": {"career_capital": [89, 96], "communication_quality": [84, 94]},
+      "invariant": "Team totals must still be separated from the candidate's decisions."
+    },
+    {
+      "id": "corp-entry-audit",
+      "role_family": "corporate_functions",
+      "candidate_stage": "intern_entry",
+      "profile": "Audit internship with clear procedures, findings, documentation, and confidentiality constraints.",
+      "expected": {"career_capital": [68, 82], "communication_quality": [72, 86]},
+      "invariant": "Confidential figures are not required when procedures and artifacts are credible."
+    },
+    {
+      "id": "corp-early-routine-volume",
+      "role_family": "corporate_functions",
+      "candidate_stage": "early_career",
+      "profile": "High routine transaction volume with little judgment, control design, or process improvement.",
+      "expected": {"career_capital": [55, 68], "communication_quality": [62, 76]},
+      "invariant": "Volume alone does not prove high complexity."
+    },
+    {
+      "id": "corp-experienced-control-owner",
+      "role_family": "corporate_functions",
+      "candidate_stage": "experienced_ic",
+      "profile": "Owns a multi-entity control process, improves close reliability, and supports executive decisions.",
+      "expected": {"career_capital": [83, 92], "communication_quality": [80, 92]},
+      "invariant": "Risk, accuracy, and decision value are accepted impact types."
+    },
+    {
+      "id": "corp-senior-policy",
+      "role_family": "corporate_functions",
+      "candidate_stage": "senior_ic",
+      "profile": "Designs cross-jurisdiction policy, manages complex stakeholders, and demonstrates durable compliance outcomes.",
+      "expected": {"career_capital": [89, 96], "communication_quality": [82, 93]},
+      "invariant": "Qualitative regulatory impact can support 90+ when scope and validation are strong."
+    },
+    {
+      "id": "research-entry-method",
+      "role_family": "research_professional",
+      "candidate_stage": "intern_entry",
+      "profile": "Clear research question, method, dataset contribution, experiment, and poster artifact.",
+      "expected": {"career_capital": [74, 86], "communication_quality": [76, 88]},
+      "invariant": "Publication count is not required for strong entry-level research evidence."
+    },
+    {
+      "id": "research-early-count-only",
+      "role_family": "research_professional",
+      "candidate_stage": "early_career",
+      "profile": "Lists papers without author role, venue context, method, or contribution.",
+      "expected": {"career_capital": [52, 68], "communication_quality": [48, 64]},
+      "invariant": "Publication count without contribution context must not score strongly."
+    },
+    {
+      "id": "research-experienced-rigorous",
+      "role_family": "research_professional",
+      "candidate_stage": "experienced_ic",
+      "profile": "Methodological contribution, replication evidence, clear author role, and external expert adoption.",
+      "expected": {"career_capital": [85, 94], "communication_quality": [82, 93]},
+      "invariant": "Research rigor and adoption are valid impact evidence."
+    },
+    {
+      "id": "professional-senior-confidential",
+      "role_family": "research_professional",
+      "candidate_stage": "senior_ic",
+      "profile": "Senior licensed professional with confidential cases, regulatory constraints, peer review, and durable domain authority.",
+      "expected": {"career_capital": [88, 96], "communication_quality": [80, 92]},
+      "invariant": "Confidentiality must lower coverage only where necessary, not force low career capital."
+    },
+    {
+      "id": "manager-new-team-lead",
+      "role_family": "leadership_management",
+      "candidate_stage": "manager_lead",
+      "profile": "First-line manager with hiring, coaching, operating cadence, and a small but clear team scope.",
+      "expected": {"career_capital": [76, 88], "communication_quality": [78, 90]},
+      "invariant": "Stage-appropriate leadership can be strong without organization-wide scope."
+    },
+    {
+      "id": "manager-title-only",
+      "role_family": "leadership_management",
+      "candidate_stage": "manager_lead",
+      "profile": "Senior title and team results with no interventions, decisions, team size, or operating mechanisms.",
+      "expected": {"career_capital": [50, 66], "communication_quality": [52, 68]},
+      "invariant": "Title and inherited outcomes alone cannot produce a high leadership score."
+    },
+    {
+      "id": "manager-program-owner",
+      "role_family": "leadership_management",
+      "candidate_stage": "manager_lead",
+      "profile": "Owns a cross-functional program, budget, governance, talent mechanisms, and durable business results.",
+      "expected": {"career_capital": [88, 96], "communication_quality": [84, 94]},
+      "invariant": "Separate personal decisions from team output while recognizing organizational scope."
+    },
+    {
+      "id": "leader-heroics-only",
+      "role_family": "leadership_management",
+      "candidate_stage": "manager_lead",
+      "profile": "Many one-off crisis stories but no repeatable mechanisms, succession, governance, or durable capability.",
+      "expected": {"career_capital": [62, 76], "communication_quality": [68, 82]},
+      "invariant": "One-off heroics cannot substitute for durable leadership systems."
+    }
+  ]
+}

@@ -1,155 +1,113 @@
 ---
 name: resume-scorecard
-description: Score and compare resumes with a structured 100-point scorecard, standalone no-JD resume scoring, cross-industry resume comparison, JD-fit analysis, ATS/readability checks, presentation/layout scoring, sensitive-info validation and auto-redaction, credibility risks, experience-year benchmark averages, and a Chinese HTML report. Use when the user asks for 简历打分, 单独评分, 无 JD 评分, 简历评分, 简历对比, 跨行业简历对比, A/B 简历比较, ATS 分数, 排版评分, 外观评分, 简历脱敏, 自动脱敏, JD 匹配分, 简历质量评估, 年限平均分, 1-3 年/3-5 年对标, 为什么这版简历更强, or wants an objective score report instead of resume rewriting or optimization.
+description: Evaluate and compare resumes with a calibrated multi-axis scorecard that separates demonstrated career capital, content communication quality, presentation/layout quality, and optional JD fit. Use for 简历打分, 无 JD 评分, 履历含金量, 内容表达分, 排版评分, ATS/可读性, JD 匹配, A/B 或跨行业简历对比, 年限/阶段对标, 90+ 差距分析, 敏感信息脱敏, or a defensible Chinese HTML diagnostic report without rewriting the resume by default.
 ---
 
 # Resume Scorecard
 
-Use this skill to evaluate resumes, not to rewrite them by default. The output is a scorecard: scores, evidence, deductions, comparison, risks, and lift levers. Only rewrite resume bullets when the user explicitly asks after the score report.
+Evaluate resumes; do not rewrite them unless the user explicitly asks after the diagnosis.
 
-## Core Promise
+## Measurement Contract
 
-Produce a defensible score that separates:
+Keep four scores separate:
 
-- **Resume quality**: whether the resume itself is clear, credible, scannable, and evidence-rich.
-- **Standalone competitiveness**: how strong the resume is when no JD is provided, using general role-market expectations or universal resume quality.
-- **JD fit**: whether this resume matches a specific job description or role.
-- **Version or cross-industry advantage**: which resume is stronger for a target, or which is stronger within its own target market when targets differ.
-- **Interview risk**: which claims may collapse under follow-up.
-- **Experience-year benchmark**: how the score compares with the expected average for the candidate's inferred experience band and the next higher band.
-- **Presentation quality**: whether the visual layout, information hierarchy, density, typography consistency, and ATS-safe formatting help or hurt the resume reader.
+1. `career_capital`: demonstrated value of the candidate's experience, scope, ownership, impact, expertise, and trajectory.
+2. `communication_quality`: how well the resume selects, positions, explains, and defends that experience in text.
+3. `presentation_quality`: visual hierarchy, density, typography, page organization, and layout-related ATS safety. Never add this score to the core score.
+4. `jd_fit`: must-have and responsibility fit for a provided JD. Omit it when no JD is provided.
 
-Never treat the score as hiring probability. Say it is a diagnostic score for resume competitiveness and evidence quality.
-Experience-year averages are rubric-calibrated reference baselines, not live hiring-market statistics. Label them as internal benchmark averages unless the user provides an external dataset.
+Derive the no-JD or general core score only as:
+
+```text
+core_score = career_capital × 0.70 + communication_quality × 0.30
+```
+
+Round to one decimal when needed. Do not mix layout or JD fit into `core_score`. Call all scores diagnostic evidence scores, never hiring probability or a score of the whole person.
+
+## Non-Negotiable Fairness Rules
+
+- Score from positive evidence and anchored levels; do not start at 100 and hunt for deductions.
+- Treat absent evidence as an evidence-coverage or confidence gap, not proof of weakness, dishonesty, or low career value.
+- Accept multiple proof types: metrics, scope, artifacts, decisions, adoption, reliability, risk reduction, external validation, and credible qualitative outcomes. Never require numbers for every role.
+- Put each issue in `issue_ledger` once. Only its `primary_axis` and `primary_dimension` may reflect a score effect; cross-references cannot deduct again.
+- Keep content ATS signals (standard headings, keyword wording) in communication quality and visual parsing hazards (columns, text boxes, reading order) in presentation quality.
+- Apply role-family and career-stage anchors. Do not judge interns with senior ownership standards or reward employer prestige without demonstrated scope.
+- Use confidence and evidence coverage to express uncertainty. Reserve credibility penalties for contradictions, implausible ownership, unsupported inflation, or clear timeline conflicts.
+- Do not use fixed experience averages as live market statistics. If the user asks for stage comparison, label it an internal expectation anchor based on `career_capital` only.
+
+Read `references/scoring-rubric.md` before scoring. Also read `references/role-calibration.md` when a target role, role family, or candidate stage is known.
 
 ## Inputs
 
-Ask only for missing essentials:
+Use available inputs and ask only for missing essentials:
 
-- `resume`: text or a local file path. For comparison, accept two or more versions.
-- `target_role`: optional target role, such as 前端开发、后端开发、产品经理、测试、数据分析. If omitted, run standalone no-JD scoring.
-- `per_resume_target`: optional target role/industry for each resume when comparing cross-industry resumes.
-- `jd`: optional job description. When present, run JD-fit mode.
-- `candidate_stage`: 校招、实习、社招、转岗、专科/高职、本科、硕士/博士, if relevant.
-- `candidate_experience_years`: optional. If omitted, infer from resume dates and stage. Use `unknown` when evidence is insufficient.
-- `output_dir`: where to save the HTML report. If omitted, save next to the resume file or in the current working directory.
+- `resume`: text or local PDF/DOCX/Markdown path; accept two or more versions for comparison.
+- `target_role` and optional `target_industry`.
+- `jd`: optional; set `jd_provided` accordingly.
+- `candidate_stage` and optional `candidate_experience_years`; infer conservatively when possible.
+- `per_resume_target`: use when cross-industry resumes target different lanes.
+- `output_dir`: optional destination for report artifacts.
 
-If a PDF/DOCX cannot be reliably parsed, ask for pasted text or a text/Markdown export. Do not score screenshots unless text is available. For file parsing, layout evidence, and confidence downgrade rules, read `references/input-parsing.md`.
+If parsing or layout evidence is incomplete, follow `references/input-parsing.md`. Do not infer hidden achievements, private data, or unsupported metrics.
 
-## Execution Modes
+## Modes
 
-- **Quick score**: Use when the user asks for a simple score in chat. Output total score, dimension table, top deductions, and 3-5 lift levers. Do not create files unless requested.
-- **Standalone no-JD mode**: Use when the user provides one resume without JD or target role. Score universal resume quality: clarity, evidence, depth, structure, credibility, and market-readiness. Do not ask for a JD unless the user specifically wants JD fit.
-- **Standalone target-role mode**: Use when the user provides a target role but no JD. Keep `score_mode` as `standalone`, set `target_role`, and explain in `scoring_context` that the resume is scored against general expectations for that role.
-- **Report mode**: Use when the user asks for HTML, deliverable, detailed report, or comparison. Create `resume_scorecard_analysis.json`, validate it, then render HTML.
-- **Comparison mode**: Use when the user gives multiple resumes or asks A/B, old/new, or "哪版更好". Score each version with the same rubric and include deltas.
-- **Cross-industry comparison mode**: Use when resumes target different roles or industries. Score each resume against its own intended target or a universal baseline, then compare normalized quality, evidence density, credibility, and market-readiness. Do not declare a single absolute winner without naming the scenario.
-- **JD-fit mode**: Use when a target JD is provided. Score both resume quality and JD fit; emphasize must-have coverage and keyword placement.
+- **Quick score**: Return the score vector, evidence coverage, strongest evidence, largest score gaps, and 3-5 lift levers in chat. Do not create files unless asked.
+- **Standalone**: No JD. Score career capital, communication quality, and presentation when supported.
+- **JD fit**: Score the three resume axes plus an independent JD-fit axis.
+- **Comparison**: Score every version independently under the same context, then compare deltas and best-use scenarios.
+- **Cross-industry comparison**: Score each resume against its own target and stage; compare normalized axes and scenarios, not raw JD keywords.
+- **Report**: Create v2 analysis JSON, validate strictly, then render a Chinese HTML report.
 
 ## Workflow
 
-### 1. Parse and Normalize
+### 1. Parse And Normalize
 
-Extract the resume into plain text. Preserve section boundaries:
+Preserve contact/header, education, skills, work/internships, projects, awards/certifications, publications, and portfolios. Infer stage from dates and role labels without treating internships as full-time seniority.
 
-- Contact and headline
-- Education
-- Skills
-- Work/internship experience
-- Projects
-- Awards/certifications
-- Publications/portfolio links, if present
+Redact phone numbers, email addresses, exact street addresses, ID numbers, credentials, and private/tokenized links from report artifacts.
 
-When file evidence is available, inspect layout signals as well: rendered PDF/DOCX page structure, section ordering, density, line breaks, alignment consistency, font hierarchy, tables/text boxes, and whether text extraction preserves the reading order. Use `references/input-parsing.md` to decide `presentation_review.layout_evidence`, score caps, and confidence. If only plain text is available, still provide a layout judgment from structural signals, but mark presentation confidence as `medium` or `low`.
+### 2. Select Context
 
-Estimate candidate experience years from work/internship dates, graduation context, and role labels. If a resume shows internships only, treat them as internship/early-career evidence rather than full professional seniority unless the resume clearly states full-time years.
+Choose one `role_family` from `references/role-calibration.md`, or use `general` when evidence is insufficient. Choose the closest career-stage overlay. State the scoring context for every resume.
 
-Remove or redact private contact details from the report. Do not include phone numbers, email addresses, exact street addresses, ID numbers, or private links in final artifacts.
+Use `score_mode` values:
 
-### 2. Choose Scoring Context
+- `standalone`
+- `jd_fit`
+- `comparison`
+- `cross_industry_comparison`
 
-Use `references/scoring-rubric.md`.
+Set top-level `jd_provided` to `true` only when an actual JD is present.
 
-- No JD: score `total_score`; do not invent fields such as `baseline_resume_score`.
-- No JD and no target role: use `score_mode: "standalone"` and score universal resume competitiveness. The target clarity dimension should judge whether the resume itself declares a coherent direction; do not punish for missing JD keywords.
-- Target role but no JD: still use `score_mode: "standalone"`; set `target_role` and make `scoring_context` say it is scored against general role-market expectations, not a concrete JD.
-- JD provided: score `jd_fit_score` and include must-have coverage.
-- Multiple resumes with the same target: score each independently, then use normal comparison rules.
-- Multiple resumes across different roles/industries: set `score_mode` to `cross_industry_comparison`, include each resume's own `target_role` when known, and use `references/comparison-rules.md` to compare normalized axes rather than one JD-fit score.
+### 3. Score Positive Evidence
 
-### 3. Score With Evidence
+Score every dimension against the anchors in `references/scoring-rubric.md` and the selected role profile. Each dimension must include:
 
-For each resume version, produce a 100-point score with these default dimensions:
+- `id`, name, score, and max score
+- confidence
+- positive evidence
+- rationale
+- optional gaps and lift actions
 
-- Target clarity and role alignment: 15
-- Evidence strength and quantified impact: 20
-- Experience and project depth: 20
-- Role competency and skill signal: 15
-- Structure, ATS, and scanability: 15
-- Credibility and interview defensibility: 15
+Do not force a gap when there is no material gap. Calculate `career_capital`, `communication_quality`, and `core_score` before considering layout or JD fit.
 
-The main `total_score` remains a resume competitiveness score. In report mode, also add a separate `presentation_review` 100-point score when layout evidence or structural signals are available. This separate score evaluates visual readability and professional presentation; do not silently fold it into `total_score`.
+### 4. Build Evidence Coverage And Issue Ledger
 
-Every dimension must include:
+Report `evidence_coverage` separately. Add one ledger entry per material issue with a stable unique `issue_id`, issue kind, evidence, primary axis/dimension, optional non-positive score effect, and cross-references.
 
-- Score and max score.
-- Evidence from the resume.
-- Deductions.
-- Rationale.
-- Lift actions with estimated score gain.
+An issue with `primary_axis: none` must have `points: 0`. Do not repeat the same issue under multiple IDs merely to lower several axes.
 
-Use score bands:
+### 5. Add Optional Diagnostics
 
-- `90-100`: A+ / strong submit-ready.
-- `80-89`: A / competitive, but not fully maximized.
-- `70-79`: B / usable, but obvious gaps remain.
-- `60-69`: C / needs significant rebuild before serious submission.
-- `<60`: D / not ready for target use.
+- Add `presentation_quality` only when structural or visual signals exist; obey layout-evidence caps.
+- Add `jd_fit` only when `jd_provided` is true.
+- Add `stage_benchmark` only when requested and stage evidence is adequate. Label it an internal expectation anchor, not an average or percentile.
+- Add comparison, ATS notes, interview risks, and lift levers without rewriting the resume.
 
-### 3.5 Add Experience-Year Benchmark
+### 6. Validate And Render
 
-After scoring each resume, add `experience_benchmark` when experience can be inferred or the user provides it.
-
-Use `references/scoring-rubric.md` for benchmark bands and include:
-
-- inferred or provided experience years
-- current experience band
-- next higher band
-- the current band's average score
-- the next higher band's average score
-- candidate delta versus each benchmark
-- the expectation gap that explains what the next band would require
-
-Example: if a candidate has about 2 years of experience, show both `1-3 年` and `3-5 年`. If the candidate has about 4 years, show `3-5 年` and `5-8 年`.
-
-Do not present these averages as real-time market statistics. Use language such as:
-
-```text
-该均分是本 skill 基于 100 分评分尺标设定的经验段参考基准，用于横向对标，不代表招聘市场真实统计均值。
-```
-
-### 4. Risk Rules
-
-Do not reward unsupported claims. Penalize:
-
-- Metrics without context or source.
-- Skills listed but not evidenced in experience/projects.
-- High-ownership words such as 主导、独立负责、Owner、从 0 到 1 when the role is unclear.
-- Timeline conflicts, vague company/project names, or inconsistent dates.
-- ATS-hostile formatting signals if file/layout evidence is available.
-- Resume content that cannot survive interview follow-up.
-
-If data is missing, mark `confidence` as `low` or `medium` rather than inventing details.
-
-### 5. Structured Analysis JSON
-
-Read `references/analysis-schema.md`, then create:
-
-```text
-resume_scorecard_analysis.json
-```
-
-Validate it:
+Read `references/analysis-schema.md`, write `resume_scorecard_analysis.json`, then run:
 
 ```bash
 python3 <skill_dir>/scripts/validate_scorecard.py \
@@ -157,8 +115,7 @@ python3 <skill_dir>/scripts/validate_scorecard.py \
   --strict
 ```
 
-Use `--strict` for final deliverables and regression tests because warnings should block report publication. For exploratory drafts, legacy JSON, or a quick chat score, run validation without `--strict`, inspect warnings, and decide whether they affect the requested output.
-If validation reports private contact details, write a redacted JSON copy before rendering:
+If private data is reported, produce a redacted copy:
 
 ```bash
 python3 <skill_dir>/scripts/validate_scorecard.py \
@@ -167,9 +124,7 @@ python3 <skill_dir>/scripts/validate_scorecard.py \
   --strict
 ```
 
-### 6. Render HTML Report
-
-Use the bundled renderer:
+Render only strict-valid data:
 
 ```bash
 python3 <skill_dir>/scripts/render_scorecard_report.py \
@@ -179,42 +134,30 @@ python3 <skill_dir>/scripts/render_scorecard_report.py \
   --strict
 ```
 
-The HTML report must include:
+## Output Order
 
-- Overall score cards for each resume version.
-- Experience-year benchmark comparison when experience is known or inferred.
-- Presentation/layout score when available.
-- Dimension breakdown with bars and deductions.
-- Version comparison and winner when multiple versions exist.
-- Cross-industry comparison notes when resumes target different industries, including "best for" scenarios instead of a simplistic winner.
-- JD-fit coverage when a JD is provided.
-- ATS/readability notes.
-- Credibility and interview-risk warnings.
-- Score lift levers, not full resume rewriting.
-- Clear confidence level and missing information.
+Lead with:
 
-## Output Guidance
+1. `core_score` and band
+2. career-capital score
+3. communication-quality score
+4. independent presentation score and evidence level, when available
+5. independent JD-fit score, when available
+6. evidence coverage and confidence
+7. strongest evidence, primary issues, and lift levers
 
-For chat summaries, keep the answer concise:
-
-- Total score and band.
-- Presentation/layout score when available.
-- Experience-year benchmark: current band average and next-band average.
-- Biggest 3 deductions.
-- Strongest 3 advantages.
-- Best version if comparing.
-- Whether HTML was generated and where.
-
-Do not end by rewriting the resume unless the user asks. The default close is: what changed the score and what data would make the score more reliable.
+For comparisons, name the scoring context and best-use scenario. Do not declare one resume universally superior across unrelated targets.
 
 ## References
 
-- Scoring rubric: `references/scoring-rubric.md`
-- Analysis schema: `references/analysis-schema.md`
-- Input parsing and confidence rules: `references/input-parsing.md`
+- Scoring anchors and no-double-count policy: `references/scoring-rubric.md`
+- Role-family and stage calibration: `references/role-calibration.md`
+- Analysis JSON contract: `references/analysis-schema.md`
+- Parsing and layout confidence: `references/input-parsing.md`
 - Comparison rules: `references/comparison-rules.md`
-- HTML report spec: `references/html-report-spec.md`
-- Complete sample analysis: `examples/complete-analysis-sample.json`
+- HTML report requirements: `references/html-report-spec.md`
+- Strict-valid sample: `examples/complete-analysis-sample.json`
+- Calibration cases: `examples/calibration-cases.json`
 - Validator: `scripts/validate_scorecard.py`
 - Renderer: `scripts/render_scorecard_report.py`
-- Template: `assets/report-template.html`
+- Regression tests: `tests/test_scorecard.py`

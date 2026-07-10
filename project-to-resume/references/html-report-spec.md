@@ -46,6 +46,7 @@ For final delivery, render with `--strict` so invalid `project_resume_analysis.j
 5. Resume-Ready Bullets
    - A copy-friendly list of safe bullets.
    - Each safe bullet should include a "查看链路详情" jump link to the matching highlight detail anchor when the source highlight is known.
+   - Derive every item from a `risk=safe` highlight. Never render unmatched top-level copy as resume-ready content.
 
 6. Enhanced Bullets Requiring Confirmation
    - Include suggested metrics and what the user must verify.
@@ -57,6 +58,7 @@ For final delivery, render with `--strict` so invalid `project_resume_analysis.j
 
 8. Interview Story Bank
    - STAR notes for the best highlights.
+   - For the strongest safe highlights, show the hardest question, answer outline, rejected alternative, failure/debugging boundary, verification method, and at least two likely follow-ups.
 
 9. Evidence Appendix
    - File paths and counts.
@@ -93,6 +95,7 @@ Each highlight card must include:
 - Enhanced bullet
 - Why it is valuable
 - Interview notes
+- Interview deep-dive link and evidence-backed verification notes when available
 - Data to confirm
 - Downstream usage suggestion: direct paste, rewrite candidate, or confirmation needed
 

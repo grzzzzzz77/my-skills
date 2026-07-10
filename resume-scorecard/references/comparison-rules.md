@@ -1,127 +1,72 @@
-# Resume Version Comparison Rules
-
-Use these rules when comparing two or more resume versions.
+# Resume Comparison Rules V2
 
 ## Compare On Equal Terms
 
-- Use the same target role and JD for all versions.
-- Use the same rubric weights.
-- Do not reward a version for simply being longer.
-- Penalize extra content if it weakens focus, ATS parsing, or credibility.
+- Use the same target, JD state, role family, stage overlay, evidence rules, and layout-evidence policy for versions of the same candidate.
+- Keep career capital, communication, presentation, and JD fit separate.
+- Do not reward length or decoration by itself.
+- Do not let a presentation difference change career-capital scores when content is unchanged.
+- Treat a `0-2` core-score delta as essentially tied, `3-5` as meaningful, `6-10` as clear, and more than `10` as substantial; still inspect axis-specific tradeoffs.
 
-For cross-industry comparisons, "equal terms" means equal scoring method, not the same JD. Score each resume against its own declared target or against a universal no-JD baseline.
+## Same-Target Comparison
 
-## Cross-Industry Normalization Method
+Compare:
 
-For `cross_industry_comparison`, do not compare JD keywords directly. Use a reproducible normalized axis table:
+1. core score
+2. career capital demonstrated by each version
+3. communication quality
+4. presentation quality and evidence level
+5. JD fit when an actual JD is present
+6. evidence coverage and confidence
+7. unique issue-ledger differences
 
-| Normalized Axis | Compare By | Suggested Winner Basis |
-|---|---|---|
-| Own-target strength | Each resume's `total_score` against its own declared target or universal baseline. | Higher own-target score, with confidence noted. |
-| Evidence density | Ratio of concrete bullets, quantified outcomes, artifacts, scope, and proof. | More claims backed by evidence. |
-| Market clarity | Whether the target direction is clear in the top third and repeated through section order. | Less reader inference needed. |
-| Transferability | Portable skills, domain breadth, communication/story value, and cross-role proof. | Easier to reuse across target scenarios. |
-| Risk level | Unsupported claims, vague ownership, timeline issues, and interview fragility. | Lower risk wins. |
-| Upgrade path | Work needed to reach 85/90+ in its own lane. | Less rewrite/repackaging effort wins. |
+If versions describe the same underlying career history, large career-capital differences require explicit evidence that one version reveals material scope, ownership, or results that the other omits. Wording polish alone should mainly change communication quality.
 
-In JSON, represent this as `comparison.normalized_axes[]`:
+## Cross-Industry Comparison
 
-```json
-{
-  "axis": "Evidence density",
-  "winner": "A",
-  "scores": {"A": "high", "B": "medium"},
-  "reason": "A has more quantified outcomes and clearer ownership evidence."
-}
-```
+Score each resume against its own target, role family, and stage. Use normalized axes:
 
-Use this table even when you still provide a scenario-specific `comparison.best_for` list.
-
-## Comparison Axes
-
-Report the winner for each relevant axis:
-
-| Axis | Question |
+| Axis | Compare by |
 |---|---|
-| Overall score | Which version has the highest weighted score? |
-| Target/JD fit | Which version better matches the role or JD must-haves? |
-| Recruiter scan | Which version communicates the strongest signal in the first 6-10 seconds? |
-| ATS safety | Which version has cleaner structure, section names, and keyword placement? |
-| Interview defensibility | Which version is safer under technical or behavioral follow-up? |
-| Growth potential | Which version can reach 90+ with less effort? |
+| Own-target career capital | Strength of demonstrated experience in its intended lane |
+| Communication quality | Positioning, prioritization, evidence expression, clarity, and consistency |
+| Evidence coverage | How much of the judgment is well supported |
+| Transferability | Portable problem solving, stakeholder, technical, commercial, research, or leadership evidence |
+| Risk | Contradictions, inflation, timeline conflicts, and unclear contribution |
+| Upgrade path | Work needed to make the resume submission-ready in its own lane |
 
-For cross-industry comparisons, add:
+Represent each normalized axis with numeric 0-100 scores when possible, confidence, winner/tie, and reason. Do not use vague `high/medium/low` labels without anchors.
 
-| Axis | Question |
-|---|---|
-| Own-market strength | Which resume is stronger for its own intended industry/role? |
-| Universal resume quality | Which resume has clearer evidence, structure, and credibility independent of industry? |
-| Transferability | Which resume has stronger portable skills and story if the candidate changes direction? |
-| Scenario winner | Which resume wins under each target scenario? |
+## Scenario-Specific Conclusions
 
-## Delta Rules
-
-- `0-2 points`: essentially tied. Pick by target scenario.
-- `3-5 points`: meaningful edge, but not decisive if the lower version fits a specific JD better.
-- `6-10 points`: clear winner.
-- `10+ points`: substantial difference; the lower version likely has structural or evidence gaps.
-
-## Winner Language
-
-Good:
+Prefer:
 
 ```text
-A 版总分高 6 分，是当前更适合投递的版本；B 版不是不能用，但项目证据分散，首屏岗位信号弱。
+技术岗位场景下 A 的履历含金量和技术证据更强；产品转向场景下 B 的定位与可迁移叙事更顺。按通用表达质量，两版接近；A 的排版领先，但不因此提高履历含金量。
 ```
 
-Avoid:
+Avoid universal claims across unrelated targets.
 
-```text
-A 完胜 B。
-```
+## Invariance Checks
 
-Explain the scenario:
+Before finalizing a comparison, verify:
 
-- `适合直接投递`
-- `适合作为 ATS 版本`
-- `适合人工 HR/内推阅读`
-- `适合技术面展开`
-- `适合作为后续优化底稿`
-- `按各自目标赛道评分更强`
-- `按通用简历质量更强`
-- `跨行业转向更有优势`
+- Same content, different visual format: career capital should be unchanged or within 1 point.
+- Same experience, clearer bullets: career capital should be stable unless new material evidence is revealed; communication may improve.
+- Redaction of contact details: all scores must remain unchanged.
+- Adding a JD: career, communication, and presentation must remain unchanged; only `jd_fit` is added.
+- Unsupported impressive metrics: no automatic score gain and possibly a communication/credibility issue.
+- Missing layout evidence: only presentation confidence/cap changes.
 
-## Cross-Industry Winner Language
-
-When resumes target different roles or industries, avoid one absolute winner unless the user explicitly asks for a forced ranking. Prefer:
-
-```text
-按各自目标赛道看：A 版在技术岗更强，B 版在产品/运营岗更顺。按通用简历质量看：A 版因证据密度、项目深度和面试可防守性更高，综合领先 5 分。
-```
-
-If you must choose one:
-
-- Name the basis: `通用简历质量`, `目标赛道适配`, `转岗潜力`, `当前投递可用性`.
-- State what the score does not prove.
-- Preserve best-use scenarios for the other resume.
-
-## Tie Handling
-
-If scores are close, choose by use case:
-
-- For online applications: prefer ATS/readability and keyword coverage.
-- For referrals: prefer stronger narrative and project depth.
-- For technical roles: prefer evidence and interview defensibility.
-- For career changers: prefer transferable-skill clarity and target consistency.
-
-## Comparison Output
+## Output
 
 Include:
 
-- Winner and total score delta.
-- Dimension deltas.
-- Best-use scenario for each version.
-- For cross-industry: own-target score, universal baseline score when useful, and scenario winners.
-- 3-5 reasons the winning version wins.
-- 2-3 cases where the losing version may still be useful.
-- Merge suggestions only if the user asks; otherwise keep to scoring and diagnosis.
+- context type and winner/tie by scenario
+- core and axis deltas
+- evidence coverage/confidence
+- 3-5 reasons grounded in evidence
+- best-use scenario for each version
+- limitations and what the scores do not prove
+
+Do not merge or rewrite versions unless explicitly asked.

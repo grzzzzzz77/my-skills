@@ -137,9 +137,22 @@ If `--analysis` is omitted, the renderer creates an evidence-only draft report. 
       "usage": "direct_paste"
     }
   ],
-  "safe_bullets": [],
+  "safe_bullets": [
+    "负责后台权限与菜单配置模块开发，基于路由守卫、菜单配置和登录态校验封装访问控制链路，支撑多角色后台页面访问控制。"
+  ],
   "confirmation_items": [],
-  "interview_stories": [],
+  "interview_stories": [
+    {
+      "title": "刷新页面时的权限恢复与跳转边界",
+      "detail_anchor": "permission-access-control",
+      "hardest_question": "登录态恢复、动态菜单和路由跳转同时发生时，怎样避免空白页或死循环？",
+      "answer_outline": "按路由触发、登录态恢复、权限读取、菜单生成和放行/兜底的顺序解释，并说明后端仍负责关键数据权限。",
+      "alternatives": "页面内分别判断实现直接但容易遗漏；集中在守卫更一致，代价是必须处理异步恢复时序。",
+      "failure_boundary": "前端菜单隐藏不能替代后端鉴权，恢复失败时必须进入明确登录或无权限路径。",
+      "verification": "用不同角色刷新受限页面并检查最终路由、菜单和鉴权服务结果。",
+      "follow_up_questions": ["动态路由何时生成？", "前后端权限如何分工？"]
+    }
+  ],
   "prompt_pack": ""
 }
 ```
@@ -168,6 +181,12 @@ python3 <skill_dir>/scripts/check_golden_fixtures.py
 
 The fixture check runs `render_resume_report.py --strict`, so it exercises evidence-aware path validation and HTML/prompt rendering together.
 
+Collector fixtures should also pass:
+
+```bash
+python3 <skill_dir>/scripts/check_collector_fixtures.py
+```
+
 ## Field Rules
 
 - `risk`: use `safe`, `needs_confirmation`, or `risky`.
@@ -194,6 +213,9 @@ The fixture check runs `render_resume_report.py --strict`, so it exercises evide
 - `logic_chain.closure`: must explicitly state how the chain ends: returned UI state, generated output, persisted data, test assertion, error fallback, model response, or a clearly labeled user-confirmation point.
 - `safe_bullet`: must be conservative and evidence-backed.
 - `interview`: must include `situation`, `task`, `action`, `result`, and `tradeoff`.
+- `safe_bullets`: optional projection for selecting/ordering direct-paste bullets. Every entry must exactly match a `risk=safe` highlight. The renderer drops unmatched entries.
+- `interview_stories`: include structured deep dives for the strongest 3 safe highlights when available. Each story requires `title`, `detail_anchor`, `hardest_question`, `answer_outline`, `alternatives`, `failure_boundary`, `verification`, and at least two `follow_up_questions`.
+- `prompt_pack`: deprecated as authored content. Leave it empty; the renderer deterministically builds the downstream prompt from validated highlights and metric strategy.
 - `enhanced_bullet`: may include `X/Y/Z` placeholders or suggested metrics, but must remain under confirmation sections.
 - `facts`: include business flows, module map, API/page map, data flow, integration points, quality signals, and contribution boundary when known.
 - Evidence fixtures and generated evidence should include `evidence_paths_index` for complete strict path validation. `file_index` may be truncated for readability.

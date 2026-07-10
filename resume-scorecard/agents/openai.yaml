@@ -1,5 +1,4 @@
 interface:
-  display_name: "简历评分卡"
-  short_description: "简历 100 分评分、排版外观分、年限对标、跨行业对比和 HTML 报告"
-  brand_color: "#16A34A"
-  default_prompt: "Use $resume-scorecard to score this resume without requiring a JD, include presentation/layout scoring, compare versions or cross-industry resumes if provided, and render a Chinese HTML scorecard report."
+  display_name: "简历多轴评分卡"
+  short_description: "四轴简历评分、岗位与阶段校准、排版布局和 JD 匹配独立诊断"
+  default_prompt: "Use $resume-scorecard to score this resume across career capital, communication quality, presentation quality, and optional JD fit without double-counting issues."

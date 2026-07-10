@@ -13,8 +13,10 @@ The prompt pack is not a final resume. It is a structured handoff to another age
 - Estimated metric directions are allowed only as placeholders under a separate section. They are prompts for the user to confirm, not facts.
 - Mark role assumptions and disclosure assumptions.
 - Keep safe bullets separate from enhanced bullets that need confirmation.
+- Derive safe bullets only from `risk=safe` highlights. Ignore unmatched top-level prose.
 - Keep verified/code-derived metrics separate from estimated metric suggestions.
 - Include highlight logic-chain details when available so the downstream agent can preserve the user's ability to explain the project in interviews.
+- Keep interview alternatives, failure boundaries, verification, and follow-up questions as preparation material rather than adding them to resume bullet copy.
 - Preserve enough project facts for the downstream agent to match the user's original resume style.
 
 ## Template

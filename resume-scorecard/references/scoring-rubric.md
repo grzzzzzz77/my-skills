@@ -1,222 +1,217 @@
-# Resume Scorecard Rubric
+# Resume Scorecard V2 Rubric
 
-Use this rubric to score resume competitiveness. The score is diagnostic, not a hiring probability.
+## Contents
 
-## Default 100-Point Rubric
+1. Measurement model
+2. Shared score bands
+3. Career-capital rubric
+4. Communication-quality rubric
+5. Presentation-quality rubric
+6. JD-fit rubric
+7. Evidence and confidence rules
+8. Issue-ledger and no-double-count policy
+9. Stage benchmarks
+10. 90+ rules
 
-| Dimension | Points | What It Measures |
-|---|---:|---|
-| Target clarity and role alignment | 15 | Whether the resume has a clear target, role-relevant headline/summary, and a consistent story for the intended role. |
-| Evidence strength and quantified impact | 20 | Whether bullets contain concrete actions, scope, results, metrics, artifacts, or proof instead of generic responsibilities. |
-| Experience and project depth | 20 | Whether work/projects show real complexity, ownership boundary, business scenario, technical depth, and interview-expandable stories. |
-| Role competency and skill signal | 15 | Whether skills and keywords match the role and are backed by experience/projects, not just listed. |
-| Structure, ATS, and scanability | 15 | Whether the resume is readable in 6-10 seconds, follows standard sections, and is likely ATS-friendly. |
-| Credibility and interview defensibility | 15 | Whether claims are truthful, consistent, risk-aware, and survivable under follow-up. |
+## 1. Measurement Model
 
-## JD-Fit Mode Adjustment
+Score four independent axes. Only the first two form `core_score`.
 
-When a JD is provided, keep the 100-point total but interpret dimensions this way:
+| Axis | Meaning | Core weight |
+|---|---|---:|
+| `career_capital` | Resume-demonstrated value of experience, scope, ownership, impact, expertise, and trajectory | 70% |
+| `communication_quality` | Quality of positioning, selection, evidence articulation, semantic clarity, and defensibility | 30% |
+| `presentation_quality` | Visual hierarchy, density, typography, organization, and layout ATS safety | 0% |
+| `jd_fit` | Match to a provided JD | 0% |
 
-| Dimension | Points | JD-Fit Interpretation |
-|---|---:|---|
-| Target clarity and role alignment | 15 | Does the top third clearly answer this JD's target role? |
-| Evidence strength and quantified impact | 20 | Are relevant achievements concrete enough for this JD's seniority and business expectations? |
-| Experience and project depth | 20 | Do the strongest experiences map to the JD's core work rather than adjacent/noisy work? |
-| Role competency and skill signal | 15 | Must-have and preferred keywords covered naturally in skills and experience. |
-| Structure, ATS, and scanability | 15 | ATS parsing, section names, keyword placement, length, and recruiter scanning. |
-| Credibility and interview defensibility | 15 | Risk that the resume overclaims JD fit, ownership, or metrics. |
-
-## Standalone No-JD Scoring
-
-Use this when the user provides a resume but no JD. This is allowed and should not be treated as incomplete. Score the resume as a standalone artifact:
-
-- Does the resume declare a coherent direction by itself?
-- Does the top third let a recruiter understand the candidate in 6-10 seconds?
-- Are experiences written with action, method, scope, and result?
-- Are projects/work experiences deep enough to survive interviews?
-- Are skills supported by bullets?
-- Is the layout ATS-safe and readable?
-- Are claims credible without needing hidden context?
-
-If no target role is provided, use universal resume quality and market-readiness. Do not deduct for missing JD-specific keywords. Instead mark confidence as `medium` and state that JD-fit cannot be assessed.
-
-Suggested standalone language:
+Calculate:
 
 ```text
-本次为无 JD 单独评分，分数代表简历本体质量与通用投递竞争力，不代表某个具体岗位的匹配概率。
+core_score = round(career_capital × 0.70 + communication_quality × 0.30, 1)
 ```
 
-## Presentation / Layout Score
+Never infer the candidate's hidden ability. Name the first axis “简历已展示的履历含金量”, not a definitive score of the person.
 
-Use this as a **separate 100-point score** named `presentation_review`. It evaluates whether the resume's appearance helps the reader quickly understand the candidate. Do not merge this score into the main `total_score`; the main score remains resume competitiveness and evidence quality.
+## 2. Shared Score Bands
 
-Score from rendered PDF/DOCX layout when possible. If only extracted text is available, infer from section order, density, line breaks, heading consistency, and ATS extraction quality, then set `presentation_review.confidence` to `medium` or `low`. Use `presentation_review.layout_evidence` to make the evidence level explicit.
-
-| Presentation Dimension | Points | What It Measures |
-|---|---:|---|
-| 信息层级与首屏抓取 | 25 | Whether the top third immediately shows target role, seniority/stage, strongest evidence, and contact/header hierarchy without forcing the reader to hunt. |
-| 版面密度与留白 | 20 | Whether page density, margins, line spacing, bullet length, and section spacing support 6-10 second scanning. |
-| 字体、字号、对齐与一致性 | 15 | Whether typography, date alignment, punctuation, headings, separators, and repeated patterns are consistent and professional. |
-| 模块组织与视觉引导 | 15 | Whether education, skills, experience, projects, awards, and links are ordered and grouped for the target role, with clear visual flow. |
-| ATS/机器解析友好度 | 15 | Whether the layout avoids fragile tables, image-only text, excessive text boxes, unreadable columns, icons as labels, or reading-order problems. |
-| 专业感与岗位气质 | 10 | Whether the visual tone fits the candidate stage and target role without decorative elements that reduce credibility or parsing. |
-
-Presentation score bands:
-
-| Score | Band | Meaning |
+| Score | Band | Interpretation |
 |---:|---|---|
-| 90-100 | A+ | Polished, submit-ready, visually easy to scan, and ATS-safe. |
-| 80-89 | A | Clean and professional with minor density or hierarchy issues. |
-| 70-79 | B | Usable, but visible layout weaknesses reduce scan efficiency. |
-| 60-69 | C | Needs a layout rebuild before serious submission. |
-| <60 | D | Visually confusing, hard to scan, or likely ATS-hostile. |
+| 90-100 | A+ | Exceptional evidence for the selected context; only minor gaps remain. |
+| 80-89 | A | Strong and competitive; meaningful strengths outweigh limited gaps. |
+| 70-79 | B | Credibly usable and competitive in some contexts; improvement is identifiable. |
+| 60-69 | C | Partial evidence or uneven packaging; focused work is needed. |
+| <60 | D | Insufficient demonstrated evidence for the selected context. Do not equate this with low personal ability. |
 
-### Presentation Rules
+Use one-decimal scores when the weighted formula produces them. Report confidence separately.
 
-- Do not reward decoration that harms ATS parsing, copyability, or recruiter scanning.
-- Penalize image-only resumes, contact details in non-copyable text boxes, unstable two-column reading order, inconsistent date alignment, and dense bullets that fill the page edge to edge.
-- For early-career candidates, one polished page usually scores higher than a cramped two-page document unless evidence genuinely requires two pages.
-- For 3-5+ year candidates, two pages may be acceptable if each section has clear hierarchy and role-relevant ordering.
-- If visual evidence is unavailable, explain the uncertainty and keep claims focused on structure/readability signals from the extracted text.
-- Without rendered layout evidence, do not assign an A+ presentation score. Use the caps in `references/input-parsing.md`: `extracted_text` up to 82, `pasted_text` up to 75, and `ocr_only` up to 65 unless the user provides stronger evidence.
+## 3. Career-Capital Rubric
 
-## Cross-Industry Comparison
+Use these exact dimensions and weights.
 
-Use this when comparing resumes for different roles, industries, or career directions, such as "前端简历 vs 产品简历" or "技术岗简历 vs 运营岗简历".
+| ID | Dimension | Points | Measures |
+|---|---|---:|---|
+| `relevance_trajectory` | 方向相关性与成长轨迹 | 15 | Coherence, increasing responsibility, and relevance to the selected role family or own-target lane. |
+| `complexity_scope` | 任务复杂度与影响范围 | 20 | Problem difficulty, constraints, system/business scope, stakeholders, scale, and ambiguity handled. |
+| `ownership` | 责任边界与主导程度 | 20 | What the candidate personally decided, built, operated, influenced, or owned end to end. |
+| `impact_value` | 结果价值与实际影响 | 20 | Business, user, technical, operational, research, risk, or organizational value. |
+| `expertise_scarcity` | 专业深度与能力稀缺性 | 15 | Role-relevant depth, tradeoffs, specialist knowledge, and hard-to-replace capability. |
+| `growth_validation` | 成长性与外部验证 | 10 | Promotions, expanding scope, adoption, awards, publications, certifications, trusted selection, or repeat responsibility. |
 
-Do not force both resumes into one JD. Score each resume in one of two ways:
+### Career-Capital Anchors
 
-1. **Own-target scoring**: each resume is scored against its declared role/industry.
-2. **Universal baseline scoring**: if targets are unclear, score both on universal resume quality: clarity, evidence density, depth, scanability, and credibility.
+Apply each anchor proportionally to its max score:
 
-Then compare normalized dimensions:
+- **90-100% of dimension max**: multiple strong, specific signals; clear personal boundary; complexity and value survive follow-up.
+- **80-89%**: strong evidence with one limited gap in scope, result, or verification.
+- **70-79%**: credible and relevant evidence, but depth, range, or personal boundary is uneven.
+- **60-69%**: some relevant evidence, with material ambiguity or shallow scope.
+- **Below 60%**: little demonstrated evidence for this dimension.
 
-- Evidence density: which resume proves claims better?
-- Market clarity: which resume makes its target clearer?
-- Transferability: which resume has stronger reusable skills across industries?
-- Risk level: which resume is more likely to fail under interview follow-up?
-- Upgrade path: which resume can reach 85/90+ with less work?
+Do not lower career capital solely because the resume lacks precise metrics. Use scope, artifacts, decisions, adoption, quality, reliability, or risk reduction when appropriate.
 
-For report mode, put these judgments in `comparison.normalized_axes` so the comparison is reproducible rather than a prose-only conclusion.
+## 4. Communication-Quality Rubric
 
-Winner language must be scenario-specific:
+Use these exact dimensions and weights.
 
-```text
-如果目标是技术岗，A 更强；如果目标是泛运营/产品转向，B 的叙事更顺。但按通用简历质量，A 的证据密度和面试可防守性更高。
-```
+| ID | Dimension | Points | Measures |
+|---|---|---:|---|
+| `positioning` | 目标定位与职业叙事 | 20 | Whether the target, stage, and strongest value are understandable without guessing. |
+| `selection_prioritization` | 内容取舍与优先级 | 20 | Whether the strongest relevant evidence is selected and ordered ahead of noise. |
+| `evidence_expression` | 证据表达完整度 | 25 | Whether claims include action, method, scope, result/artifact, and personal contribution where available. |
+| `semantic_clarity` | 语义结构与扫读效率 | 20 | Headings, bullet logic, wording, information hierarchy in text, and textual ATS semantics. |
+| `consistency_defensibility` | 一致性与面试可防守性 | 15 | Timeline, terminology, ownership wording, metric framing, and claim consistency. |
 
-Avoid:
+### Communication Boundaries
 
-```text
-A 简历一定比 B 简历好。
-```
+- Standard section names, keyword wording, and bullet clarity belong here.
+- Fonts, spacing, columns, text boxes, margins, and visual reading order do not belong here.
+- A strong career history written vaguely may receive high career capital with medium confidence and a lower communication score.
+- Missing context is a communication gap unless it creates a genuine contradiction or implausible claim.
 
-## Score Bands
+## 5. Presentation-Quality Rubric
 
-| Score | Band | Meaning |
-|---:|---|---|
-| 90-100 | A+ | Strong submit-ready resume for the target. Only minor polish remains. |
-| 80-89 | A | Competitive, but one or two meaningful gaps prevent top-tier confidence. |
-| 70-79 | B | Usable, but needs targeted work before serious applications. |
-| 60-69 | C | Significant rebuild needed; likely underperforms against comparable candidates. |
-| <60 | D | Not ready for this target; foundational content or positioning is missing. |
+Use these exact dimensions and weights when layout evidence exists.
 
-## Experience-Year Benchmark Averages
+| ID | Dimension | Points | Measures |
+|---|---|---:|---|
+| `visual_hierarchy` | 信息层级与首屏抓取 | 25 | Visual emphasis and first-screen comprehension. |
+| `density_whitespace` | 版面密度与留白 | 20 | Margins, spacing, bullet density, line length, and page balance. |
+| `typography_alignment` | 字体、字号、对齐与一致性 | 15 | Typography, dates, punctuation, alignment, and repeated patterns. |
+| `visual_organization` | 模块组织与视觉引导 | 15 | Grouping, ordering, and visual flow. |
+| `ats_layout` | 版式 ATS/机器解析友好度 | 15 | Columns, tables, text boxes, image-only text, copyability, and reading order. |
+| `professional_fit` | 专业感与岗位气质 | 10 | Appropriate visual tone without harmful decoration. |
 
-Use this section to give the user a same-seniority and one-level-up reference. These are **rubric-calibrated benchmark averages**, not live market statistics. They answer: "For this resume-quality scoring system, what score is typical for a candidate at this experience level?"
+Presentation score caps by `layout_evidence`:
 
-Always show the candidate's current band and the next higher band when experience can be estimated. For example:
+| Evidence | Cap | Max confidence |
+|---|---:|---|
+| `rendered_file` | 100 | high |
+| `file_structure` | 90 | high |
+| `extracted_text` | 82 | medium |
+| `pasted_text` | 75 | medium |
+| `ocr_only` | 65 | low |
 
-- About 2 years of experience -> show `1-3 年` and `3-5 年`.
-- About 4 years of experience -> show `3-5 年` and `5-8 年`.
-- Fresh graduate or internship-only resume -> show `应届/0-1 年` and `1-3 年`.
+If only pasted or extracted text is available, do not claim exact typography, margins, or visual polish.
 
-| Experience band | Benchmark average | Competitive line | Excellent line | What this band usually needs |
-|---|---:|---:|---:|---|
-| 应届/0-1 年 | 64 | 74 | 84 | Clear target, strong projects/internships, skills backed by evidence, no obvious template gaps. |
-| 1-3 年 | 72 | 80 | 88 | Real work or production-like projects, concrete ownership, several quantified outcomes, clean one-page/two-page structure. |
-| 3-5 年 | 78 | 85 | 90 | Independent module ownership, business impact, cross-team collaboration, measurable delivery quality, deeper technical tradeoffs. |
-| 5-8 年 | 82 | 88 | 92 | System-level ownership, architecture decisions, mentoring or project leadership, stable business impact, strong risk control. |
-| 8 年以上 | 84 | 90 | 94 | Domain leadership, strategy/architecture scope, team influence, complex stakeholder management, durable measurable outcomes. |
+## 6. JD-Fit Rubric
 
-### Benchmark Rules
+Create this axis only when an actual JD is provided.
 
-- `estimated_years` should be based on resume evidence or user-provided facts. If unclear, mark `unknown` and skip numeric deltas.
-- `candidate_delta` = `candidate total_score - benchmark average`.
-- If the candidate beats the current-band average but falls below the next-band average, say they are strong for current seniority but not yet packaged like the next band.
-- If the candidate beats both averages, still check the next-band expectation gap before claiming next-band readiness.
-- If the candidate is below the current-band average, explain the biggest 2-3 gaps by evidence, not by seniority alone.
-- For cross-industry comparisons, compute benchmarks per resume using each resume's own target role and inferred years.
-- If the user provides real cohort data, prefer it over this built-in table and state the source.
+| ID | Dimension | Points | Measures |
+|---|---|---:|---|
+| `must_haves` | 硬性条件覆盖 | 35 | Explicit must-have qualifications and disqualifying gaps. |
+| `responsibility_match` | 核心职责匹配 | 25 | Evidence aligned with the JD's actual work. |
+| `seniority_scope` | 年限、级别与责任范围 | 15 | Seniority, ownership, and scale expected by the role. |
+| `domain_tools` | 领域、方法与工具匹配 | 15 | Domain knowledge, methods, platforms, or tools. |
+| `targeted_evidence` | 关键证据呈现 | 10 | Whether relevant proof is visible and credible in the resume. |
 
-## 90+ Gate
+An unrelated or missing JD must never reduce career capital, communication quality, or presentation quality.
 
-A resume should not exceed 90 unless most of these are true:
+## 7. Evidence And Confidence Rules
 
-- Target role is clear in the top third.
-- At least 60-70% of major bullets have action + method + scope/result.
-- Strongest projects or work experiences have credible ownership and depth.
-- Key skills are evidenced in experience, not only listed.
-- Formatting is ATS-safe and easy to scan.
-- Claims do not depend on unverifiable inflated metrics.
-- For JD mode, must-have requirements are substantially covered.
+### Accepted Evidence Types
 
-Common reasons to cap at 89:
+Treat these as legitimate proof when role-appropriate:
 
-- Good experience but weak metrics or proof.
-- Strong project list but unclear personal contribution.
-- Skills match the role but are not tied to bullets.
-- Resume is strong generally but not tailored to the provided JD.
-- Claims are plausible but would need confirmation in an interview.
+- quantified result or before/after comparison
+- scale, users, transactions, budget, team, geography, stakeholders, or operational reach
+- shipped artifact, system, product, publication, policy, campaign, design, process, or certification
+- decision, tradeoff, diagnosis, experiment, architecture, or strategy
+- adoption, reuse, customer acceptance, stakeholder approval, citation, award, or promotion
+- quality, reliability, compliance, safety, cost, time, or risk improvement
+- credible qualitative result when disclosure restrictions prevent exact numbers
 
-## Dimension Anchors
+No single evidence type is mandatory across all roles.
 
-### Target Clarity And Role Alignment (15)
+### Confidence
 
-- 13-15: Clear target role, coherent professional story, strongest evidence ordered for the role.
-- 10-12: Direction is visible but top third or ordering could be sharper.
-- 6-9: Multiple directions mixed together; recruiter must infer the target.
-- 0-5: No clear target, or resume points at the wrong role.
+- `high`: complete text, adequate context, and strong evidence for the scored axis.
+- `medium`: complete resume but some target, scope, ownership, or verification context is missing.
+- `low`: partial text, OCR uncertainty, unclear target/stage, or many assumptions.
 
-### Evidence Strength And Quantified Impact (20)
+### Evidence Coverage
 
-- 17-20: Achievements include scope, metrics, artifacts, users, systems, or measurable outcomes.
-- 13-16: Several concrete bullets, but some important claims lack numbers or results.
-- 8-12: Mostly responsibilities with limited evidence.
-- 0-7: Generic statements, little proof, no clear outcomes.
+Report a separate 0-100 `evidence_coverage.score`:
 
-### Experience And Project Depth (20)
+- 85-100: most major claims have enough context to score confidently.
+- 70-84: several strong signals, but material claims need context.
+- 50-69: scoring is possible but sensitive to missing information.
+- Below 50: avoid strong conclusions; emphasize what cannot be determined.
 
-- 17-20: Experiences show complexity, tradeoffs, end-to-end ownership, and interview-ready stories.
-- 13-16: Solid experiences, but depth or ownership is uneven.
-- 8-12: Projects/work are present but shallow, school-like, or feature-list heavy.
-- 0-7: Little relevant experience for the target.
+Do not subtract evidence coverage from any score. It qualifies the reliability of the diagnosis.
 
-### Role Competency And Skill Signal (15)
+## 8. Issue-Ledger And No-Double-Count Policy
 
-- 13-15: Core skills are role-relevant and evidenced in bullets/projects.
-- 10-12: Good skill match but some skills are unsupported.
-- 6-9: Skill list is noisy, too broad, or missing important role keywords.
-- 0-5: Skills do not match target or cannot be trusted.
+Represent each material issue once in `issue_ledger`.
 
-### Structure, ATS, And Scanability (15)
+Required fields:
 
-- 13-15: Standard sections, strong ordering, readable density, ATS-safe layout.
-- 10-12: Generally readable but has length, ordering, or section-name issues.
-- 6-9: Dense, inconsistent, hard to scan, or likely ATS-fragile.
-- 0-5: Severe formatting or structure problems.
+- unique `issue_id`
+- `kind`: `gap`, `risk`, `contradiction`, or `layout`
+- `severity`: `high`, `medium`, or `low`
+- `primary_axis`: one score axis or `none`
+- `primary_dimension`: a valid dimension ID for the primary axis, or empty when `none`
+- `points`: zero or negative; use `0` for informational gaps
+- evidence and explanation
+- optional `cross_references`
 
-### Credibility And Interview Defensibility (15)
+Rules:
 
-- 13-15: Claims are conservative, consistent, and easy to defend.
-- 10-12: Mostly credible with a few unclear ownership/metric risks.
-- 6-9: Several claims need proof or could trigger skeptical follow-up.
-- 0-5: Obvious overclaiming, contradictions, or unsupported seniority.
+1. One issue may affect only one primary dimension.
+2. Cross-references are narrative only and cannot deduct again.
+3. Missing evidence should usually have `points: 0` and reduce coverage/confidence.
+4. Use negative points only when the dimension score explicitly reflects a real weakness or risk.
+5. Layout issues may affect only `presentation_quality`.
+6. JD gaps may affect only `jd_fit`.
+7. A metric without context is normally a communication issue; treat it as credibility risk only when implausible, contradictory, or inflated.
 
-## Confidence Levels
+## 9. Stage Benchmarks
 
-- `high`: full resume text plus target role/JD is available; file format/layout evidence is sufficient.
-- `medium`: resume text is available but JD, role target, or layout evidence is incomplete.
-- `low`: partial text, OCR uncertainty, missing target, or many assumptions.
+Generate `stage_benchmark` only when requested and stage evidence is adequate. Base it on `career_capital`, never `core_score` or presentation.
 
-Report confidence separately from score. A 86 with low confidence means "promising but under-verified", not "definitely A-level".
+Use the label `internal_expectation`, not market average or percentile. The reference lines are calibration anchors, not observed hiring-market statistics.
+
+| Stage | Reference line | Strong line | Exceptional line |
+|---|---:|---:|---:|
+| `intern_entry` | 60 | 75 | 88 |
+| `early_career` | 68 | 80 | 90 |
+| `experienced_ic` | 74 | 84 | 92 |
+| `senior_ic` | 80 | 88 | 94 |
+| `manager_lead` | 82 | 90 | 95 |
+
+Interpret these through the selected role-family profile. Do not claim that a score is above a real population average without external cohort data.
+
+## 10. 90+ Rules
+
+Do not use a universal 89 cap. Award 90+ on an axis when evidence matches the exceptional anchors for that axis.
+
+Career capital may exceed 90 without numeric metrics when there is strong alternative proof of complexity, ownership, and value. Communication may exceed 90 with minor missing context if the narrative is otherwise precise and defensible. Presentation may exceed 90 only with rendered evidence.
+
+Use a hard cap only on the directly affected axis:
+
+- unresolved timeline contradiction
+- clearly implausible or inflated ownership
+- critical content missing so the axis cannot be evaluated
+- a JD hard requirement demonstrably not met, applied only to `jd_fit`
+
+When confidence is low, report the score with low confidence instead of inventing certainty or automatically forcing a low score.

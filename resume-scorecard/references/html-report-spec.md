@@ -1,88 +1,35 @@
-# HTML Report Spec
+# HTML Report Spec V2
 
-The report is a standalone Chinese HTML file rendered from `resume_scorecard_analysis.json`.
+Render a standalone Chinese HTML file from strict-valid v2 analysis JSON.
 
 ## Required Sections
 
-1. Hero
-   - Report title
-   - Target role
-   - Score mode
-   - Confidence level
-   - Generated time
-
-2. Executive Summary
-   - Overall conclusion
-   - Missing information and confidence caveats
-
-3. Score Overview
-   - One card per resume version
-   - Total score, band, short summary
-   - JD-fit score when available
-
-4. Experience-Year Benchmark
-   - Show when a resume includes `experience_benchmark`
-   - Estimate or display the candidate's years of experience
-   - Compare the candidate score against the current experience band average
-   - Also compare against the next higher band average
-   - Clearly state in a visible callout and in methodology that built-in averages are rubric-calibrated reference baselines, not live market statistics
-
-5. Presentation / Layout Score
-   - Show when a resume includes `presentation_review`
-   - Display a separate 0-100 presentation score, band, confidence, and short summary
-   - Display `layout_evidence` when available so readers understand whether the score came from rendered layout, extracted text, pasted text, or OCR
-   - Include criteria breakdown for information hierarchy, density/white space, typography/alignment consistency, module organization, ATS parsing friendliness, and professional tone
-   - List visual strengths, visible layout issues, concrete layout lift actions, and ATS layout notes
-   - Make clear that this is separate from the main resume competitiveness score
-
-6. Version Comparison
-   - Show only when there are multiple resume versions or `comparison` exists
-   - Winner, reason, score deltas, best-use scenario
-   - For cross-industry comparisons, show `comparison.normalized_axes` as a table when available
-
-7. Dimension Breakdown
-   - For each resume version:
-     - Dimension score and max score
-     - Progress bar
-     - Rationale
-     - Evidence
-     - Deductions
-     - Lift actions
-
-8. Risk And ATS Notes
-   - Red flags grouped by severity
-   - ATS/readability notes
-   - Interview risks
-
-9. Score Lift Levers
-   - Action
-   - Estimated score gain
-   - Effort
-   - Why it matters
-
-10. Methodology
-   - Explain that the score is diagnostic, not hiring probability
-   - Mention the six default score dimensions
-   - Mention that experience-year averages are internal benchmark references unless an external dataset is provided
-   - Mention that presentation/layout score, when present, is an independent 100-point visual/readability diagnostic and is not added to the main total score
+1. Hero: report title, target, mode, confidence, time, and diagnostic disclaimer.
+2. Score vector: core score plus separate career-capital, communication, presentation, and optional JD-fit scores.
+3. Executive summary: strongest evidence, main gaps, evidence coverage, and missing information.
+4. Axis breakdown: exact dimension scores, positive evidence, rationale, optional gaps, and lift actions.
+5. Issue ledger: unique issue ID, primary axis/dimension, points, evidence, and cross-references.
+6. Presentation diagnosis: evidence level, confidence, layout strengths/issues, and ATS-layout notes when available.
+7. JD-fit diagnosis: must-have coverage and matched/missing terms only when a JD exists.
+8. Stage benchmark: show only when present and label it an internal expectation anchor, not a market average.
+9. Comparison: show axis deltas, numeric normalized axes, and scenario winners when multiple resumes exist.
+10. Risks, ATS notes, and score-lift levers.
+11. Methodology: formula, score separation, evidence coverage, no-double-count rule, and limitations.
 
 ## UX Requirements
 
-- Clean professional style.
-- Responsive layout.
-- No external dependencies.
-- Text must not overflow on mobile.
-- Use tables for dense comparisons and cards for score summaries.
-- Wrap dense tables in a horizontal scroll container on mobile; table overflow must not widen the whole page.
-- Use color sparingly:
-  - Green for strong scores.
-  - Amber for medium.
-  - Red for high-risk deductions.
-  - Neutral gray for methodology.
-- Do not include private phone numbers, email addresses, or sensitive contact details. Use renderer `--auto-redact` or validator `--redacted-output` before final HTML publication when warnings appear.
+- Make the score vector more prominent than any one isolated number.
+- Label presentation and JD fit as independent scores that do not enter core score.
+- Show confidence and evidence coverage beside scores rather than burying them at the end.
+- Use cards for score summaries and horizontally scrollable tables for dense comparisons.
+- Keep responsive layout and avoid external dependencies.
+- Use restrained colors and never communicate low evidence as personal worth.
+- Escape all report content and auto-redact sensitive contact details before publication.
 
 ## Copy Rules
 
-- The report may include "提分杠杆" but should not rewrite the full resume by default.
-- If recommending a score lift, phrase it as diagnostic advice, not guaranteed improvement.
-- Estimated score gains must be ranges and labeled as estimates.
+- Say “简历已展示的履历含金量”, not “候选人能力分”.
+- Say “内部阶段期望锚点”, not “市场平均分”, unless an external dataset is provided.
+- Explain that missing evidence affects confidence/coverage before treating it as a weakness.
+- Estimated gains must be ranges and must not promise outcomes.
+- Do not rewrite the resume by default.

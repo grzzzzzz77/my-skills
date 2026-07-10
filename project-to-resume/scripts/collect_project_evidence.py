@@ -35,6 +35,7 @@ SIGNAL_EXCLUDE_DIR_PARTS = {
     "fixtures",
     "preskill",
     "screenshots",
+    "uni_modules",
     "vendor",
     "vendors",
 }
@@ -183,7 +184,7 @@ FRAMEWORK_DEFINITIONS = {
     "Testing": {
         "manifest": ["vitest", "jest", "playwright", "pytest", "unittest"],
         "files": ["vitest.config.ts", "jest.config.js", "playwright.config.ts", "pytest.ini"],
-        "patterns": [r"describe\s*\(", r"it\s*\(", r"def\s+test_"],
+        "patterns": [r"\bdescribe\s*\(", r"\bit\s*\(", r"\bdef\s+test_"],
         "role": "quality",
     },
     "AI/Data": {
@@ -198,7 +199,7 @@ FRAMEWORK_DEFINITIONS = {
         "patterns": [
             r"tool_call|function_call|tools\s*[:=]",
             r"createAgent|AgentExecutor|StateGraph|workflow",
-            r"retriever|vectorStore|embedding|RAG|memory",
+            r"retriever|vectorStore|embedding|\bRAG\b|memory",
             r"system_prompt|PromptTemplate|messages\s*[:=]",
         ],
         "role": "ai_agent",
@@ -272,10 +273,10 @@ AI_AGENT_DEPS = {
 AI_AGENT_PATTERNS = {
     "tool_calling": re.compile(r"tool_call|function_call|tools\s*[:=]|Tool\s*\(", re.I),
     "prompt_engineering": re.compile(r"system_prompt|PromptTemplate|messages\s*[:=]|role\s*:\s*[\"']system", re.I),
-    "rag_retrieval": re.compile(r"retriever|vectorStore|similaritySearch|RAG|context\s+window", re.I),
+    "rag_retrieval": re.compile(r"retriever|vectorStore|similaritySearch|\bRAG\b|context\s+window", re.I),
     "memory_state": re.compile(r"memory|checkpoint|conversation_state|chat_history", re.I),
     "workflow_orchestration": re.compile(r"StateGraph|createAgent|AgentExecutor|workflow|planner|executor", re.I),
-    "mcp_integration": re.compile(r"modelcontextprotocol|mcp\.|MCP", re.I),
+    "mcp_integration": re.compile(r"modelcontextprotocol|mcp\.|\bMCP\b", re.I),
 }
 
 COMMON_DOMAIN_WORDS = {
@@ -494,6 +495,12 @@ def rel_has_named_file(rels: list[str], file_name: str) -> bool:
     return any(wanted in rel.split("/") for rel in rels)
 
 
+def dependency_matches(wanted: str, actual: str) -> bool:
+    wanted_lower = wanted.lower()
+    actual_lower = actual.lower()
+    return actual_lower == wanted_lower or actual_lower.startswith(wanted_lower + "/")
+
+
 def detect_framework_profiles(repo: Path, files: list[Path], manifests: dict) -> list[dict]:
     deps = manifest_names(manifests)
     rels = [
@@ -517,7 +524,7 @@ def detect_framework_profiles(repo: Path, files: list[Path], manifests: dict) ->
         signals = []
         for dep in spec["manifest"]:
             dep_lower = dep.lower()
-            if any(dep_lower in item for item in deps):
+            if any(dependency_matches(dep_lower, item) for item in deps):
                 signals.append(f"dependency:{dep}")
         for file_name in spec["files"]:
             if rel_has_named_file(rels, file_name):
@@ -527,6 +534,10 @@ def detect_framework_profiles(repo: Path, files: list[Path], manifests: dict) ->
                 signals.append(f"pattern:{pattern}")
         if name == "Node API" and not any(signal.startswith(("dependency:", "file:")) for signal in signals):
             continue
+        if name == "AI Agent":
+            has_dependency = any(signal.startswith("dependency:") for signal in signals)
+            if not has_dependency and len(signals) < 2:
+                continue
         if signals:
             profiles.append({
                 "name": name,
@@ -733,7 +744,7 @@ def collect_ai_agent_signals(repo: Path, files: list[Path], deps: set[str]) -> d
     pattern_counts = {key: value for key, value in pattern_counts.items() if value}
     source_candidate_count = sum(len(values) for values in file_candidates.values())
     source_hit_count = source_candidate_count + sum(pattern_counts.values())
-    if not agent_deps and not source_candidate_count:
+    if not agent_deps and (len(file_candidates) < 2 or not pattern_counts):
         return {}
     return {
         "dependencies": agent_deps[:30],
@@ -759,7 +770,7 @@ def sensitivity_signals(rel_files: list[str]) -> list[str]:
     signals = []
     for rel in rel_files:
         lowered = rel.lower()
-        if any(part in lowered for part in [".env", "secret", "credential", "customer", "client", "internal"]):
+        if any(part in lowered for part in [".env", "secret", "credential", "customer", "internal"]):
             signals.append(rel)
         if len(signals) >= 20:
             break
@@ -1154,7 +1165,7 @@ def highlight_seeds(evidence: dict) -> list[dict]:
                 "category": category,
                 "reason": reason,
                 "evidence_count": score,
-                "example_paths": seed_examples[:12],
+                "example_paths": list(dict.fromkeys(seed_examples))[:12],
             })
     if specialized.get("uniapp"):
         uni = specialized["uniapp"]
@@ -1164,7 +1175,7 @@ def highlight_seeds(evidence: dict) -> list[dict]:
             "category": "移动端/小程序多端交付",
             "reason": "检测到 UniApp pages.json、manifest、多端条件编译或小程序 API，可提炼多端页面、登录授权、支付、地图、上传等移动端业务亮点。",
             "evidence_count": int(uni.get("page_count") or 0) + len(uni.get("uni_api_calls") or []),
-            "example_paths": paths[:12],
+            "example_paths": list(dict.fromkeys(paths))[:12],
         })
     if specialized.get("node_backend"):
         node = specialized["node_backend"]
@@ -1175,7 +1186,7 @@ def highlight_seeds(evidence: dict) -> list[dict]:
             "category": "Node 后端服务设计",
             "reason": "检测到 Node API 依赖、路由/控制器/服务/中间件/模型等分层，可提炼接口设计、鉴权、数据层和任务队列亮点。",
             "evidence_count": len(candidates) + len(node.get("dependencies") or []),
-            "example_paths": candidates[:12],
+            "example_paths": list(dict.fromkeys(candidates))[:12],
         })
     if specialized.get("python_backend"):
         python = specialized["python_backend"]
@@ -1186,7 +1197,7 @@ def highlight_seeds(evidence: dict) -> list[dict]:
             "category": "Python API / 网关服务",
             "reason": "检测到 FastAPI/Flask/Django、代理转发、鉴权、配额或计量等 Python 后端服务结构，可提炼 API 网关、可靠性和服务治理亮点。",
             "evidence_count": len(candidates) + len(python.get("dependencies") or []),
-            "example_paths": candidates[:12],
+            "example_paths": list(dict.fromkeys(candidates))[:12],
         })
     if specialized.get("ai_agent"):
         agent = specialized["ai_agent"]
@@ -1197,7 +1208,7 @@ def highlight_seeds(evidence: dict) -> list[dict]:
             "category": "AI Agent 应用落地",
             "reason": "检测到模型调用、Prompt、工具调用、RAG、Memory、Workflow 或 MCP 信号，可提炼 AI 应用工程化落地亮点。",
             "evidence_count": len(candidates) + min(sum((agent.get("pattern_counts") or {}).values()), 50),
-            "example_paths": candidates[:12],
+            "example_paths": list(dict.fromkeys(candidates))[:12],
         })
     return seeds
 

@@ -23,12 +23,13 @@ Ask only for missing truth-critical details:
 
 - `repo` or code evidence: local repository path, project folder, specific files, diff, or pasted source snippets.
 - `target_role`: target role, such as 前端开发、后端开发、全栈、测试、AI 工程师.
+- `target_level`: optional target seniority or experience band. Use neutral wording when unknown.
 - `mode`: optional: `micro`, `quick`, `standard`, or `strict_report`.
 - `output_dir`: optional. Use it for generated evidence, JSON, reports, and prompt packs.
 - `author`: optional Git author name/email for personal contribution analysis.
 - `role_claim`: optional ownership boundary, such as independent owner, module owner, team member, or unknown.
 - `publicity`: optional disclosure boundary for internal metrics, customer names, private APIs, revenue, traffic, or company details.
-- Existing resume/JD: optional context for wording only; never use it to fabricate project facts.
+- Existing resume/JD: optional but recommended for role-specific keyword priority and bullet density; never use it to fabricate project facts.
 
 If role boundary or disclosure boundary would materially change truthfulness, ask at most 1-2 questions. If the user wants to proceed, use conservative assumptions and show them.
 
@@ -109,6 +110,8 @@ Return:
 
 Create and validate `project_resume_analysis.json` using `references/analysis-schema.md`. For every final highlight, include `technical_mechanism`, `technical_difficulty`, `business_value`, a stable `detail_anchor`, and `logic_chain` so the summary bullet can jump to a beginner-readable detail section explaining the full closed loop. The title and first sentence should expose the technical mechanism before the business scenario.
 
+Treat `highlights[].safe_bullet` with `risk=safe` as the single source of truth. Top-level `safe_bullets`, when present, may only select or order exact copies of those validated bullets. Never create a separate direct-paste bullet that is not linked to a safe highlight. Include at least three structured `interview_stories` for the strongest safe highlights when three are available; each story must cover the hardest question, answer outline, alternatives, failure boundary, verification method, and likely follow-ups.
+
 Run:
 
 ```bash
@@ -139,12 +142,16 @@ Before final delivery:
 
 - Confirm every final bullet has evidence or a visible risk label.
 - Confirm every final highlight balances technical mechanism, technical difficulty, and business value. Do not accept cards that only describe product workflow.
+- Reject semantic placeholders such as “负责模块开发”“有一定技术难度”“提升业务价值”, even when every JSON field is present.
+- Confirm `logic_chain.trigger` describes a runtime/user/system event rather than the candidate's responsibility, and ensure the beginner summary does not repeat the resume bullet verbatim.
+- Replace unsupported “提升效率/优化体验” with code-derived scope or a directly implied outcome such as preventing stale responses, centralizing error handling, reducing duplicate implementations, or exposing a controlled fallback.
 - Confirm every final highlight has `detail_anchor` and `logic_chain` in standard/strict_report outputs.
 - Confirm safe bullets do not contain unverified business metrics, ownership, users, revenue, GMV, latency, or production impact.
 - Confirm role/disclosure assumptions are visible when not user-confirmed.
 - Confirm generated JSON passes `scripts/validate_analysis.py --strict`; in report mode include `--evidence project_evidence.json`.
 - Confirm strict reports are rendered by `scripts/render_resume_report.py --strict`.
 - For skill maintenance, run `scripts/check_golden_fixtures.py`.
+- For collector maintenance, run `scripts/check_collector_fixtures.py`.
 - For substantial skill revisions, forward-test collector behavior on 2-3 real local repositories when available, not only golden fixtures; record repo type, command, pass/fail, and notable gaps in the final response.
 - Run no project build/test command unless required for understanding or explicitly requested. Static scanning, collector scripts, renderer validation, and Git commands are enough by default.
 
@@ -163,3 +170,4 @@ Before final delivery:
 - Report template: `assets/report-template.html`
 - Golden examples: `examples/*-golden-analysis.json`
 - Golden evidence fixtures: `examples/fixtures/*-project_evidence.json`
+- Collector fixture check: `scripts/check_collector_fixtures.py`

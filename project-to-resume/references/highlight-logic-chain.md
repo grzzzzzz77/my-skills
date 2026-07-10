@@ -59,6 +59,8 @@ For standard and strict_report analyses, add these fields to every final highlig
 
 - Keep `detail_anchor` stable, lowercase, URL-safe, and unique within the report.
 - Write the logic chain for a smart beginner, not for the original developer.
+- `trigger` must describe what starts the runtime flow: a user action, request, callback, scheduled job, model response, page refresh, or state transition. Candidate responsibilities such as “负责模块开发” belong in STAR `task`, not here.
+- `plain_summary` must explain the mechanism in simpler language instead of repeating `safe_bullet` verbatim. `problem` must name the concrete conflict/risk instead of copying `beginner_context`.
 - Prefer 3-6 `flow_steps`. Fewer than 3 usually means the highlight is not a chain yet.
 - Each step should include evidence when possible. Use file paths, route names, tests, configs, docs, or code-derived counts.
 - Put runtime implementation evidence first. Tests are excellent for proving the chain closes, but they should usually appear in the final verification/closure step rather than replacing the actual route, store, service, adapter, controller, or prompt builder.

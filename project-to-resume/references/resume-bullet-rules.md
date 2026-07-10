@@ -175,6 +175,29 @@ If it does not, keep it as a project fact rather than a resume highlight.
 
 After writing a safe bullet for standard or strict_report mode, write its beginner-readable logic chain using `references/highlight-logic-chain.md`. If the chain cannot explain the trigger, technical process, output, and evidence-backed closure, the bullet is probably still too generic.
 
+## Strict Semantic Quality Gate
+
+Passing JSON shape validation is not enough. A resume-ready highlight must also pass these checks:
+
+- `technical_mechanism` names actual code mechanisms such as a state machine, request guard, parser, adapter, service boundary, cache, queue, Schema, route guard, retry, or protocol handler.
+- `technical_difficulty` names what can fail: race conditions, stale state, ordering, consistency, invalid input, permission refresh, retries, long contexts, integration boundaries, or an explicit tradeoff.
+- `business_value` names the protected user/workflow or the directly implied engineering consequence. “提升业务价值” is not a result.
+- `logic_chain.trigger` is an event such as a request, page refresh, user action, scheduled job, callback, model response, or state transition. “负责某模块” is a task, not a trigger.
+- `logic_chain.plain_summary` explains the idea for a beginner and must not copy the safe bullet word for word.
+- Safe bullets avoid unsupported “提升效率/优化体验”. Prefer a code-derived count or a direct effect that follows from the mechanism: prevent duplicate submission, isolate failures, centralize common errors, reduce duplicate implementations, expose source traceability, or preserve an extension boundary.
+
+Reject examples:
+
+```text
+技术机制：负责模块开发。
+技术难点：有一定技术难度。
+业务价值：提升业务价值。
+```
+
+### Safe Bullet Single Source
+
+`highlights[].safe_bullet` with `risk=safe` is the only authoritative resume-ready copy. A top-level `safe_bullets` list may only contain exact copies selected from those safe highlights. The HTML report and downstream prompt must derive their content from validated highlights, never from an independent free-form paragraph.
+
 ## Chinese-First Technical Wording
 
 Default strict-report highlights should lead with the technical concept, then explain the project context. Use Chinese as the default expression for the concept. English should be kept only when it is a real professional term, framework/protocol name, abbreviation, or code-level identifier that Chinese technical resumes commonly keep as English.
@@ -226,6 +249,15 @@ For each strong bullet, prepare:
 - Action: 技术方案、拆分、关键实现。
 - Result: 代码可验证结果 + 待确认业务结果。
 - Tradeoff: 为什么这么设计，有什么边界。
+
+For the best 3 safe highlights, add a structured interview deep dive:
+
+- `hardest_question`: the question most likely to expose shallow understanding.
+- `answer_outline`: a concise mechanism-first answer path.
+- `alternatives`: at least one rejected design and why.
+- `failure_boundary`: concrete failure/debugging scenarios and what the solution does not guarantee.
+- `verification`: tests, logs, fixtures, counters, manual scenarios, or code evidence used to prove the chain.
+- `follow_up_questions`: at least two realistic interviewer follow-ups.
 
 ## Role and Disclosure Safety
 

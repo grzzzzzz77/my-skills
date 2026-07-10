@@ -383,8 +383,6 @@ def build_safe_bullets(highlights: list[dict], analysis: dict) -> tuple[str, int
             if match_index is not None:
                 used_indexes.add(match_index)
                 rows.append({"bullet": bullet, "anchor": highlights[match_index].get("detail_anchor")})
-            else:
-                rows.append({"bullet": bullet, "anchor": ""})
     else:
         rows = [
             {"bullet": item["safe_bullet"].strip(), "anchor": item.get("detail_anchor")}
@@ -451,6 +449,27 @@ def render_interview_notes(notes: Any) -> str:
     if isinstance(notes, list):
         return "<ul>" + "".join(f"<li>{h(item)}</li>" for item in notes) + "</ul>"
     return h(notes)
+
+
+def render_interview_drill(story: dict) -> str:
+    labels = [
+        ("hardest_question", "最难追问"),
+        ("answer_outline", "回答主线"),
+        ("alternatives", "备选方案与取舍"),
+        ("failure_boundary", "失败边界 / 排障"),
+        ("verification", "验证方式"),
+    ]
+    items = [
+        f"<li><strong>{label}：</strong>{h(story.get(key, ''))}</li>"
+        for key, label in labels
+        if str(story.get(key, "")).strip()
+    ]
+    questions = [str(value).strip() for value in as_list(story.get("follow_up_questions")) if str(value).strip()]
+    if questions:
+        items.append("<li><strong>继续追问：</strong><ol>" + "".join(f"<li>{h(value)}</li>" for value in questions) + "</ol></li>")
+    anchor = slugify_anchor(story.get("detail_anchor"), "")
+    link = f'<a class="detail-link" href="#{h(anchor)}">查看对应证据链</a>' if anchor else ""
+    return ("<ul>" + "".join(items) + "</ul>" + link) if items else ""
 
 
 def render_evidence_tags(values: Any) -> str:
@@ -585,7 +604,11 @@ def build_interview_stories(highlights: list[dict], analysis: dict) -> str:
     rows = []
     for story in stories:
         if isinstance(story, dict):
-            rows.append(f'<article class="story-card"><strong>{h(story.get("title", "面试故事"))}</strong>{render_interview_notes(story.get("notes") or story)}</article>')
+            if story.get("hardest_question"):
+                body = render_interview_drill(story)
+            else:
+                body = render_interview_notes(story.get("notes") or story)
+            rows.append(f'<article class="story-card"><strong>{h(story.get("title", "面试故事"))}</strong>{body}</article>')
         elif str(story).strip():
             rows.append(f'<article class="story-card">{h(story)}</article>')
     if not rows:
@@ -643,8 +666,6 @@ def build_evidence_appendix(evidence: dict) -> str:
 
 
 def build_prompt_pack(evidence: dict, analysis: dict, highlights: list[dict]) -> str:
-    if isinstance(analysis.get("prompt_pack"), str) and analysis["prompt_pack"].strip():
-        return analysis["prompt_pack"].strip()
     project_name = analysis.get("project_name") or evidence.get("project_name") or "未命名项目"
     pitch = evidence.get("resume_pitch_inputs") or {}
     safe_bullets = [
