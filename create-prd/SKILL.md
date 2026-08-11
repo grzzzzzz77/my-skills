@@ -77,7 +77,20 @@ description: Create, refine, or review implementation-ready product requirement 
 
 涉及数据量化时，不得擅自创造样本门槛、成功阈值、因果结论或预测数字。是否需要阈值由业务目标和用户决策确定；样例数字必须标注为展示占位，不得冒充估算。
 
-### 5. 生成原型（条件分支）
+### 5. 明确测试责任与操作边界
+
+每份需要进入开发的 PRD 都要写清测试分工、允许使用的测试工具和判定证据。默认执行边界如下：
+
+- Agent 负责 Agent 服务、接口、数据、任务、规则、权限和聚合逻辑的测试，可使用测试夹具完成单元、集成、契约和数据校验；
+- 默认不由 Agent 操控浏览器、H5 页面、小程序、模拟器或真实客户端，也不自动执行页面点击、登录、支付、授权等 UI 操作；
+- H5 与小程序的实际交互、容器兼容、登录授权和页面视觉由用户手动操作；Agent 应提供步骤、预期结果和证据要求；
+- 用户未回传人工测试结果前，相关用例只能标记为“待人工验证”，不得推断为通过；
+- 只有用户在当前任务中明确授权浏览器或小程序自动化时，才可扩大操作范围；授权必须说明目标环境和允许动作；
+- 默认使用测试环境、测试账号和合成数据，不进行真实支付、真实 Token 扣减、真实投递、真实触达或生产数据修改。
+
+具体测试矩阵、状态和退出标准见 [references/prd-standard.md](references/prd-standard.md)。
+
+### 6. 生成原型（条件分支）
 
 只有 `delivery_mode=prd_with_prototype` 时，完整读取 [references/prototype-standard.md](references/prototype-standard.md) 并执行。
 
@@ -85,7 +98,7 @@ description: Create, refine, or review implementation-ready product requirement 
 
 如果用户没有明确指定原型技术形态，优先生成单文件、离线可打开、响应式的 HTML/CSS/JavaScript 原型。若同时交付完整 PRD，默认提供“原型 / 完整 PRD”视图切换；若用户要求分开文件则分开交付。
 
-### 6. 一致性检查
+### 7. 一致性检查
 
 交付前逐项检查：
 
@@ -96,9 +109,10 @@ description: Create, refine, or review implementation-ready product requirement 
 - 示例、占位、推断和真实数据是否清楚区分；
 - PRD 与原型的菜单、字段、状态和规则是否一致；
 - 是否误生成了用户没有要求的原型；
+- 是否明确区分 Agent 自动测试和用户人工 UI 测试，待人工验证项是否被错误标为通过；
 - 文件是否保存到用户指定位置，旧文件是否按指令保留或替换。
 
-生成 HTML 时，至少验证 HTML 可打开、内联 JavaScript 语法有效、主要交互可达；环境允许时进行视觉预览，检查溢出、遮挡和响应式布局。
+生成 HTML 时，默认只做文件存在性、结构、内联 JavaScript 语法、交互绑定和规则一致性的静态验证；可使用非交互渲染预览检查明显的溢出和遮挡。不得默认启动或操控浏览器进行点击测试。需要真实交互验证时，输出人工测试步骤并等待用户结果；只有用户明确授权时才执行浏览器自动化。
 
 ## 写作规则
 
