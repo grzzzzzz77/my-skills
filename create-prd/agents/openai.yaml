@@ -1,0 +1,4 @@
+interface:
+  display_name: "Create PRD"
+  short_description: "产出结构化、可验收的 PRD，并按用户明确要求追加交互原型"
+  default_prompt: "Use $create-prd to turn this product requirement into an implementation-ready PRD."

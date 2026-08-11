@@ -54,6 +54,15 @@
       "strict": false
     },
     {
+      "description": "Create, refine, or review implementation-ready product requirement documents from discussions, product files, screenshots, codebases, and existing specs. Defaults to PRD-only delivery and adds a prototype only when the user explicitly requests one.",
+      "name": "create-prd",
+      "skills": [
+        "./"
+      ],
+      "source": "./create-prd",
+      "strict": false
+    },
+    {
       "description": "Guides users through creating effective Agent Skills for Cursor. Use when you want to create, write, or author a new skill, or asks about skill structure, best practices, or SKILL.md format.",
       "name": "create-skill",
       "skills": [

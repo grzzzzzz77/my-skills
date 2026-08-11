@@ -20,7 +20,7 @@ Then install any skill you want:
 
 Browse all available skills with `/plugin` after adding the marketplace, or see the full list in [`.claude-plugin/marketplace.json`](./.claude-plugin/marketplace.json).
 
-## Skills (44)
+## Skills (45)
 
 | # | Skill | Description |
 |---|-------|-------------|
@@ -68,3 +68,4 @@ Browse all available skills with `/plugin` after adding the marketplace, or see 
 | 42 | **project-to-resume** | 本地代码项目转简历亮点技能。要求有仓库、项目路径、代码文件、diff 或明确代码片段作为证据；支持 micro/quick/standard/strict_report 四档输出、workspace 识别、uni_modules/vendor/资源包噪声过滤和真实仓库前向验证。严格模式不仅校验 JSON 结构，还会拦截空泛技术机制、伪技术难点、职责冒充触发条件、逻辑链复读、无依据“提升效率”和未绑定 highlight 的安全 bullet；所有可直接粘贴内容都来自 risk=safe 的单一事实源。每条核心亮点包含技术机制、失败边界、业务价值、证据闭环、STAR，以及最难追问、备选方案、验证方式和追问题库；同时支持 100 分含金量评分、evidence-safe/potential 双评分、verified/code-derived/estimated 指标策略、中文 HTML 报告和下游改写 Prompt。 |
 | 43 | **resume-optimize** | 无 JD 一次性简历安全优化技能。基于原简历输出 evidence-safe Markdown 草稿、事实边界、改写说明、待确认项和 ATS/排版建议；支持 quick/full/file 模式，不做 JD 匹配、岗位打分、投递追踪或代码仓库提炼。 |
 | 44 | **resume-scorecard** | 简历多轴评分卡技能。把“简历已展示的履历含金量”“内容表达质量”“排版布局质量”和可选“JD 匹配度”拆成独立 100 分，其中核心竞争力只按履历含金量 70% + 内容表达 30% 派生，排版与 JD 不混入主分；支持六类岗位族、六种候选人阶段、无 JD/同岗位/跨行业对比、PDF/DOCX/纯文本证据降级、证据覆盖率、唯一 issue_id 防重复扣分、内部阶段期望锚点、ATS/面试风险、strict 语义校验、自动脱敏和中文 HTML 报告。 |
+| 45 | **create-prd** | 把产品讨论、文档、截图、代码和接口资料整理成结构化、可验收的 PRD。默认只交付 PRD；只有用户明确要求原型、交互稿、页面稿、wireframe 或可交互 HTML 时才追加原型。每份文档包含目标、非目标、输入、交付物、验收和停止条件；交互功能必须补齐状态机与异常路径。 |
