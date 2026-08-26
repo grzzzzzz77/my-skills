@@ -1,7 +1,7 @@
 {
   "metadata": {
     "description": "Skills backup synced by Skills Manager",
-    "version": "2026.06.26"
+    "version": "2026.08.26"
   },
   "name": "my-skills",
   "owner": {
@@ -60,6 +60,15 @@
         "./"
       ],
       "source": "./create-prd",
+      "strict": false
+    },
+    {
+      "description": "Review consumer mini-program and mobile-product PRDs, user flows, wireframes, prototypes, screenshots, or interactive flows before development. Produces evidence-graded findings, flow and state matrices, P0/P1/P2 priorities, UI and interaction improvements, PRD updates, acceptance criteria, and a strict 95+ report-quality gate.",
+      "name": "c-end-miniapp-ux-review",
+      "skills": [
+        "./"
+      ],
+      "source": "./c-end-miniapp-ux-review",
       "strict": false
     },
     {

@@ -19,14 +19,14 @@
         <div class="meta-row"><span class="pill">来源：/Users/edy/Desktop/grzzz/skills/my-skills</span><span class="pill">生成时间：2026/8/11</span><span class="pill">纯静态 HTML，可直接打开</span></div>
       </section>
       <aside class="metrics" aria-label="目录统计">
-        <div class="metric"><strong>68</strong><span>技能入口</span></div>
+        <div class="metric"><strong>69</strong><span>技能入口</span></div>
         <div class="metric"><strong>16</strong><span>功能类别</span></div>
-        <div class="metric"><strong>66</strong><span>直接技能目录</span></div>
+        <div class="metric"><strong>67</strong><span>直接技能目录</span></div>
         <div class="metric"><strong>2</strong><span>聚合技能包</span></div>
       </aside>
     </header>
     <div class="layout">
-      <aside class="category-panel"><h2 class="panel-title">按类别浏览</h2><button class="category-button active" data-category="全部"><span>全部目录</span><strong>68</strong></button>
+      <aside class="category-panel"><h2 class="panel-title">按类别浏览</h2><button class="category-button active" data-category="全部"><span>全部目录</span><strong>69</strong></button>
 <button class="category-button" data-category="自动化与浏览器"><span>自动化与浏览器</span><strong>1</strong></button>
 <button class="category-button" data-category="资讯与研究"><span>资讯与研究</span><strong>1</strong></button>
 <button class="category-button" data-category="前端工程"><span>前端工程</span><strong>13</strong></button>
@@ -35,7 +35,7 @@
 <button class="category-button" data-category="技能与规则管理"><span>技能与规则管理</span><strong>6</strong></button>
 <button class="category-button" data-category="研究与论文"><span>研究与论文</span><strong>21</strong></button>
 <button class="category-button" data-category="Figma 与设计协作"><span>Figma 与设计协作</span><strong>3</strong></button>
-<button class="category-button" data-category="设计与体验"><span>设计与体验</span><strong>4</strong></button>
+<button class="category-button" data-category="设计与体验"><span>设计与体验</span><strong>5</strong></button>
 <button class="category-button" data-category="设计与内容创作"><span>设计与内容创作</span><strong>2</strong></button>
 <button class="category-button" data-category="办公自动化"><span>办公自动化</span><strong>1</strong></button>
 <button class="category-button" data-category="数据库与后端"><span>数据库与后端</span><strong>1</strong></button>
@@ -77,7 +77,30 @@
     folders.unshift({"name":"create-prd","category":"技能与规则管理","type":"直接技能目录","path":"create-prd/","accent":"violet","summary":"把产品讨论和现有材料沉淀成可实施、可验收的 PRD，并严格按用户指令决定是否追加原型。","detail":"这个目录用于把零散需求、项目文档、截图、代码与接口资料整理成统一产品契约。默认只产出 PRD，不会因为需求涉及页面或看板就自动制作原型；只有用户明确要求原型、交互稿、页面稿、wireframe 或可交互 HTML 时才进入原型分支。","abilities":["建立目标、非目标、输入、交付物、验收和停止条件组成的最小任务契约。","区分已确认事实、产品决策、合理假设、未决问题和明确排除项。","补齐范围、优先级、业务规则、主流程、数据方向、接口、权限、灰度和 Definition of Done。","对交互功能强制补充状态机、异常路径、空态、加载态、失败态和无权限态。","默认输出 Markdown PRD；明确要求 HTML 时可渲染为 HTML，但不会因此自动增加原型。","明确要求原型时生成与 PRD 同口径的离线可交互 HTML，并验证脚本与视觉布局。"],"scenarios":["几轮产品讨论后，需要沉淀为研发可执行的 PRD。","已有旧版方案、代码和截图，需要明确新需求的范围与边界。","只想要 Markdown PRD，不希望额外制作页面原型。","明确需要把后台看板原型与完整 PRD 合并到一个 HTML 中。"],"examples":["根据我们刚才的讨论生成一份详细 PRD，默认只要 Markdown。","先和我讨论几轮，等边界明确后再写 PRD。","生成 PRD，并附一个可交互的后台看板 HTML 原型。","把 PRD 写成 HTML，但不要做原型。"],"tags":["PRD","产品需求","需求边界","最小任务契约","状态机","异常路径","交互原型","HTML原型"]});
     const createPrdEntry = folders.find(item => item.name === 'create-prd');
     if (createPrdEntry) createPrdEntry.abilities.push('明确测试责任边界：Agent 默认测试 Agent、接口与数据层，不操控浏览器或小程序；H5/小程序由用户人工验证。');
+    folders.unshift({"name":"c-end-miniapp-ux-review","category":"设计与体验","type":"直接技能目录","path":"c-end-miniapp-ux-review/","accent":"cyan","summary":"面向 C 端小程序和移动产品的开发前体验评审，把 PRD、原型和页面交互风险转成可落地、可验收的优化方案。","detail":"这个目录用于在研发投入前系统检查用户目标、任务入口、操作路径、信息层级、登录授权、反馈、异常恢复、小程序容器习惯、触控与可访问性风险。它严格区分 PRD 说明、静态图观察、实际操作和推断，不会把截图审查冒充真实可用性测试；完整报告通过最多三轮 95+ 质量门禁后才交付。","abilities":["支持 spec_only、static_artifact、interactive_flow 三种证据模式，并为每条结论标记 observed、specified、inferred 或 unknown。","从真实入口到成功结果逐步审查首次使用、重复使用、中断返回、登录失效和关键分支。","输出 P0/P1/P2/Opportunity 唯一问题台账，避免同一根因跨维度重复扣分。","覆盖加载、空、部分成功、失败、无权限、离线、超时、重复提交和版本不兼容等状态。","检查小程序胶囊区、安全区、返回、键盘、滚动、授权、隐私、支付、触控和无障碍风险。","把优化结论回写为业务规则、状态机、异常路径、文案规则和 Given/When/Then 验收标准。","提供严格 JSON 契约与 validate_review.py 校验器；95 分代表报告质量，不冒充产品体验分。"],"scenarios":["C 端小程序需求进入开发前，需要评审 PRD 和页面流程是否完整。","已有 Axure、Figma、线框图或截图，需要找出功能、UI 和交互问题。","登录授权、预约、下单、支付、表单或发布流程需要检查失败恢复和信任风险。","同一个功能改版前后需要按统一证据和评分维度比较。","希望把体验问题直接沉淀为 PRD 修改项和研发测试可执行的验收标准。"],"examples":["用 c-end-miniapp-ux-review 审查这个预约小程序 PRD，先评审不要改代码。","根据这些原型图检查用户路径、页面层级、授权时机和异常状态。","严格模式输出 review.json，并通过 95+ 质量门禁后再交付。","比较新旧两个下单流程，列出 P0/P1/P2 问题和 PRD 回写项。"],"tags":["C端产品","小程序","UX评审","PRD评审","原型评审","交互校验","状态矩阵","异常恢复","UI优化","可访问性","证据分级","95+质量门禁"]});
     const usageOverrides = {
+      'c-end-miniapp-ux-review': {
+        questions: [
+          '这个 C 端小程序需求开发前，帮我评审 PRD、原型和完整用户链路。',
+          '这个页面看起来不太顺，帮我找出 UI、交互、状态和授权体验问题。'
+        ],
+        inputs: [
+          'PRD、流程图、线框图、Figma/Axure 原型、截图、录屏或可访问的测试流程。',
+          '目标用户、核心任务、入口、成功结果，以及本次评审的起止范围。',
+          '现有设计规范、平台约束、登录/授权/支付规则和明确不能修改的业务边界。'
+        ],
+        outputs: [
+          '按证据等级标注的用户任务链路、总体结论和评审限制。',
+          '唯一 P0/P1/P2/Opportunity 问题台账，以及完整状态与异常恢复矩阵。',
+          '优化后的流程、UI/交互建议、PRD 回写项、Given/When/Then 验收标准和验证计划。',
+          '严格模式可生成 review.json，并用校验器执行最多三轮 95+ 报告质量门禁。'
+        ],
+        responses: [
+          '用户：这是预约小程序 PRD，开发前帮我做体验评审。\n回复：我会按 spec_only 模式先固定目标用户、核心任务和证据边界，再从入口走到预约结果，补齐授权、加载、空态、失败、超时、登录失效和重复提交，最后输出分级问题、优化流程、PRD 回写与验收标准；没有原型的视觉和真实行为会明确标为未验证。',
+          '用户：这些是 Figma 原型图，检查 UI 和交互。\n回复：我会按 static_artifact 模式审查可见层级、主操作、文案、触控和状态表达，同时区分哪些只是静态风险、哪些需要可操作原型才能验证，不会把截图评审写成真实点击测试。',
+          '用户：严格模式，必须 95 分以上。\n回复：我会输出符合严格 JSON 契约的评审结果，运行 validate_review.py 检查证据引用、完整链路、状态矩阵、问题去重、PRD 回写和验证计划；最多三轮修订，达到 95+ 且硬门禁通过后再交付。'
+        ]
+      },
       'create-prd': {
         questions: [
           '根据这些讨论和现有文档，帮我生成一份可开发、可验收的 PRD。',

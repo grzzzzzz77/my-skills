@@ -20,7 +20,7 @@ Then install any skill you want:
 
 Browse all available skills with `/plugin` after adding the marketplace, or see the full list in [`.claude-plugin/marketplace.json`](./.claude-plugin/marketplace.json).
 
-## Skills (45)
+## Skills (46)
 
 | # | Skill | Description |
 |---|-------|-------------|
@@ -69,3 +69,4 @@ Browse all available skills with `/plugin` after adding the marketplace, or see 
 | 43 | **resume-optimize** | 无 JD 一次性简历安全优化技能。基于原简历输出 evidence-safe Markdown 草稿、事实边界、改写说明、待确认项和 ATS/排版建议；支持 quick/full/file 模式，不做 JD 匹配、岗位打分、投递追踪或代码仓库提炼。 |
 | 44 | **resume-scorecard** | 简历多轴评分卡技能。把“简历已展示的履历含金量”“内容表达质量”“排版布局质量”和可选“JD 匹配度”拆成独立 100 分，其中核心竞争力只按履历含金量 70% + 内容表达 30% 派生，排版与 JD 不混入主分；支持六类岗位族、六种候选人阶段、无 JD/同岗位/跨行业对比、PDF/DOCX/纯文本证据降级、证据覆盖率、唯一 issue_id 防重复扣分、内部阶段期望锚点、ATS/面试风险、strict 语义校验、自动脱敏和中文 HTML 报告。 |
 | 45 | **create-prd** | 把产品讨论、文档、截图、代码和接口资料整理成结构化、可验收的 PRD。默认只交付 PRD；只有用户明确要求原型、交互稿、页面稿、wireframe 或可交互 HTML 时才追加原型。每份文档包含最小任务契约、状态机、异常路径及测试责任边界；默认由 Agent 测试 Agent/接口/数据层，H5 与小程序由用户人工操作，待人工验证不得标记为通过。 |
+| 46 | **c-end-miniapp-ux-review** | 面向 C 端小程序和移动端产品的开发前体验评审。审查 PRD、用户流程、线框图、原型图、截图或可操作流程，按证据等级输出任务链路、状态矩阵、P0/P1/P2 问题、优化方案、PRD 回写与验收标准；内置三轮 95+ 报告质量门禁和严格 JSON 校验器。 |

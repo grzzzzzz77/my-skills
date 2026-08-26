@@ -1,0 +1,4 @@
+interface:
+  display_name: "C 端小程序体验评审"
+  short_description: "开发前系统审查小程序 PRD、原型、UI、交互与状态体验"
+  default_prompt: "Use $c-end-miniapp-ux-review to review this consumer mini-program PRD and prototype before development."
