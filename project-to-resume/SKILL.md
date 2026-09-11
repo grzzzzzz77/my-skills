@@ -1,6 +1,6 @@
 ---
 name: project-to-resume
-description: Turn local code evidence into evidence-backed resume bullets, technical-business balanced project highlights, anchor-linked highlight logic-chain details, STAR interview stories, optional HTML reports, and downstream resume-rewrite prompt packs. Requires a local repository, project path, or explicit code files/snippets as evidence; not for resume polishing without code evidence. Use for codebase-to-resume, 代码项目转简历, 技术亮点, 业务价值, 简历项目描述, project bullets, contribution packaging, 项目链路闭环, 亮点详情跳转, project value scoring, and portfolio/interview story extraction across frontend/uni-app, Node/backend, AI/Agent, data automation, and full-stack projects.
+description: Turn local code evidence into target-role-specific, evidence-backed resume bullets, technical-business balanced project highlights, anchor-linked logic chains, STAR interview stories, multi-round scores, optional HTML reports, and downstream resume-rewrite prompt packs. Always ask or explicitly confirm the application direction before analysis; never assume AI/Agent from a previous run. Requires a local repository, project path, or explicit code files/snippets as evidence; not for resume polishing without code evidence. Use for codebase-to-resume, 代码项目转简历, 技术亮点, 业务价值, 简历项目描述, project bullets, contribution packaging, 项目链路闭环, target-role scoring, STAR 项目经历, and portfolio/interview story extraction across frontend/uni-app, Node/backend, AI/Agent, data automation, and full-stack projects.
 ---
 
 # Project To Resume
@@ -19,10 +19,16 @@ Do not use this skill for plain resume rewriting without code evidence. Use `res
 
 ## Inputs
 
-Ask only for missing truth-critical details:
+Before reading the repository or selecting highlights, always issue one role-direction question:
+
+> 这次准备投递什么岗位方向？请给出岗位名称或 3-5 个能力关键词（例如 Agent 应用开发、Java 后端、前端工程化、数据工程）。
+
+This question is mandatory on every invocation, even if the previous run used a known direction. If the current user message already names a direction, turn it into a confirmation question in the same turn (for example, “本次按 Agent 应用开发方向筛选和评分，可以吗？”), use the stated direction provisionally, and adjust if the user corrects it. Never hard-code Agent, frontend, backend, or any other role as the default.
+
+Then ask only for other missing truth-critical details:
 
 - `repo` or code evidence: local repository path, project folder, specific files, diff, or pasted source snippets.
-- `target_role`: target role, such as 前端开发、后端开发、全栈、测试、AI 工程师.
+- `target_role`: required per-run application direction, such as 前端开发、后端开发、全栈、测试、AI/Agent 应用开发. Do not inherit it from an earlier invocation.
 - `target_level`: optional target seniority or experience band. Use neutral wording when unknown.
 - `mode`: optional: `micro`, `quick`, `standard`, or `strict_report`.
 - `output_dir`: optional. Use it for generated evidence, JSON, reports, and prompt packs.
@@ -32,6 +38,18 @@ Ask only for missing truth-critical details:
 - Existing resume/JD: optional but recommended for role-specific keyword priority and bullet density; never use it to fabricate project facts.
 
 If role boundary or disclosure boundary would materially change truthfulness, ask at most 1-2 questions. If the user wants to proceed, use conservative assumptions and show them.
+
+## Target-Role-First Analysis
+
+Treat the repository as the evidence pool and the confirmed target direction as the ranking lens. The same project may produce different bullets for Agent, backend, frontend, data, test, platform, or product-engineering roles.
+
+1. Translate `target_role` into 3-6 observable competency signals. For Agent development these may include runtime/tool orchestration, context or memory, protocolized artifacts, human-in-the-loop, evaluation/guardrails, and deterministic execution. For other directions, derive a different set; do not reuse Agent weights.
+2. Score every candidate in at least three rounds: evidence safety, target-role relevance, and STAR/interview defensibility.
+3. Keep a candidate only when its final wording is supported by code evidence and its Action/Result can be defended without invented ownership or metrics.
+4. Order final bullets by target-role signal, not by file count or implementation chronology.
+5. Expose the confirmed target direction and round-by-round score rationale in standard/strict outputs.
+
+Load `references/target-role-star-scoring.md` before performing this calibration.
 
 ## Output Directory
 
@@ -87,6 +105,7 @@ Author handling:
 Load references only when needed:
 
 - Before selecting/scoring highlights: `references/highlight-rubric.md`.
+- Before role-specific ranking, STAR compression, or multi-round scoring: `references/target-role-star-scoring.md`.
 - Before writing anchor-linked highlight details or explaining a highlight's full path to a beginner: `references/highlight-logic-chain.md`.
 - Before writing bullets, metric strategy, STAR notes, ownership wording, or disclosure-sensitive content: `references/resume-bullet-rules.md`.
 - Before creating `project_resume_analysis.json`: `references/analysis-schema.md`.
@@ -109,6 +128,8 @@ Return:
 ### Standard Output
 
 Create and validate `project_resume_analysis.json` using `references/analysis-schema.md`. For every final highlight, include `technical_mechanism`, `technical_difficulty`, `business_value`, a stable `detail_anchor`, and `logic_chain` so the summary bullet can jump to a beginner-readable detail section explaining the full closed loop. The title and first sentence should expose the technical mechanism before the business scenario.
+
+Also include the confirmed `target_role`, its role-signal mapping, and at least three scoring rounds. A direct-paste bullet must be a compressed STAR statement: it should make the Situation/Task inferable, name the candidate's evidence-backed Action, and end with an evidence-safe Result. Keep the expanded Situation, Task, Action, Result, and tradeoff in `highlights[].interview`.
 
 Treat `highlights[].safe_bullet` with `risk=safe` as the single source of truth. Top-level `safe_bullets`, when present, may only select or order exact copies of those validated bullets. Never create a separate direct-paste bullet that is not linked to a safe highlight. Include at least three structured `interview_stories` for the strongest safe highlights when three are available; each story must cover the hardest question, answer outline, alternatives, failure boundary, verification method, and likely follow-ups.
 
@@ -141,6 +162,9 @@ Use `references/html-report-spec.md` for report QA. The final chat response shou
 Before final delivery:
 
 - Confirm every final bullet has evidence or a visible risk label.
+- Confirm the target application direction was asked or explicitly confirmed in this invocation; do not reuse a previous direction silently.
+- Confirm every selected highlight has passed evidence-safety, target-role relevance, and STAR/interview-defensibility scoring rounds.
+- Confirm each direct-paste bullet contains an evidence-backed Action and Result; a list of technologies or responsibilities alone is not STAR.
 - Confirm every final highlight balances technical mechanism, technical difficulty, and business value. Do not accept cards that only describe product workflow.
 - Reject semantic placeholders such as “负责模块开发”“有一定技术难度”“提升业务价值”, even when every JSON field is present.
 - Confirm `logic_chain.trigger` describes a runtime/user/system event rather than the candidate's responsibility, and ensure the beginner summary does not repeat the resume bullet verbatim.
@@ -158,6 +182,7 @@ Before final delivery:
 ## References
 
 - Highlight scoring: `references/highlight-rubric.md`
+- Target-role and STAR multi-round scoring: `references/target-role-star-scoring.md`
 - Structured analysis schema: `references/analysis-schema.md`
 - Bullet, metric, ownership, and disclosure rules: `references/resume-bullet-rules.md`
 - Highlight logic-chain detail rules: `references/highlight-logic-chain.md`

@@ -37,6 +37,14 @@ If `--analysis` is omitted, the renderer creates an evidence-only draft report. 
   "role_assumption": "用户角色边界。未知时写：未确认，默认使用保守表述。",
   "disclosure_assumption": "公开边界。未知时写：未确认，不暴露内部指标、客户名和敏感细节。",
   "keywords": ["TypeScript", "Vue", "权限体系"],
+  "role_signal_map": [
+    {"signal": "当前岗位要看的能力", "evidence": "对应代码/文档证据提示"}
+  ],
+  "scoring_rounds": [
+    {"round": "R1 证据安全性", "score": 88, "decision": "pass", "rationale": "证据与风险边界"},
+    {"round": "R2 目标岗位匹配度", "score": 90, "decision": "pass", "rationale": "岗位能力信号覆盖"},
+    {"round": "R3 STAR 与面试可答辩性", "score": 85, "decision": "pass", "rationale": "Situation/Task/Action/Result/Trade-off 完整度"}
+  ],
   "project_score": {
     "evidence_safe_score": 89,
     "potential_score": 93,
@@ -192,6 +200,8 @@ python3 <skill_dir>/scripts/check_collector_fixtures.py
 - `risk`: use `safe`, `needs_confirmation`, or `risky`.
 - `readiness`: use `direct`, `rewrite`, `confirm`, or `idea`.
 - `score`: required for serious report highlights; use the rubric score after any AI application bonus.
+- `role_signal_map`: recommended for standard/strict reports; map the confirmed current target role to observable competencies and evidence hints. It is per-invocation data, not a global default.
+- `scoring_rounds`: required when the user asks for multi-round scoring or role-specific optimization. Include at least evidence safety, target-role relevance, and STAR/interview defensibility; preserve each score and rationale in the report facts or prompt pack.
 - `score_breakdown`: optional but recommended for strict reports; include the six base dimensions and `ai_application_bonus` when relevant.
 - `score_rationale`: optional but recommended; one concise Chinese sentence explaining why this highlight ranks high or low.
 - `project_score`: optional, but required when the user asks for comparison, "含金量", "打分", or "为什么没上 90".

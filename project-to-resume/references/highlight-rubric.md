@@ -2,6 +2,8 @@
 
 Use this rubric to decide whether a codebase finding is worth turning into a resume highlight.
 
+First load `target-role-star-scoring.md` and confirm the current application direction. This rubric measures general project value; the role-specific round decides ordering and can change between invocations. The AI section below applies only when the user confirms an AI/Agent direction or the requested output explicitly evaluates AI application value.
+
 ## Score Dimensions
 
 Rate each candidate from 0-3.
@@ -94,9 +96,9 @@ Use `potential_score` to show what the project could reach after confirmation. E
 }
 ```
 
-## AI Application Weighting
+## AI Application Weighting (Conditional)
 
-When the project is an AI application, AI Agent platform, model-powered workflow, coding assistant, RAG/search assistant, local AI desktop client, or tool-calling system, adjust scoring and ordering:
+When the current target direction is AI/Agent and the project is an AI application, AI Agent platform, model-powered workflow, coding assistant, RAG/search assistant, local AI desktop client, or tool-calling system, adjust scoring and ordering:
 
 - Add `+2` to highlights that cover **Agent orchestration, memory, prompt/context injection, tool calling, MCP, RAG/retrieval, evaluation/guardrails, workflow automation, model routing, or long-session AI state**.
 - Add `+1` to highlights that support AI experience indirectly, such as streaming rendering, long conversation UI, Markdown rendering, message protocol adaptation, or AI result state management.

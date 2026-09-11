@@ -731,10 +731,35 @@ def build_prompt_pack(evidence: dict, analysis: dict, highlights: list[dict]) ->
         if isinstance(item, dict) and str(item.get("confirmation_needed", "")).strip():
             confirmation_questions.append(str(item["confirmation_needed"]))
     keywords = analysis.get("keywords") or pitch.get("tech_keywords") or []
+    role_signals = []
+    for item in as_list(analysis.get("role_signal_map")):
+        if isinstance(item, dict):
+            signal = str(item.get("signal") or "").strip()
+            evidence_hint = str(item.get("evidence") or "").strip()
+            if signal:
+                role_signals.append(f"{signal}：{evidence_hint}" if evidence_hint else signal)
+        elif str(item).strip():
+            role_signals.append(str(item).strip())
+    scoring_rounds = []
+    for item in as_list(analysis.get("scoring_rounds")):
+        if isinstance(item, dict):
+            round_name = str(item.get("round") or "").strip()
+            score = item.get("score")
+            decision = str(item.get("decision") or "").strip()
+            rationale = str(item.get("rationale") or "").strip()
+            if round_name:
+                head = f"{round_name} {score}/100" if score not in (None, "") else round_name
+                if decision:
+                    head += f" [{decision}]"
+                scoring_rounds.append(f"{head}：{rationale}" if rationale else head)
+        elif str(item).strip():
+            scoring_rounds.append(str(item).strip())
     facts = [
         f"【项目名称】{project_name}",
         f"【一句话概述】{analysis.get('summary') or first_text(pitch.get('description_candidates', []), '待补充')}",
         f"【目标岗位】{analysis.get('target_role') or '待补充'}",
+        "【岗位能力信号】" + ("；".join(role_signals) if role_signals else "按本次确认的目标岗位动态生成"),
+        "【三轮评分】" + ("；".join(scoring_rounds) if scoring_rounds else "证据安全性 → 目标岗位匹配度 → STAR/面试可答辩性"),
         f"【我的角色/边界】{analysis.get('role_assumption') or '未确认，请使用保守表述'}",
         f"【是否可公开的边界】{analysis.get('disclosure_assumption') or '未确认，不要写内部指标、客户名或敏感细节'}",
         "【技术栈与关键词】" + ("、".join(str(x) for x in keywords) if keywords else "待补充"),

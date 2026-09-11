@@ -37,8 +37,10 @@ For final delivery, render with `--strict` so invalid `project_resume_analysis.j
 
 4. Project Fact Pack
    - One-line project summary.
+   - The current target role and role-signal map for this invocation; do not imply a permanent Agent default.
    - Role/disclosure assumptions.
    - Tech stack and keywords.
+   - Three-round score summary: evidence safety, target-role relevance, and STAR/interview defensibility.
    - Verified and code-derived metrics with sources.
    - Optional 100-point project value score when `project_score` exists.
    - Optional metric strategy when `metric_strategy` exists: verified, code-derived, estimated placeholders, and metrics not to claim.
@@ -73,6 +75,7 @@ For final delivery, render with `--strict` so invalid `project_resume_analysis.j
 - Individual highlight details must have stable anchors derived from `detail_anchor`, so a summary bullet can jump directly to the full chain.
 - Keep the report scannable: show the safest resume material early, keep dense evidence and STAR notes behind expandable detail areas when practical.
 - When scoring is present, show both evidence-safe score and potential score. If the safe score is below 90, explain the score ceiling reason instead of leaving the number unexplained.
+- When role-specific optimization is requested, make the confirmed target direction and the three scoring rounds visible in the fact pack or score rationale.
 - The highlight explorer must show the total highlight count.
 - Highlight titles should expose professional technical essence first, preferably in Chinese, such as `异步请求竞态治理`, `流式 Markdown 渲染`, `请求网关`, or `前端可观测性链路`.
 - Keep English in titles only for established technical names, protocols, frameworks, abbreviations, or code identifiers such as `WebSocket`, `SSE`, `SDK`, `CLI`, `MCP`, `API`, `Markdown`, `SQLite FTS`, `Tauri`, `Rust`, `rAF`, or `stream-json`; avoid bilingual title stacking for style.
