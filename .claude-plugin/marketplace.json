@@ -394,6 +394,15 @@
       ],
       "source": "./xcode-ios-simulator-setup",
       "strict": false
+    },
+    {
+      "description": "中国个人财务管家 Skill。深度财务访谈 → 完整财务规划 → 交互式仪表盘 → 长期陪伴复盘，覆盖个税与专项附加扣除、社保养老（含渐进式延迟退休）、债务危机处理、房产、保险、投资、外汇跨境（5万美元额度/QDII/港股通/CRS）与虚拟币持仓盘点（估值/安全/反诈，不协助交易）；以人民币为本位币，兼容 USD/HKD 多币种资产，净资产含/不含虚拟币双口径。含 17 个按需加载参考文件、现行数字事实源（带官方来源）与 8 个端到端测试人设。",
+      "name": "china-finance-planner",
+      "skills": [
+        "./"
+      ],
+      "source": "./china-finance-planner",
+      "strict": false
     }
   ]
 }
