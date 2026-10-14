@@ -20,7 +20,15 @@ Then install any skill you want:
 
 Browse all available skills with `/plugin` after adding the marketplace, or see the full list in [`.claude-plugin/marketplace.json`](./.claude-plugin/marketplace.json).
 
-## Skills (47)
+## Skills (51)
+
+新增技能：[**grill-me — 方案追问入口**](./grill-me/SKILL.md)。这是 Matt Pocock 仓库中的简短入口技能，指示调用同仓库的 `grilling`；当前只安装了 `grill-me`，未安装其依赖的 `grilling`，因此独立使用会受限。
+
+新增技能：[**human-writing — 活人感中文写作**](./human-writing/SKILL.md)。面向中文长帖、文章、评论、故事等创作与改稿，强调材料与事实边界、自然中文表达，附写作参考及文稿检查脚本。
+
+新增技能：[**xhs-virtual-product — 小红书虚拟资料产品**](./xhs-virtual-product/SKILL.md)。涵盖原创合规的选品、对标拆解、产品制作、店铺运营、商品笔记及账号/笔记材料拆解，附参考资料、检查清单和采集脚本。
+
+新增技能：[**transcript-essence — 逐字稿精华**](./transcript-essence/SKILL.md)。适配分享、口播、教程、演讲、访谈、讨论、故事与混合素材，采用原文在上、精华在下的固定六节 Markdown／Obsidian 排版；短标题、正确折叠层级，默认不生成关系图或三件事清单。
 
 | # | Skill | Description |
 |---|-------|-------------|
@@ -71,3 +79,7 @@ Browse all available skills with `/plugin` after adding the marketplace, or see 
 | 45 | **create-prd** | 把产品讨论、文档、截图、代码和接口资料整理成结构化、可验收的 PRD。默认只交付 PRD；只有用户明确要求原型、交互稿、页面稿、wireframe 或可交互 HTML 时才追加原型。每份文档包含最小任务契约、状态机、异常路径及测试责任边界；默认由 Agent 测试 Agent/接口/数据层，H5 与小程序由用户人工操作，待人工验证不得标记为通过。 |
 | 46 | **c-end-miniapp-ux-review** | 面向 C 端小程序和移动端产品的开发前体验评审。审查 PRD、用户流程、线框图、原型图、截图或可操作流程，按证据等级输出任务链路、状态矩阵、P0/P1/P2 问题、优化方案、PRD 回写与验收标准；内置三轮 95+ 报告质量门禁和严格 JSON 校验器。 |
 | 47 | **china-finance-planner** | 中国个人财务管家 Skill。深度财务访谈 → 完整财务规划 → 交互式仪表盘 → 长期陪伴复盘，覆盖个税与专项附加扣除、社保养老（含渐进式延迟退休）、债务危机处理、房产、保险、投资、外汇跨境（5 万美元额度/QDII/港股通/CRS）与虚拟币持仓盘点（估值/安全/反诈；境内存量管理，境外合法法域充分支持）；以人民币为本位币，兼容 USD/HKD 多币种资产，净资产含/不含虚拟币双口径。含 17 个按需加载参考文件、现行数字事实源（带官方来源）与 8 个端到端测试人设。 |
+| 48 | **transcript-essence** | 通用逐字稿精华提炼：适配分享、口播、教程、访谈、讨论、故事与混合素材；原文在上、精华在下，统一六节布局、短标题与可折叠层级。区分原文要点、理解、应用与边界，默认无关系图和三件事任务清单；附结构校验器与多轮评审规则。 |
+| 49 | **xhs-virtual-product** | 小红书虚拟资料产品：原创合规选品、对标与账号拆解、产品制作、店铺运营、商品笔记和复盘；包含参考资料、模板、合规清单及账号/笔记采集脚本。 |
+| 50 | **human-writing** | 通用中文创作与改稿技能，适合知乎回答、论坛长帖、公众号文章、评论、故事与口播等；强调具体材料、自然中文节奏与真实内容的事实核验，附参考资料和文稿检查脚本。 |
+| 51 | **grill-me** | 对计划或设计进行追问的入口技能。上游 `SKILL.md` 只要求调用 `grilling`，且禁止模型主动触发；若要完整追问能力，需另行安装 `grilling`。 |

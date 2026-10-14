@@ -403,6 +403,33 @@
       ],
       "source": "./china-finance-planner",
       "strict": false
+    },
+    {
+      "description": "小红书原创虚拟资料产品选品、对标拆解、制作、上架、商品笔记及合规复盘技能。",
+      "name": "xhs-virtual-product",
+      "skills": [
+        "./"
+      ],
+      "source": "./xhs-virtual-product",
+      "strict": false
+    },
+    {
+      "description": "通用中文创作与改稿技能，面向长帖、文章、评论、故事与口播，强调材料支撑、事实边界与自然中文表达。",
+      "name": "human-writing",
+      "skills": [
+        "./"
+      ],
+      "source": "./human-writing",
+      "strict": false
+    },
+    {
+      "description": "对计划或设计进行追问的入口技能。上游只调用 grilling，完整使用需另行安装 grilling。",
+      "name": "grill-me",
+      "skills": [
+        "./"
+      ],
+      "source": "./grill-me",
+      "strict": false
     }
   ]
 }

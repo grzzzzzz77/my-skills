@@ -16,33 +16,33 @@
           <h1>我的技能目录</h1>
           <p class="lead">这版按 <strong>my-skills</strong> 下的一级文件夹和重要子技能聚合介绍。每张卡片说明这个技能入口能做什么；详情弹窗补充典型问题、需要输入什么、会输出什么，以及回复大概长什么样。</p>
         </div>
-        <div class="meta-row"><span class="pill">来源：/Users/edy/Desktop/grzzz/skills/my-skills</span><span class="pill">生成时间：2026/8/11</span><span class="pill">纯静态 HTML，可直接打开</span></div>
+        <div class="meta-row"><span class="pill">来源：/Users/Zhuanz/Desktop/grzzzzz/my-skills</span><span class="pill">生成时间：2026/8/11</span><span class="pill">纯静态 HTML，可直接打开</span></div>
       </section>
       <aside class="metrics" aria-label="目录统计">
-        <div class="metric"><strong>69</strong><span>技能入口</span></div>
+        <div class="metric"><strong>74</strong><span>技能入口</span></div>
         <div class="metric"><strong>16</strong><span>功能类别</span></div>
-        <div class="metric"><strong>67</strong><span>直接技能目录</span></div>
+        <div class="metric"><strong>72</strong><span>直接技能目录</span></div>
         <div class="metric"><strong>2</strong><span>聚合技能包</span></div>
       </aside>
     </header>
     <div class="layout">
-      <aside class="category-panel"><h2 class="panel-title">按类别浏览</h2><button class="category-button active" data-category="全部"><span>全部目录</span><strong>69</strong></button>
+      <aside class="category-panel"><h2 class="panel-title">按类别浏览</h2><button class="category-button active" data-category="全部"><span>全部目录</span><strong>74</strong></button>
 <button class="category-button" data-category="自动化与浏览器"><span>自动化与浏览器</span><strong>1</strong></button>
 <button class="category-button" data-category="资讯与研究"><span>资讯与研究</span><strong>1</strong></button>
 <button class="category-button" data-category="前端工程"><span>前端工程</span><strong>13</strong></button>
 <button class="category-button" data-category="求职与职业"><span>求职与职业</span><strong>7</strong></button>
 <button class="category-button" data-category="代码质量与联调"><span>代码质量与联调</span><strong>2</strong></button>
-<button class="category-button" data-category="技能与规则管理"><span>技能与规则管理</span><strong>6</strong></button>
+<button class="category-button" data-category="技能与规则管理"><span>技能与规则管理</span><strong>7</strong></button>
 <button class="category-button" data-category="研究与论文"><span>研究与论文</span><strong>21</strong></button>
 <button class="category-button" data-category="Figma 与设计协作"><span>Figma 与设计协作</span><strong>3</strong></button>
 <button class="category-button" data-category="设计与体验"><span>设计与体验</span><strong>5</strong></button>
-<button class="category-button" data-category="设计与内容创作"><span>设计与内容创作</span><strong>2</strong></button>
+<button class="category-button" data-category="设计与内容创作"><span>设计与内容创作</span><strong>3</strong></button>
 <button class="category-button" data-category="办公自动化"><span>办公自动化</span><strong>1</strong></button>
 <button class="category-button" data-category="数据库与后端"><span>数据库与后端</span><strong>1</strong></button>
 <button class="category-button" data-category="项目规划"><span>项目规划</span><strong>1</strong></button>
 <button class="category-button" data-category="本地系统与计算"><span>本地系统与计算</span><strong>3</strong></button>
-<button class="category-button" data-category="内容与演示"><span>内容与演示</span><strong>1</strong></button>
-<button class="category-button" data-category="写作与内容创作"><span>写作与内容创作</span><strong>1</strong></button><button class="reset" id="resetBtn" type="button">重置筛选</button></aside>
+<button class="category-button" data-category="内容与演示"><span>内容与演示</span><strong>2</strong></button>
+<button class="category-button" data-category="写作与内容创作"><span>写作与内容创作</span><strong>2</strong></button><button class="reset" id="resetBtn" type="button">重置筛选</button></aside>
       <main>
         <section class="toolbar" aria-label="检索工具">
           <input id="searchInput" class="input" type="search" placeholder="搜索技能、文件夹、类别、标签、说明或场景" aria-label="搜索目录" />
@@ -109,7 +109,15 @@
     const createPrdEntry = folders.find(item => item.name === 'create-prd');
     if (createPrdEntry) createPrdEntry.abilities.push('明确测试责任边界：Agent 默认测试 Agent、接口与数据层，不操控浏览器或小程序；H5/小程序由用户人工验证。');
     folders.unshift({"name":"c-end-miniapp-ux-review","category":"设计与体验","type":"直接技能目录","path":"c-end-miniapp-ux-review/","accent":"cyan","summary":"面向 C 端小程序和移动产品的开发前体验评审，把 PRD、原型和页面交互风险转成可落地、可验收的优化方案。","detail":"这个目录用于在研发投入前系统检查用户目标、任务入口、操作路径、信息层级、登录授权、反馈、异常恢复、小程序容器习惯、触控与可访问性风险。它严格区分 PRD 说明、静态图观察、实际操作和推断，不会把截图审查冒充真实可用性测试；完整报告通过最多三轮 95+ 质量门禁后才交付。","abilities":["支持 spec_only、static_artifact、interactive_flow 三种证据模式，并为每条结论标记 observed、specified、inferred 或 unknown。","从真实入口到成功结果逐步审查首次使用、重复使用、中断返回、登录失效和关键分支。","输出 P0/P1/P2/Opportunity 唯一问题台账，避免同一根因跨维度重复扣分。","覆盖加载、空、部分成功、失败、无权限、离线、超时、重复提交和版本不兼容等状态。","检查小程序胶囊区、安全区、返回、键盘、滚动、授权、隐私、支付、触控和无障碍风险。","把优化结论回写为业务规则、状态机、异常路径、文案规则和 Given/When/Then 验收标准。","提供严格 JSON 契约与 validate_review.py 校验器；95 分代表报告质量，不冒充产品体验分。"],"scenarios":["C 端小程序需求进入开发前，需要评审 PRD 和页面流程是否完整。","已有 Axure、Figma、线框图或截图，需要找出功能、UI 和交互问题。","登录授权、预约、下单、支付、表单或发布流程需要检查失败恢复和信任风险。","同一个功能改版前后需要按统一证据和评分维度比较。","希望把体验问题直接沉淀为 PRD 修改项和研发测试可执行的验收标准。"],"examples":["用 c-end-miniapp-ux-review 审查这个预约小程序 PRD，先评审不要改代码。","根据这些原型图检查用户路径、页面层级、授权时机和异常状态。","严格模式输出 review.json，并通过 95+ 质量门禁后再交付。","比较新旧两个下单流程，列出 P0/P1/P2 问题和 PRD 回写项。"],"tags":["C端产品","小程序","UX评审","PRD评审","原型评审","交互校验","状态矩阵","异常恢复","UI优化","可访问性","证据分级","95+质量门禁"]});
+    folders.unshift({"name":"transcript-essence","category":"内容与演示","type":"直接技能目录","path":"transcript-essence/","accent":"teal","summary":"将各种逐字稿提炼为固定风格的个人笔记：原文在上、精华在下，短标题、正确折叠，不默认生成关系图或任务清单。","detail":"适用于单人分享、口播、教程、访谈、演讲、故事、多人讨论及混合转写。保全原文正文，统一六节布局，分开原文观点、理解、应用与边界；不虚构角色、引文或已核实事实。结构校验不冒充实际 Obsidian 客户端验证。","abilities":["完整读取素材，筛选机制、原则、步骤、区分与适用条件。","原文先于精华，唯一 H1、两个 H2、六节 H3，确保标题包含关系。","默认无关系图、Mermaid 或三件事任务清单。","区分作者观点和整理者延伸，保留多人分歧与未核实信息。","提供标准库结构校验器与多轮评分量表。"],"scenarios":["看完分享视频后，将转写沉淀为 Obsidian 个人笔记。","整理教程、讨论或混合素材，同时保留原文和步骤。","修正笔记长标题、折叠层级或不一致的排版。"],"examples":["提炼这份逐字稿，保留原文，按固定风格整理到我的笔记。","这是一个分享视频，不是访谈；不要关系图或三件事清单。"],"tags":["逐字稿","精华提炼","视频笔记","Obsidian","固定排版","标题折叠"]});
+    folders.unshift({"name":"xhs-virtual-product","category":"设计与内容创作","type":"直接技能目录","path":"xhs-virtual-product/","accent":"pink","summary":"小红书虚拟资料产品工作流：选品、对标、制作、上架、商品笔记与复盘，强调原创合规。","detail":"覆盖虚拟产品从想法到交付的七步路径，并提供账号/笔记材料拆解、证据记录及行动方案。采集脚本只处理用户提供的链接和有限的公开页面；搜索、翻页、评论、销量、订单和利润不在采集范围。上架或发文前应检查合规清单，平台实时规则以官方后台为准。","abilities":["用选品清单和七天计划筛选原创虚拟资料方向。","拆解对标产品与账号，记录来源、数据缺口和可借鉴的方法。","生成产品 MVP 思路、商品笔记标题与正文、评论区话术。","梳理店铺上架、交付和三日复盘流程，并逐项检查版权、宣传与导流风险。","在有 Python 3.9+ 和 curl 时按需运行账号/笔记采集脚本；不捏造无法获取的数据。"],"scenarios":["想从零规划小红书虚拟资料或模板产品。","给出账号或笔记链接，需要有限证据的对标拆解。","准备写商品笔记、配置店铺交付或检查合规风险。"],"examples":["帮我选三个原创小红书虚拟资料产品方向并制定七天计划。","根据这条小红书笔记做对标拆解，说明哪些数据没有获取。"],"tags":["小红书","虚拟产品","选品","对标拆解","商品笔记","合规"]});
+    folders.unshift({"name":"human-writing","category":"写作与内容创作","type":"直接技能目录","path":"human-writing/","accent":"orange","summary":"通用中文创作和改稿技能，面向长帖、文章、评论、故事与口播，追求有材料、有边界的自然表达。","detail":"先区分现实、虚构与混合写作。非虚构长文须用可核验材料支撑篇幅，缺材料时先检索、追问或缩短；虚构内容注重人物行动和因果。提供按题材分开的写作参考与文稿检查脚本，不负责自动核验未提供的事实，也不创建个人作者画像。","abilities":["按知乎回答、论坛长帖、公众号文章、评论、故事、演讲等形式写作或改稿。","区分用户材料、已核验事实和获准虚构的情节，避免编造现实经历。","调整段落推进、细节密度和中文节奏，减少空泛口号与模板腔。","对成稿执行修订规则，必要时运行文稿检查脚本。"],"scenarios":["把一份材料写成自然、可信的中文长帖或文章。","修改一篇有模型腔或重复解释的初稿。","写小说对白、个人叙事或口播稿，并保留指定文体。"],"examples":["根据这些事实材料帮我写一篇自然的知乎回答，缺材料先告诉我。","把这篇文章改得更像人在说话，但别编造我的经历。"],"tags":["中文写作","改稿","长帖","事实核验","小说","活人感"]});
+    folders.unshift({"name":"grill-me","category":"技能与规则管理","type":"直接技能目录","path":"grill-me/","accent":"violet","summary":"对方案或设计进行连续追问的入口技能；上游实际指向同仓库的 grilling 技能。","detail":"grill-me 的上游 SKILL.md 仅包含调用 grilling 的指令，并设有 disable-model-invocation。当前只安装 grill-me，没有安装 grilling，所以独立使用无法完成完整访谈；需要另行安装 grilling 才能按上游流程工作。","abilities":["为用户明确指定的方案追问任务提供入口。","将具体访谈流程转交给 grilling 技能；不会自行实现完整追问。"],"scenarios":["希望通过连续问题检查计划的假设与边界（需同时具备 grilling）。","设计方案落地前想暴露尚未确定的选择（需同时具备 grilling）。"],"examples":["使用 grill-me 追问我的方案；如果缺少 grilling，请先告诉我。"],"tags":["方案追问","设计评审","入口技能","依赖grilling"]});
     const usageOverrides = {
+      "grill-me": {"questions":["请用 grill-me 帮我追问这个产品方案。"],"inputs":["待检查的计划、设计草案或关键决策。","完整使用需要另行安装 grilling 技能。"],"outputs":["安装 grilling 后进入连续追问流程；若未安装，提示缺少依赖。"],"responses":["用户：用 grill-me 追问这个方案。\n回复：这个入口只会调用 grilling；当前未安装 grilling，无法执行完整追问。"]},
+      "human-writing": {"questions":["基于这些材料写一篇有真实细节的中文长帖。","帮我修改这篇文章的模板腔，不要添加未经证实的事实。"],"inputs":["主题、目标读者、平台、文体和期望长度。","现有草稿或可核验的事实材料；若是虚构作品，说明允许创造的范围。"],"outputs":["符合指定文体、材料和事实边界的成稿或修改稿。","材料不足时先指出缺口、研究可公开核验的信息或交付更短的文字。"],"responses":["用户：把这段材料改成自然的中文长帖。\n回复：我会以实际材料推进段落，不补造亲历或无来源的数字；如果材料撑不起长文，先补证据或缩短篇幅。"]},
+      "xhs-virtual-product": {"questions":["我想做小红书原创虚拟资料，如何选品并做第一版？","根据这个账号/笔记链接做对标拆解，帮我写商品笔记。"],"inputs":["目标用户、擅长领域、可交付资料、预算与时间约束；可选账号/笔记链接或截图。","若需采集笔记数据，提供同篇带 token 的链接；上架前提供商品内容与当前平台规则。"],"outputs":["选品判断清单、三个候选方向与七天行动计划。","对标拆解、证据台账、原创产品思路、笔记文案及合规核查结果。"],"responses":["用户：我想做小红书虚拟资料，先帮我选品。\n回复：我会先确认用户与可原创交付的内容，提供三个候选方向、选品判断和七天计划；不会承诺销量或使用侵权资料。"]},
+      "transcript-essence": {"questions": ["提炼这份逐字稿，保留原文，按固定风格整理到我的笔记。", "这是一个分享视频，不是访谈；不要关系图或三件事清单。"], "inputs": ["逐字稿全文或可读转写文件；可选来源链接与已知作者信息。", "目标笔记路径与已有内容；明确是否授权重命名。"], "outputs": ["完整原文与固定六节精华：内容主线、核心认知、关键区分、自查问题、原文摘录、一句提醒。", "短标题与正确嵌套层级；明确原文、整理者延伸和未核实边界。"], "responses": ["用户：提炼这个分享视频的逐字稿，保留原文。\n回复：我会完整阅读素材，不强套访谈角色；上方保留原文，下方按固定六节整理精华，检查标题层级与引文，默认不添加关系图或任务清单。"]},
       'c-end-miniapp-ux-review': {
         questions: [
           '这个 C 端小程序需求开发前，帮我评审 PRD、原型和完整用户链路。',
