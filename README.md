@@ -20,7 +20,11 @@ Then install any skill you want:
 
 Browse all available skills with `/plugin` after adding the marketplace, or see the full list in [`.claude-plugin/marketplace.json`](./.claude-plugin/marketplace.json).
 
-## Skills (51)
+## Skills (53)
+
+新增技能：[**novel-writer — 小说创作工坊**](./novel-writer/SKILL.md)。将小说创作拆分为需求采集、角色 DNA、情绪节拍、正文分章、体检脚本与长篇连贯性维护的六阶段工作流；支持商业网文（番茄/七猫/起点）与文学双模式，注重代入感与爽感引擎。
+
+新增技能：[**qimao-novel-scraper — 七猫扫榜与新书设定**](./qimao-novel-scraper/SKILL.md)。依赖 Playwright 浏览器工具进行七猫小说扫榜、挑选热门标杆、抓取并拆解前 3 章爽感骨架，产出多套原创的新书设定候选方案。
 
 新增技能：[**grill-me — 方案追问入口**](./grill-me/SKILL.md)。这是 Matt Pocock 仓库中的简短入口技能，指示调用同仓库的 `grilling`；当前只安装了 `grill-me`，未安装其依赖的 `grilling`，因此独立使用会受限。
 
@@ -83,3 +87,5 @@ Browse all available skills with `/plugin` after adding the marketplace, or see 
 | 49 | **xhs-virtual-product** | 小红书虚拟资料产品：原创合规选品、对标与账号拆解、产品制作、店铺运营、商品笔记和复盘；包含参考资料、模板、合规清单及账号/笔记采集脚本。 |
 | 50 | **human-writing** | 通用中文创作与改稿技能，适合知乎回答、论坛长帖、公众号文章、评论、故事与口播等；强调具体材料、自然中文节奏与真实内容的事实核验，附参考资料和文稿检查脚本。 |
 | 51 | **grill-me** | 对计划或设计进行追问的入口技能。上游 `SKILL.md` 只要求调用 `grilling`，且禁止模型主动触发；若要完整追问能力，需另行安装 `grilling`。 |
+| 52 | **novel-writer** | 将小说创作拆解为需求采集、角色 DNA、大纲情绪节拍、分章起草、体检去 AI 味与长篇连贯性维护的六阶段工作流；支持番茄/七猫/起点商业网文与纯文学双模式。 |
+| 53 | **qimao-novel-scraper** | 七猫小说扫榜、挑标杆、拆解前 3 章爽感骨架并产出 2~3 套原创设定候选的一站式选题与拆书技能；依赖 Playwright 浏览器工具。 |

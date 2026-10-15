@@ -430,6 +430,24 @@
       ],
       "source": "./grill-me",
       "strict": false
+    },
+    {
+      "description": "Create, continue, revise, or audit Chinese fiction through a staged workflow covering requirements, character DNA, outlining, emotional beats, chapter drafting, deterministic manuscript checks, layered revision, and long-form continuity.",
+      "name": "novel-writer",
+      "skills": [
+        "./"
+      ],
+      "source": "./novel-writer",
+      "strict": false
+    },
+    {
+      "description": "七猫小说扫榜 → 挑标杆 → 拆解前3章 → 生成新书设定（多候选供用户选择）的一站式技能。依赖 playwright MCP 浏览器工具。",
+      "name": "qimao-novel-scraper",
+      "skills": [
+        "./"
+      ],
+      "source": "./qimao-novel-scraper",
+      "strict": false
     }
   ]
 }
